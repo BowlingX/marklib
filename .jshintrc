@@ -1,0 +1,24 @@
+{
+  "undef": true,
+  "unused": true,
+  "strict": true,
+  "esnext":true,
+  "predef": [
+    "window",
+    "jQuery",
+    "document",
+    "setTimeout",
+    "requestAnimationFrame",
+    "HTMLElement",
+    "HTMLSelectElement",
+    "HTMLFieldSetElement",
+    "HTMLTextAreaElement",
+    "HTMLInputElement",
+    "DocumentFragment",
+    "KeyboardEvent",
+    "MouseEvent",
+    "MutationObserver",
+    "TouchEvent",
+    "console"
+  ]
+}
