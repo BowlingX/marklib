@@ -1,10 +1,22 @@
 /* global Node */
 
+/**
+ * @type {string}
+ */
 export const ATTR_DATA_ORIGINAL_INDEX = 'data-original-index';
+/**
+ * @type {string}
+ */
 export const DATA_PSEUDO = 'data-is-pseudo';
+/**
+ * @type {string}
+ */
 export const DATA_IS_SELECTION = 'data-is-selection';
-
+/**
+ * @type {string}
+ */
 const SERIALIZE_SEPARATOR = ";";
+
 /**
  * Utility class
  * Contains DOM/Node manipulation helpers
@@ -22,12 +34,47 @@ class Util {
     }
 
     /**
+     * Checks if a given node is empty
+     * @param {HTMLElement} node
+     * @returns {*}
+     */
+    static nodeIsEmpty(node) {
+        return node.nodeValue.match(/^[\s]*$/g)
+    }
+
+
+    /**
      * @param {HTMLElement} node
      * @return {int} the index of this node in context to it's siblings
      */
     static index(node) {
         var children = node.nodeType === Node.TEXT_NODE ? node.parentNode.childNodes : node.parentNode.children;
         return Array.prototype.indexOf.call(children, node);
+    }
+
+    /**
+     * Wraps given `elms` in given `wrapper`
+     *
+     * @param {HTMLElement} wrapper
+     * @param {HTMLElement|Array.<HTMLElement>} elms
+     * @return {HTMLElement}
+     */
+    static wrap(elms, wrapper) {
+        // Convert `elms` to an array, if necessary.
+        if (! (elms instanceof NodeList || elms instanceof Array)) elms = [elms];
+        for (var i = elms.length - 1; i >= 0; i--) {
+            var child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
+            var el = elms[i];
+            // Cache the current parent and sibling.
+            var parent = el.parentNode, sibling = el.nextSibling;
+            child.appendChild(el);
+            if (sibling) {
+                parent.insertBefore(child, sibling);
+            } else {
+                parent.appendChild(child);
+            }
+        }
+        return wrapper;
     }
 
     /**
@@ -80,6 +127,12 @@ class Util {
         return foundElements;
     }
 
+    /**
+     * Determines the correct paths and excludes all `marklib` generated content
+     * @param {HTMLElement} el
+     * @param {HTMLElement} [context] if given extraction path is relative to this element
+     * @returns {*}
+     */
     static getPath(el, context) {
         var path = null, node = el;
 
@@ -120,7 +173,6 @@ class Util {
             }
             // Select only siblings that are not part of selection and are of the same type
             // (because we use nth-of-type selector later)
-
             var siblings = Util.nodeListFilter(parent.children, (el) => {
                 return !el.hasAttribute(DATA_IS_SELECTION) && el.nodeName === node.nodeName;
             }), nodeIndex = Util.index(node);
