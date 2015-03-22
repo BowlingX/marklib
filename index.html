@@ -63,7 +63,7 @@ layout: default
         document.addEventListener("click", function(e){
             if(e.target.id === 'action-mark') {
                 return actionMark();
-            } else {
+            } else if(e.target.id === 'action-clear') {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
             }
         });
