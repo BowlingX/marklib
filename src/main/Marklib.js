@@ -1,4 +1,4 @@
-/* global Node, Text */
+/* global Node, Text, Marklib */
 import Util from 'util/Util';
 
 import {ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION} from 'util/Util';
