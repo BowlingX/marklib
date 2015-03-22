@@ -25,10 +25,10 @@ module.exports = {
             path.join(__dirname, 'src/main')]
     },
     output: {
-        filename: 'flexcss.js',
+        filename: 'marklib.js',
         libraryTarget: 'umd',
-        library: 'FlexCss',
-        sourceMapFilename: 'flexcss.map'
+        library: 'Marklib',
+        sourceMapFilename: 'marklib.map'
     },
     plugins: [
         new webpack.ResolverPlugin(

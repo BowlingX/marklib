@@ -1,4 +1,4 @@
-/* global Node, Text, Marklib */
+/* global Node, Text, Marklib, Document */
 import Util from 'util/Util';
 
 import {ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION} from 'util/Util';
@@ -33,6 +33,9 @@ class Marklib {
 
     constructor(document, cssClass, context) {
 
+        if(!(document instanceof Document)) {
+            throw 'Marklib {0} is required to be a document instance';
+        }
         /**
          * @type {Document}
          */
@@ -48,7 +51,7 @@ class Marklib {
          * Class that is set on all highlight nodes
          * @type {String}
          */
-        this.cssClass = cssClass;
+        this.cssClass = cssClass || 'marking';
 
         /**
          * StartContainer
@@ -527,7 +530,7 @@ class Marklib {
             startContainerPath: Util.getPath(startContainer, this.context),
             endContainerPath: Util.getPath(endContainer, this.context)
         };
-        
+
         this._renderSelection(startContainer, endContainer, startOffset, endOffset, contextContainer, outer);
 
         return result;

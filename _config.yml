@@ -1,0 +1,4 @@
+# Permalinks
+permalink:        pretty
+
+exclude: ['src', 'scripts', 'assets', 'node_modules', 'bower_components', 'coverage','examples']

@@ -45,10 +45,11 @@ class Util {
 
     /**
      * @param {HTMLElement} node
+     * @param [optionalList]
      * @return {int} the index of this node in context to it's siblings
      */
-    static index(node) {
-        var children = node.nodeType === Node.TEXT_NODE ? node.parentNode.childNodes : node.parentNode.children;
+    static index(node, optionalList) {
+        var children = optionalList || (node.nodeType === Node.TEXT_NODE ? node.parentNode.childNodes : node.parentNode.children);
         return Array.prototype.indexOf.call(children, node);
     }
 
@@ -118,8 +119,8 @@ class Util {
         var foundElements = [];
         while (element.parentNode !== null) {
             element = element.parentNode;
-            if (optionalSelector && ((optionalSelector instanceof String && element.matches && element.matches(optionalSelector)) ||
-                element === optionalSelector)) {
+            if (optionalSelector && ((element === optionalSelector) ||
+                ( (typeof optionalSelector === 'string') && element.matches && element.matches(optionalSelector)))) {
                 foundElements.push(element);
             } else if (!optionalSelector) {
                 foundElements.push(element);
@@ -177,7 +178,7 @@ class Util {
 
                 // Extract original index of this node:
                 // Outer most data-original-index is original index
-                var outerMostElement = Util.parents(node, ('[' + ATTR_DATA_ORIGINAL_INDEX + ']')).reverse()[0];
+                var outerMostElement = Util.parents(node, '[' + ATTR_DATA_ORIGINAL_INDEX + ']').reverse()[0];
                 // if element is not yet wrapped in span, recalculate index based on parent container:
                 // We have to do this because text node indexes != element indexes...
                 var calculatedIndex = 0;
@@ -204,10 +205,10 @@ class Util {
             // (because we use nth-of-type selector later)
             var siblings = Util.nodeListFilter(parent.children, (el) => {
                 return !el.hasAttribute(DATA_IS_SELECTION) && el.nodeName === node.nodeName;
-            }), nodeIndex = Util.index(node);
+            }), nodeIndex = Util.index(node, siblings);
 
             if (siblings.length > 1 && nodeIndex >= 0) {
-                name += ':nth-of-type(' + (nodeIndex) + ')';
+                name += ':nth-of-type(' + (nodeIndex + 1) + ')';
             }
 
             path = name + (path ? '>' + path : '');

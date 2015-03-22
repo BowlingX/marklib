@@ -1,0 +1,68 @@
+---
+layout: default
+---
+<h1>Testpage</h1>
+
+<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore
+    magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea rebum.
+    Stet clita kasd
+    gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur sadipscing
+    elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam voluptua. At
+    vero
+    eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
+    sanctus est Lorem ipsum
+    dolor sit amet.
+</p>
+
+<h2>A second paragraph</h2>
+<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore
+    magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea rebum.
+    Stet clita kasd
+    gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur sadipscing
+    elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam voluptua. At
+    vero
+    eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
+    sanctus est Lorem ipsum
+    dolor sit amet.
+</p>
+
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function (event) {
+        var STORAGE_KEY = 'savedRanges';
+        var savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+        savedRanges.forEach(function (range) {
+            var marker = new Marklib(document);
+            try {
+                marker.renderWithPath(range.startContainerPath + ";" + range.startOffset,
+                        range.endContainerPath + ";" + range.endOffset)
+            } catch (e) {
+                console.warn("Could not render:", range);
+            }
+
+        });
+        document.addEventListener("keydown", function (e) {
+            if (13 === e.keyCode) {
+                var selection = document.getSelection();
+                var renderer = new Marklib(document);
+                var result = renderer.renderWithRange(selection.getRangeAt(0));
+                selection.removeAllRanges();
+
+                savedRanges.push(result);
+
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
+            }
+        });
+    });
+</script>
+
+<style type="text/css">
+    .marking {
+        background: yellow;
+    }
+
+    .marking .marking {
+        background: orange;
+    }
+</style>
