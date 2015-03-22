@@ -1,4 +1,4 @@
-/* global Node */
+/* global Node, NodeList */
 
 /**
  * @type {string}
@@ -39,7 +39,7 @@ class Util {
      * @returns {*}
      */
     static nodeIsEmpty(node) {
-        return node.nodeValue.match(/^[\s]*$/g)
+        return node.nodeValue.match(/^[\s]*$/g);
     }
 
 
@@ -61,12 +61,13 @@ class Util {
      */
     static wrap(elms, wrapper) {
         // Convert `elms` to an array, if necessary.
-        if (! (elms instanceof NodeList || elms instanceof Array)) elms = [elms];
+        if (!(elms instanceof NodeList || elms instanceof Array)) elms = [elms];
         for (var i = elms.length - 1; i >= 0; i--) {
             var child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
             var el = elms[i];
             // Cache the current parent and sibling.
             var parent = el.parentNode, sibling = el.nextSibling;
+
             child.appendChild(el);
             if (sibling) {
                 parent.insertBefore(child, sibling);
@@ -92,10 +93,9 @@ class Util {
                 return false;
             }
             var maybeIndexOfOriginal = el.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
-            var isOriginal = maybeIndexOfOriginal != undefined;
+            var isOriginal = maybeIndexOfOriginal !== undefined;
             // Important: do not include pseudo elements
-            if (el !== node && (el.nodeType !== Node.TEXT_NODE || isOriginal)
-                && !el.hasAttribute(DATA_PSEUDO)) {
+            if (el !== node && (el.nodeType !== Node.TEXT_NODE || isOriginal) && !el.hasAttribute(DATA_PSEUDO)) {
                 if (isOriginal) {
                     calculatedIndex = parseInt(maybeIndexOfOriginal);
                     foundWrapper = true;
@@ -104,7 +104,7 @@ class Util {
                 }
             }
         }
-        return foundWrapper ? calculatedIndex : Util.index(node)
+        return foundWrapper ? calculatedIndex : Util.index(node);
     }
 
     /**
@@ -118,13 +118,42 @@ class Util {
         var foundElements = [];
         while (element.parentNode !== null) {
             element = element.parentNode;
-            if (optionalSelector && element instanceof HTMLElement && element.matches(optionalSelector)) {
+            if (optionalSelector && ((optionalSelector instanceof String && element.matches && element.matches(optionalSelector)) ||
+                element === optionalSelector)) {
                 foundElements.push(element);
             } else if (!optionalSelector) {
                 foundElements.push(element);
             }
         }
         return foundElements;
+    }
+
+    /**
+     * Finds a parent node (the closest) with a given selector
+     * @param {Node} el
+     * @param {String} selector
+     * @returns {*}
+     */
+    static parent(el, selector) {
+        var element = el;
+        while (element.parentNode !== null) {
+            element = element.parentNode;
+            if (element.matches && element.matches(selector)) {
+                return element;
+            }
+        }
+        return false;
+    }
+
+    static closest(el, selector) {
+        var element = el;
+        while (element !== null) {
+            if (element.matches && element.matches(selector)) {
+                return element;
+            }
+            element = element.parentNode;
+        }
+        return false;
     }
 
     /**

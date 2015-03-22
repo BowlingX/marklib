@@ -10,11 +10,19 @@ module.exports = {
                 loader: 'babel-loader?experimental&optional=runtime&sourceMap=inline'
             }
         ],
+
         postLoaders: [{ //
             test: /\.js$/,
             exclude: /(test|node_modules|bower_components|test_helpers)\//,
             loader: 'istanbul-instrumenter'
-        }]
+        }],
+        preLoaders: [
+            {
+                test: /\.js$/,
+                include:/src\/main/,
+                loader: "jshint-loader"
+            }
+        ]
     },
     resolve: {
         // add bower components and main source to resolved

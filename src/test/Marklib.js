@@ -19,5 +19,15 @@ describe("Test some wrappings", () => {
     it("Should wrapSiblings", () => {
         var marklib = new Marklib(document, 'wow');
         marklib.wrapSiblings(document.getElementById('startContainer'), document.getElementById('endContainer'));
+    });
+
+    it("Should render a range", () => {
+        var marklib = new Marklib(document, 'wow');
+        var range = document.createRange();
+        range.setStart(document.getElementById("firstP").childNodes[0], 1);
+        range.setEnd(document.getElementById("lastP").childNodes[0], 2);
+        marklib.renderWithRange(range);
+
+        console.log(document.getElementById('startContainer'))
     })
 });
