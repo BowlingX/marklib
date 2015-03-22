@@ -206,11 +206,15 @@ class Marklib {
      * @returns {Array.<Text>}
      */
     _getTextNodesIn(el) {
-        return Util.nodeListFilter(el.childNodes, (node) => {
-            return Node.TEXT_NODE === node.nodeType && !Util.nodeIsEmpty(node);
+        var foundNodes = [];
+        this.walkDom(el, function(node){
+            if(Node.TEXT_NODE === node.nodeType && !Util.nodeIsEmpty(node)) {
+                foundNodes.push(node);
+            }
+            return true;
         });
+        return foundNodes;
     }
-
 
     /**
      * Walks the tree
