@@ -89,7 +89,7 @@ class Marklib {
     getId() {
         return this.id;
     }
-
+    
     /**
      * @param {Node} container
      * @param {Number} thisIndex
@@ -117,7 +117,7 @@ class Marklib {
      * @returns {Node}
      * @private
      */
-    _createSpanTemplate() {
+    _createWrapTemplate() {
         var el = this.document.createElement(TAG_NAME), vTrue = "true";
         el.className = this.cssClass;
         el.setAttribute(DATA_IS_SELECTION, vTrue);
@@ -134,8 +134,8 @@ class Marklib {
      * @returns {Node}
      * @private
      */
-    _createSpanStartEndTemplate(id, text) {
-        var el = this._createSpanTemplate(), vTrue = "true";
+    _createStartEndWrapTemplate(id, text) {
+        var el = this._createWrapTemplate(), vTrue = "true";
         el.setAttribute(ATTR_DATA_START_END, vTrue);
         el.id = id;
         el.textContent = text;
@@ -150,10 +150,10 @@ class Marklib {
      * @param text
      * @param offset
      * @param index
-     * @returns {*|jQuery|Node}
+     * @returns {Node}
      */
     _createStartOrEndContainer(initialNode, prefix, text, offset, index) {
-        var wrapper = this._createSpanStartEndTemplate(prefix + this.getId(), text);
+        var wrapper = this._createStartEndWrapTemplate(prefix + this.getId(), text);
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Marklib._getIndexParentIfHas(initialNode, index));
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
         wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
@@ -172,7 +172,7 @@ class Marklib {
      */
     _createWrap(el, optionalLength, optionalIndex, optionalIsSameNode) {
         var originalIndex = optionalIndex >= 0 ? optionalIndex : Util.calcIndex(el);
-        var wrapper = this._createSpanTemplate();
+        var wrapper = this._createWrapTemplate();
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Marklib._getIndexParentIfHas(el, originalIndex));
         var offsetLength = optionalLength >= 0 ? optionalLength : Marklib._getOffsetParentIfHas(el);
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offsetLength);
