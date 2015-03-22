@@ -26,19 +26,12 @@ describe("Test some wrappings", () => {
         var range = document.createRange();
         range.setStart(document.getElementById("firstP").childNodes[0], 1);
         range.setEnd(document.getElementById("lastP").childNodes[0], 2);
-        marklib.renderWithRange(range);
-
-        //console.log(document.getElementById('startContainer'))
     });
 
     it("should render a range in the same node", () => {
         var marklib = new Marklib(document, 'highlight');
-
         var range = document.createRange();
         range.setStart(document.getElementById("firstP").childNodes[0], 0);
         range.setEnd(document.getElementById("firstP").childNodes[0], 5);
-        marklib.renderWithRange(range);
-
-        console.log(document.getElementById('startContainer'));
     });
 });

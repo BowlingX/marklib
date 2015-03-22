@@ -74,6 +74,9 @@ class Marklib {
          */
         this.markerSuffix = 'marker-end-';
 
+        /**
+         * @type {Node}
+         */
         this.context = context || this.document;
     }
 
@@ -517,11 +520,14 @@ class Marklib {
         }
 
         var result = {
+            // Real offset is calculated by relative length and absolute length
             startOffset: originalStartOffset + startOffset,
-            endOffset: originalEndOffset + endOffset
+            endOffset: originalEndOffset + endOffset,
+            // get the path for this selection
+            startContainerPath: Util.getPath(startContainer, this.context),
+            endContainerPath: Util.getPath(endContainer, this.context)
         };
-
-
+        
         this._renderSelection(startContainer, endContainer, startOffset, endOffset, contextContainer, outer);
 
         return result;
