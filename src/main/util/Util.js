@@ -30,7 +30,7 @@ class Util {
      * @returns {Array.<HTMLElement>}
      */
     static nodeListFilter(nodes, func) {
-        return Array.prototype.filter.call(nodes, func);
+        return Array.prototype.filter.call(nodes || [], func);
     }
 
     /**
@@ -50,7 +50,7 @@ class Util {
      */
     static index(node, optionalList) {
         var children = optionalList || (node.nodeType === Node.TEXT_NODE ? node.parentNode.childNodes : node.parentNode.children);
-        return Array.prototype.indexOf.call(children, node);
+        return Array.prototype.indexOf.call(children || [], node);
     }
 
     /**
