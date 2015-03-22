@@ -205,15 +205,13 @@ class Marklib {
      * @param {Node} el
      * @returns {Array.<Text>}
      */
-    _getTextNodesIn(el) {
-        var foundNodes = [];
-        this.walkDom(el, function(node){
-            if(Node.TEXT_NODE === node.nodeType && !Util.nodeIsEmpty(node)) {
-                foundNodes.push(node);
+    _walkTextNodes(el, func) {
+        this.walkDom(el, function (node) {
+            if (Node.TEXT_NODE === node.nodeType && !Util.nodeIsEmpty(node)) {
+                func(node);
             }
             return true;
         });
-        return foundNodes;
     }
 
     /**
@@ -285,8 +283,7 @@ class Marklib {
                     });
                     found = true;
                 } else {
-                    var nodes = this._getTextNodesIn(currentNext);
-                    nodes.forEach((el) => {
+                    this._walkTextNodes(currentNext, (el) => {
                         wrapIf(el);
                     });
                 }
@@ -398,7 +395,7 @@ class Marklib {
             startContainer.parentNode.insertBefore(startT, startContainer.nextSibling);
             this.startContainer = startT;
 
-            if( startContainer.nodeValue) {
+            if (startContainer.nodeValue) {
                 // Wrap start container in detection node, offset is always 0 or parent offset.
                 Util.wrap(startContainer, this._createSplitContainer(startContainer, startContainerIndex,
                     Marklib._getOffsetParentIfHas(startContainer)));
@@ -422,7 +419,7 @@ class Marklib {
             endContainer.parentNode.insertBefore(endT, endContainer);
             this.endContainer = endT;
             var offsetParent = Marklib._getOffsetParentIfHas(endContainer);
-            Util.wrap(endContainer,this._createSplitContainer(endContainer, endContainerIndex,
+            Util.wrap(endContainer, this._createSplitContainer(endContainer, endContainerIndex,
                 offsetParent === endOffset ? offsetParent : offsetParent + endOffset));
         }
 
