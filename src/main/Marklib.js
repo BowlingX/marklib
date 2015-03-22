@@ -1,4 +1,4 @@
-/* global Node */
+/* global Node, Text */
 import Util from 'util/Util';
 
 import {ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION} from 'util/Util';
@@ -337,7 +337,7 @@ class Marklib {
         //cut off that part and put it into it's own textnode.
         if (startIndex > 0) {
             var textBefore = initialText.slice(0, startIndex);
-            textNode.parentNode.insertBefore(textBefore, textNode);
+            textNode.parentNode.insertBefore(new Text(textBefore), textNode);
             // wrap cutted text node:
             Util.wrap(textNode.previousSibling, this._createSplitContainer(textNode,
                 initialIndex, Marklib._getOffsetParentIfHas(textNode)));
@@ -346,7 +346,7 @@ class Marklib {
         //cut off that part and put it into it's own textnode.
         if (endIndex < initialText.length) {
             var textAfter = initialText.slice(endIndex, initialText.length);
-            textNode.parentNode.insertBefore(textAfter, textNode.nextSibling);
+            textNode.parentNode.insertBefore(new Text(textAfter), textNode.nextSibling);
 
             Util.wrap(textNode.nextSibling, this._createSplitContainer(textNode,
                 initialIndex, Marklib._getOffsetParentIfHas(textNode) + endIndex));
@@ -538,18 +538,17 @@ class Marklib {
      * @private
      */
     _renderSelection(startContainer, endContainer, startOffset, endOffset, contextContainer, outer) {
-        if (!outer) {
-            // start on
-            var r1 = this._markTextDifferentNode(startContainer, endContainer, startOffset, endOffset);
-            this.wrapSiblings(r1.startT.nextSibling, endContainer);
-            // If selection is on same level, we only loop through all next elements.
-        }
-        else if (startContainer === endContainer) {
+
+        // if start and end-container are the same, mark text on the same node
+        if(startContainer === endContainer) {
             this._markTextSameNode(startContainer, startOffset, endOffset);
         } else {
-            var r2 = this._markTextDifferentNode(startContainer, endContainer, startOffset, endOffset);
-            // Otherwise we need to loop until we reach the same level as our container
-            this.walk(r2.startT, endContainer, contextContainer);
+            var result = this._markTextDifferentNode(startContainer, endContainer, startOffset, endOffset);
+            if(!outer) {
+                this.wrapSiblings(result.startT.nextSibling, endContainer);
+            } else {
+                this.walk(result.startT, endContainer, contextContainer);
+            }
         }
     }
 

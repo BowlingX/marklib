@@ -16,18 +16,29 @@ describe("Test some wrappings", () => {
         loadFixtures('wrap-test.html');
     });
 
-    it("Should wrapSiblings", () => {
+    it("should wrapSiblings", () => {
         var marklib = new Marklib(document, 'wow');
         marklib.wrapSiblings(document.getElementById('startContainer'), document.getElementById('endContainer'));
     });
 
-    it("Should render a range", () => {
+    it("should render a range in different start/end nodes", () => {
         var marklib = new Marklib(document, 'wow');
         var range = document.createRange();
         range.setStart(document.getElementById("firstP").childNodes[0], 1);
         range.setEnd(document.getElementById("lastP").childNodes[0], 2);
         marklib.renderWithRange(range);
 
-        console.log(document.getElementById('startContainer'))
-    })
+        //console.log(document.getElementById('startContainer'))
+    });
+
+    it("should render a range in the same node", () => {
+        var marklib = new Marklib(document, 'highlight');
+
+        var range = document.createRange();
+        range.setStart(document.getElementById("firstP").childNodes[0], 0);
+        range.setEnd(document.getElementById("firstP").childNodes[0], 5);
+        marklib.renderWithRange(range);
+
+        console.log(document.getElementById('startContainer'));
+    });
 });
