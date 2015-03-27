@@ -99,27 +99,17 @@ class Marklib {
         return this;
     }
 
-    /**
-     * @param {Node} container
-     * @param {int} thisIndex
-     * @param {string} attr
-     * @returns {int}
-     * @private
-     */
-    static _getParentIfHas(container, thisIndex, attr) {
-        var p = container.parentNode;
-        var index = parseInt(p.getAttribute(attr));
-        return index > thisIndex ? index : thisIndex;
-    }
 
     /**
      * @param {Node} container
-     * @param {int} thisIndex
+     * @param {Number} thisIndex
      * @returns {int} index of parent or original
      * @private
      */
     static _getIndexParentIfHas(container, thisIndex) {
-        return Marklib._getParentIfHas(container, thisIndex, ATTR_DATA_ORIGINAL_INDEX);
+        var p = container.parentNode;
+        var index = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_INDEX));
+        return index > thisIndex ? index : thisIndex;
     }
 
     /**
@@ -127,7 +117,9 @@ class Marklib {
      * @returns {int} offset start of parent if has, else 0
      */
     static _getOffsetParentIfHas(container) {
-        return Marklib._getParentIfHas(container, ATTR_DATA_ORIGINAL_OFFSET_START);
+        var p = container.parentNode;
+        var offset = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START));
+        return offset > 0 ? offset : 0;
     }
 
     /**
