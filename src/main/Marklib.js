@@ -33,7 +33,7 @@ class Marklib {
 
     constructor(document, cssClass, context) {
 
-        if(!(document instanceof Document)) {
+        if (!(document instanceof Document)) {
             throw 'Marklib {0} is required to be a document instance';
         }
         /**
@@ -98,17 +98,28 @@ class Marklib {
         this.id = id;
         return this;
     }
-    
+
     /**
      * @param {Node} container
-     * @param {Number} thisIndex
+     * @param {int} thisIndex
+     * @param {string} attr
+     * @returns {int}
+     * @private
+     */
+    static _getParentIfHas(container, thisIndex, attr) {
+        var p = container.parentNode;
+        var index = parseInt(p.getAttribute(attr));
+        return index > thisIndex ? index : thisIndex;
+    }
+
+    /**
+     * @param {Node} container
+     * @param {int} thisIndex
      * @returns {int} index of parent or original
      * @private
      */
     static _getIndexParentIfHas(container, thisIndex) {
-        var p = container.parentNode;
-        var index = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_INDEX));
-        return index > thisIndex ? index : thisIndex;
+        return Marklib._getParentIfHas(container, thisIndex, ATTR_DATA_ORIGINAL_INDEX);
     }
 
     /**
@@ -116,9 +127,7 @@ class Marklib {
      * @returns {int} offset start of parent if has, else 0
      */
     static _getOffsetParentIfHas(container) {
-        var p = container.parentNode;
-        var offset = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START));
-        return offset > 0 ? offset : 0;
+        return Marklib._getParentIfHas(container, ATTR_DATA_ORIGINAL_OFFSET_START);
     }
 
     /**
@@ -558,11 +567,11 @@ class Marklib {
     _renderSelection(startContainer, endContainer, startOffset, endOffset, contextContainer, outer) {
 
         // if start and end-container are the same, mark text on the same node
-        if(startContainer === endContainer) {
+        if (startContainer === endContainer) {
             this._markTextSameNode(startContainer, startOffset, endOffset);
         } else {
             var result = this._markTextDifferentNode(startContainer, endContainer, startOffset, endOffset);
-            if(!outer) {
+            if (!outer) {
                 this.wrapSiblings(result.startT.nextSibling, endContainer);
             } else {
                 this.walk(result.startT, endContainer, contextContainer);
