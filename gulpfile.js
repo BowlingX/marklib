@@ -1,5 +1,5 @@
 /*
- * Build file for FlexCSS
+ * Build file for marklib
  * @author David Heidrich (me@bowlingx.com)
  */
 
