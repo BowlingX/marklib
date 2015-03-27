@@ -93,10 +93,11 @@ p {
 .marking {
   transition:background .5s ease;
   background: $markingColor;
+}
 
-  &.deleted {
-    background: none !important;
-  }
+.deleted {
+  transition:background .5s ease;
+  background: none !important;
 }
 
 .marking .marking {
