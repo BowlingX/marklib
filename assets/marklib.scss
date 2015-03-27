@@ -4,6 +4,8 @@ $buttonBaseColor: #95a5a6;
 $buttonAltColor:#9b59b6;
 $buttonWarnColor:#e74c3c;
 $maxWidth:960px;
+$twitterColor:#00aced;
+
 @import 'lib/animations';
 @import 'lib/highlighting';
 
@@ -100,6 +102,14 @@ p {
       background:lighten($buttonWarnColor, 10%);
     }
   }
+
+  &.twitter {
+    background:$twitterColor;
+
+    &:hover {
+      background: lighten($twitterColor, 10%);
+    }
+  }
 }
 
 .marking {
@@ -143,5 +153,9 @@ pre > code {
 
   .presentation {
     padding:15px;
+  }
+
+  .hide-small {
+    display:none;
   }
 }
