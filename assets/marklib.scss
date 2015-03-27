@@ -1,9 +1,27 @@
+// Some settings:
 $markingColor: #2ecc71;
-$buttonBaseColor: #3498db;
+$buttonBaseColor: #95a5a6;
+$buttonAltColor:#9b59b6;
+$buttonWarnColor:#e74c3c;
+@import 'lib/animations';
+@import 'lib/highlighting';
+
 body {
   font-family: "Roboto", sans-serif;
   padding:0;
   margin:0;
+  font-weight:300;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.wrapper {
+  max-width:960px;
+  margin:0 auto;
+}
+
+strong {
+  font-weight:500;
 }
 
 header {
@@ -16,10 +34,11 @@ header {
 
 .subline {
   font-size:2rem;
+  font-weight:100;
 }
 
 .presentation {
-  background: rgba(#34495e,.8);
+  background: rgba(#34495e,.7);
   color:#fff;
   padding:40px;
 }
@@ -34,6 +53,8 @@ p {
 }
 
 .button, button {
+  font:inherit;
+  font-weight:400;
   background: $buttonBaseColor;
   border:none;
   padding:10px 15px;
@@ -47,52 +68,46 @@ p {
     transform:translate3d(0,4px,0);
   }
   margin:10px;
-
+  display:inline-block;
+  text-decoration: none;
   > * {
     pointer-events:none;
+  }
+
+  &.alt {
+    margin:10px 15px 20px;
+    background:$buttonAltColor;
+    &:hover {
+      background:lighten($buttonAltColor, 10%);
+    }
+  }
+
+  &.warn {
+    background:$buttonWarnColor;
+    &:hover {
+      background:lighten($buttonWarnColor, 10%);
+    }
   }
 }
 
 .marking {
+  transition:background .5s ease;
   background: $markingColor;
+
+  &.deleted {
+    background: none !important;
+  }
 }
 
 .marking .marking {
-  background: darken($markingColor, 20%);
+  background: darken($markingColor, 10%);
 }
 
 .marking .marking .marking {
-  background: darken($markingColor, 40%);
+  background: darken($markingColor, 20%);
 }
 
-
-@-webkit-keyframes fadeInDown {
-  0% {
-    opacity: 0;
-    -webkit-transform: translate3d(0, -5px, 0);
-
-  }
-
-  100% {
-    opacity: 1;
-    -webkit-transform: none;
-  }
+::selection {
+  background: $markingColor;
 }
 
-@keyframes fadeInDown {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, -5px, 0);
-  }
-
-  100% {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.fadeInDown {
-  -webkit-animation-name: fadeInDown;
-  animation-name: fadeInDown;
-  animation-duration: .2s;
-}

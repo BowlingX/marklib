@@ -5,46 +5,52 @@ layout: default
     <h1>mark[lib</h1>
 
     <p class="subline" id="automark">Damn fast easy marking with serializable selections.</p>
+
+    <a class="button alt" href="https://github.com/BowlingX/marklib"><i class="fa fa-github"></i> Fork me on Github</a>
 </header>
 <div class="presentation">
-    <h2>Try it</h2>
+    <div class="wrapper">
+        <h2>Try it</h2>
 
-    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-        dolore
-        magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea
-        rebum.
-        Stet clita kasd
-        gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur
-        sadipscing
-        elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam voluptua.
-        At
-        vero
-        eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
-        sanctus est Lorem ipsum
-        dolor sit amet.
-    </p>
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+            dolore
+            magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea
+            rebum.
+            Stet clita kasd
+            gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur
+            sadipscing
+            elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam
+            voluptua.
+            At
+            vero
+            eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
+            sanctus est Lorem ipsum
+            dolor sit amet.
+        </p>
 
-    <h2>A second paragraph</h2>
+        <h2>A second paragraph</h2>
 
-    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-        dolore
-        magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea
-        rebum.
-        Stet clita kasd
-        gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur
-        sadipscing
-        elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam voluptua.
-        At
-        vero
-        eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
-        sanctus est Lorem ipsum
-        dolor sit amet.
-    </p>
-    <br>
+        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+            dolore
+            magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea
+            rebum.
+            Stet clita kasd
+            gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur
+            sadipscing
+            elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam
+            voluptua.
+            At
+            vero
+            eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
+            sanctus est Lorem ipsum
+            dolor sit amet.
+        </p>
+        <br>
 
-    <div class="text-center">
-        <button id="action-mark">Mark selection</button>
-        <button id="action-clear">Clear markings from local-storage</button>
+        <div class="text-center">
+            <button id="action-mark"><i class="fa fa-eraser"></i> Mark selection</button>
+            <button class="warn" id="action-clear"><i class="fa fa-trash-o"></i></button>
+        </div>
     </div>
 </div>
 <script type="text/javascript">
@@ -99,6 +105,11 @@ layout: default
             if (e.target.id === 'action-mark') {
                 return actionMark();
             } else if (e.target.id === 'action-clear') {
+                var elements = document.getElementsByTagName('x-marker');
+                for(var i=0;i<elements.length;i++) {
+                    elements[i].classList.add('deleted');
+                }
+                savedRanges = [];
                 localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
             }
         });
