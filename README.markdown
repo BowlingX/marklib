@@ -3,3 +3,5 @@
 [![Code Climate](https://codeclimate.com/github/BowlingX/marklib/badges/gpa.svg)](https://codeclimate.com/github/BowlingX/marklib)
 
 A Library to wrap serializable TextSelections.
+
+[Demo](http://bowlingx.github.io/marklib/)
