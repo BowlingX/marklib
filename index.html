@@ -88,11 +88,15 @@ layout: default
 
         });
         var actionMark = function () {
-            var selection = document.getSelection(), renderer = new Marklib(document),
-                    result = renderer.renderWithRange(selection.getRangeAt(0));
-            selection.removeAllRanges();
-            savedRanges.push(result);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
+            try {
+                var selection = document.getSelection(), renderer = new Marklib(document),
+                        result = renderer.renderWithRange(selection.getRangeAt(0));
+                selection.removeAllRanges();
+                savedRanges.push(result);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
+            } catch (e) {
+                console.warn("Could not add selection: ", e);
+            }
         };
 
         document.addEventListener("keydown", function (e) {
