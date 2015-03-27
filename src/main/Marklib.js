@@ -45,7 +45,7 @@ class Marklib {
          * ID of rendering, will be set on each element that is part of it
          * @type {String}
          */
-        this.id = 'new-id';
+        this.id = Util.guid();
 
         /**
          * Class that is set on all highlight nodes
@@ -84,10 +84,19 @@ class Marklib {
     }
 
     /**
-     * @returns {String} id of this rendering
+     * @returns {string} id of this rendering
      */
     getId() {
         return this.id;
+    }
+
+    /**
+     * @param {string} id
+     * @returns {Marklib}
+     */
+    setId(id) {
+        this.id = id;
+        return this;
     }
     
     /**
@@ -269,7 +278,6 @@ class Marklib {
                 wrap(n);
             }
         };
-
         while (null !== next && next !== endContainer) {
             var currentNext = next;
             next = next.nextSibling;
@@ -538,6 +546,7 @@ class Marklib {
 
     /**
      * Renders a given selection
+     *
      * @param {Node} startContainer
      * @param {Node} endContainer
      * @param {int} startOffset
@@ -564,10 +573,12 @@ class Marklib {
 
     /**
      * Deserializes a specific path and finds the right textnodes
-     * This even works when DOM has been manipulated by MarkerRenderer
+     * This even works when DOM has been manipulated before by `marklib`
      * @param {string} path the serialized path (including offsets)
+     * @return {Node}
+     * @private
      */
-    deserializePath(path) {
+    _deserializePath(path) {
         var pSplit = path.split(';'), p = pSplit[0],
             objectIndex = parseInt(pSplit[1]),
             charOffset = parseInt(pSplit[2]),
@@ -591,20 +602,25 @@ class Marklib {
                 return true;
             }
             return true;
-
         });
+
         return maybeFoundNode;
     }
 
     /**
-     * Prepares to render a Selection with jquery path selectors
+     * Prepares to render a Selection with path selectors
+     * ```
+     * A Path looks like this:
+     *
+     * #selector;#textnode;#offset
+     * ``
      * @param {string} startPath
      * @param {string} endPath
      * @returns {*}
      */
     renderWithPath(startPath, endPath) {
-        var startContainer = this.deserializePath(startPath);
-        var endContainer = this.deserializePath(endPath);
+        var startContainer = this._deserializePath(startPath);
+        var endContainer = this._deserializePath(endPath);
         if (startContainer && endContainer && startContainer.node && endContainer.node) {
             var range = document.createRange();
             range.setStart(startContainer.node, startContainer.offset);

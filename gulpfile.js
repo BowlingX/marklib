@@ -25,7 +25,6 @@ var paths = {
     tests: ['src/test/**/*.js'],
     images: ['assets/img/**/*', 'themes/img/**/*'],
     fonts: 'assets/fonts/**/*',
-    sassThemes: 'examples/**/*.scss',
     sassLib: 'assets/**/*.scss',
     // Karma config file
     karmaConfig: 'karma.conf.js'
@@ -110,7 +109,7 @@ gulp.task('compileSass', function () {
         csswring
     ];
 
-    return gulp.src(paths.sassThemes)
+    return gulp.src(paths.sassLib)
         .pipe($.plumber({
             errorHandler: onError
         }))
@@ -125,7 +124,6 @@ gulp.task('compileSass', function () {
 gulp.task('watch', function () {
     // scripts and images
     // sass
-    gulp.watch(paths.sassThemes, ['compileSass']);
     gulp.watch(paths.sassLib, ['compileSass']);
     gulp.watch(paths.images, ['imagesReload']);
 

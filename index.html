@@ -1,37 +1,74 @@
 ---
 layout: default
 ---
-<h1>Testpage</h1>
+<header class="text-center">
+    <h1>mark[lib</h1>
 
-<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore
-    magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea rebum.
-    Stet clita kasd
-    gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam voluptua. At
-    vero
-    eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
-    sanctus est Lorem ipsum
-    dolor sit amet.
-</p>
+    <p class="subline" id="automark">Damn fast easy marking with serializable selections.</p>
+</header>
+<div class="presentation">
+    <h2>Try it</h2>
 
-<h2>A second paragraph</h2>
-<p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore
-    magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea rebum.
-    Stet clita kasd
-    gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam voluptua. At
-    vero
-    eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
-    sanctus est Lorem ipsum
-    dolor sit amet.
-</p>
+    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+        dolore
+        magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea
+        rebum.
+        Stet clita kasd
+        gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur
+        sadipscing
+        elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam voluptua.
+        At
+        vero
+        eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
+        sanctus est Lorem ipsum
+        dolor sit amet.
+    </p>
 
-<button id="action-mark">Mark selection</button>
-<button id="action-clear">Clear markings from local-storage</button>
+    <h2>A second paragraph</h2>
 
+    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+        dolore
+        magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea
+        rebum.
+        Stet clita kasd
+        gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur
+        sadipscing
+        elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam voluptua.
+        At
+        vero
+        eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
+        sanctus est Lorem ipsum
+        dolor sit amet.
+    </p>
+    <br>
+
+    <div class="text-center">
+        <button id="action-mark">Mark selection</button>
+        <button id="action-clear">Clear markings from local-storage</button>
+    </div>
+</div>
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function (event) {
         var STORAGE_KEY = 'savedRanges';
+
+        var autoMarkText = document.getElementById('automark').childNodes[0];
+
+        var render = function (autoMarkText, c) {
+            var r = new Marklib(document, 'fadeInDown');
+            var range = document.createRange();
+            range.setStart(autoMarkText, 0);
+            range.setEnd(autoMarkText, 1);
+            r.renderWithRange(range);
+            if (autoMarkText.parentNode.nextSibling) {
+                autoMarkText = autoMarkText.parentNode.nextSibling.childNodes[0];
+                setTimeout(function () {
+                    render(autoMarkText, c++);
+                }, 10 * c);
+            }
+        };
+
+        render(autoMarkText, 1);
+
         var savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
         savedRanges.forEach(function (range) {
@@ -44,42 +81,26 @@ layout: default
             }
 
         });
-        var actionMark = function() {
-            var selection = document.getSelection();
-            var renderer = new Marklib(document);
-            var result = renderer.renderWithRange(selection.getRangeAt(0));
+        var actionMark = function () {
+            var selection = document.getSelection(), renderer = new Marklib(document),
+                    result = renderer.renderWithRange(selection.getRangeAt(0));
             selection.removeAllRanges();
-
             savedRanges.push(result);
-
             localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
-        }
+        };
+
         document.addEventListener("keydown", function (e) {
             if (13 === e.keyCode) {
                 actionMark();
             }
         });
 
-        document.addEventListener("click", function(e){
-            if(e.target.id === 'action-mark') {
+        document.addEventListener("click", function (e) {
+            if (e.target.id === 'action-mark') {
                 return actionMark();
-            } else if(e.target.id === 'action-clear') {
+            } else if (e.target.id === 'action-clear') {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
             }
         });
     });
 </script>
-
-<style type="text/css">
-    .marking {
-        background: yellow;
-    }
-
-    .marking .marking {
-        background: orange;
-    }
-
-    .marking .marking .marking {
-        background:green;
-    }
-</style>

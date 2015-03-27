@@ -1,0 +1,98 @@
+$markingColor: #2ecc71;
+$buttonBaseColor: #3498db;
+body {
+  font-family: "Roboto", sans-serif;
+  padding:0;
+  margin:0;
+}
+
+header {
+  padding:10px;
+}
+
+.text-center {
+  text-align:center;
+}
+
+.subline {
+  font-size:2rem;
+}
+
+.presentation {
+  background: rgba(#34495e,.8);
+  color:#fff;
+  padding:40px;
+}
+
+h1, h2 {
+  font-family: "Shadows Into Light", sans-serif;
+}
+
+p {
+  font-size:1rem;
+  line-height:1.6;
+}
+
+.button, button {
+  background: $buttonBaseColor;
+  border:none;
+  padding:10px 15px;
+  border-radius:5px;
+  font-size:1rem;
+  cursor:pointer;
+  color:#fff;
+  transition:background .5s ease, transform .5s ease;
+  &:hover {
+    background: lighten($buttonBaseColor, 10%);
+    transform:translate3d(0,4px,0);
+  }
+  margin:10px;
+
+  > * {
+    pointer-events:none;
+  }
+}
+
+.marking {
+  background: $markingColor;
+}
+
+.marking .marking {
+  background: darken($markingColor, 20%);
+}
+
+.marking .marking .marking {
+  background: darken($markingColor, 40%);
+}
+
+
+@-webkit-keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -5px, 0);
+
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: none;
+  }
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -5px, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fadeInDown {
+  -webkit-animation-name: fadeInDown;
+  animation-name: fadeInDown;
+  animation-duration: .2s;
+}
