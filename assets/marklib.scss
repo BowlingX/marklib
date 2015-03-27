@@ -3,6 +3,7 @@ $markingColor: #2ecc71;
 $buttonBaseColor: #95a5a6;
 $buttonAltColor:#9b59b6;
 $buttonWarnColor:#e74c3c;
+$maxWidth:960px;
 @import 'lib/animations';
 @import 'lib/highlighting';
 
@@ -15,8 +16,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.highlight {
+  pre {
+    max-width: $maxWidth;
+    margin: 0 auto;
+  }
+}
+
+code {
+  font-size:1.3rem;
+}
+
 .wrapper {
-  max-width:960px;
+  max-width:$maxWidth;
   margin:0 auto;
 }
 
@@ -112,3 +124,24 @@ p {
   background: $markingColor;
 }
 
+pre {
+  margin:0;
+}
+pre > code {
+  display:block;
+  font-family: monospace;
+  overflow-y:auto;
+  padding:30px;
+  -webkit-overflow-scrolling:touch;
+}
+
+.animate .wrapper {
+ @extend .fadeInDownSlow;
+}
+
+@media (max-width:480px) {
+
+  .presentation {
+    padding:15px;
+  }
+}

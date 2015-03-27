@@ -12,30 +12,31 @@ layout: default
     <div class="wrapper">
         <h2>Try it</h2>
 
-        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
-            dolore
-            magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea
-            rebum.
-            Stet clita kasd
-            gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur
-            sadipscing
-            elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam
-            voluptua.
-            At
-            vero
-            eos et accusam et justo duo <strong>dolores ea rebum. Stet</strong> clita kasd gubergren, no sea takimata
-            sanctus est Lorem ipsum
-            dolor sit amet.
+        <p>Start marking this paragraph as an example and use either <code>enter</code> &#9166; or the button under this
+            section.<br>
+            <code>marklib</code> supports highlighting/marking <strong>textnodes</strong>
+            even if the DOM has been modified by another marking of <code>marklib</code>. If you mark something on this
+            page, it will be stored on your browsers local storage. Try to refresh the page and play a little bit :).
         </p>
 
-        <h2>A second paragraph</h2>
+        <p class="text-center subline">Show me the Code, Dude</p>
+    </div>
+</div>
+{% highlight javascript %}
+var selection = document.getSelection();
+new Marklib(document).renderWithRange(selection.getRangeAt(0));
+{% endhighlight %}
+<div class="presentation" id="secondParagraph">
+    <div class="wrapper">
+        <h2>A second paragraph with some latin like text</h2>
 
         <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
             dolore
             magna aliquyam erat, sed diam voluptua. <strong>At vero eos et accusam</strong> et justo duo dolores et ea
             rebum.
             Stet clita kasd
-            gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolorasit amet, consetetur
+            gubergren, <span id="secondParagraphItem">no sea takimata sanctus est Lorem ipsum dolor sit amet.</span>
+            Lorem ipsum dolorasit amet, consetetur
             sadipscing
             elitr, sed diam nonumy eirmod tempor invidunt ut <i>labore</i> et dolore magna aliquyam erat, sed diam
             voluptua.
@@ -51,32 +52,44 @@ layout: default
             <button id="action-mark"><i class="fa fa-eraser"></i> Mark selection</button>
             <button class="warn" id="action-clear"><i class="fa fa-trash-o"></i></button>
         </div>
+        <p class="text-center subline">marklib depends on zero libraries and is just around 10kb minified</p>
+
     </div>
 </div>
+<footer>
+    <p class="text-center">Made with ♥ by David Heidrich, licensed under the MIT License</p>
+</footer>
 <script type="text/javascript">
-    void function(document) {
+    void function (document) {
         document.addEventListener("DOMContentLoaded", function () {
             var STORAGE_KEY = 'savedRanges';
 
-            var autoMarkText = document.getElementById('automark').childNodes[0];
+            /**
+             * Creates an animated rendering
+             */
+            function presentRendering(selector, classNames, speed) {
+                var autoMarkText = document.getElementById(selector).childNodes[0];
 
-            var render = function (autoMarkText, c) {
-                var r = new Marklib(document, 'fadeInDown');
-                var range = document.createRange();
-                range.setStart(autoMarkText, 0);
-                range.setEnd(autoMarkText, 1);
-                r.renderWithRange(range);
-                if (autoMarkText.parentNode.nextSibling) {
-                    autoMarkText = autoMarkText.parentNode.nextSibling.childNodes[0];
-                    setTimeout(function () {
-                        render(autoMarkText, c++);
-                    }, 10 * c);
-                }
-            };
+                var render = function (autoMarkText, c) {
+                    var r = new Marklib(document, classNames);
+                    var range = document.createRange();
+                    range.setStart(autoMarkText, 0);
+                    range.setEnd(autoMarkText, 1);
+                    r.renderWithRange(range);
+                    if (autoMarkText.parentNode.nextSibling) {
+                        autoMarkText = autoMarkText.parentNode.nextSibling.childNodes[0];
+                        setTimeout(function () {
+                            render(autoMarkText, c++);
+                        }, speed * c);
+                    }
+                };
 
-            render(autoMarkText, 1);
+                return render(autoMarkText, 1);
+            }
 
-            var savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            presentRendering('automark', 'fadeInDown', 10);
+
+            var savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [],  animated = false;;
 
             savedRanges.forEach(function (range) {
                 var marker = new Marklib(document);
@@ -85,9 +98,25 @@ layout: default
                             range.endContainerPath + ";" + range.endOffset)
                 } catch (e) {
                     console.warn("Could not render:", range);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+                    throw 'Cleared local storage because of a rendering issue, the page might have been changed ;)'
                 }
 
             });
+
+            window.addEventListener('scroll', function () {
+                var el = document.getElementById('secondParagraph'), r = el.getBoundingClientRect(),
+                        html = document.documentElement;
+                if (r.top <= html.clientHeight && r.bottom >= 0 && !animated) {
+                    animated = true;
+
+                    el.classList.add('animate');
+                    if(!savedRanges.length) {
+                        presentRendering('secondParagraphItem', 'marking', 25);
+                    }
+                }
+            });
+
             var actionMark = function () {
                 try {
                     var selection = document.getSelection(), renderer = new Marklib(document),
