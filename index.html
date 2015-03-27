@@ -54,68 +54,70 @@ layout: default
     </div>
 </div>
 <script type="text/javascript">
-    document.addEventListener("DOMContentLoaded", function (event) {
-        var STORAGE_KEY = 'savedRanges';
+    void function(document) {
+        document.addEventListener("DOMContentLoaded", function () {
+            var STORAGE_KEY = 'savedRanges';
 
-        var autoMarkText = document.getElementById('automark').childNodes[0];
+            var autoMarkText = document.getElementById('automark').childNodes[0];
 
-        var render = function (autoMarkText, c) {
-            var r = new Marklib(document, 'fadeInDown');
-            var range = document.createRange();
-            range.setStart(autoMarkText, 0);
-            range.setEnd(autoMarkText, 1);
-            r.renderWithRange(range);
-            if (autoMarkText.parentNode.nextSibling) {
-                autoMarkText = autoMarkText.parentNode.nextSibling.childNodes[0];
-                setTimeout(function () {
-                    render(autoMarkText, c++);
-                }, 10 * c);
-            }
-        };
-
-        render(autoMarkText, 1);
-
-        var savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-        savedRanges.forEach(function (range) {
-            var marker = new Marklib(document);
-            try {
-                marker.renderWithPath(range.startContainerPath + ";" + range.startOffset,
-                        range.endContainerPath + ";" + range.endOffset)
-            } catch (e) {
-                console.warn("Could not render:", range);
-            }
-
-        });
-        var actionMark = function () {
-            try {
-                var selection = document.getSelection(), renderer = new Marklib(document),
-                        result = renderer.renderWithRange(selection.getRangeAt(0));
-                selection.removeAllRanges();
-                savedRanges.push(result);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
-            } catch (e) {
-                console.warn("Could not add selection: ", e);
-            }
-        };
-
-        document.addEventListener("keydown", function (e) {
-            if (13 === e.keyCode) {
-                actionMark();
-            }
-        });
-
-        document.addEventListener("click", function (e) {
-            if (e.target.id === 'action-mark') {
-                return actionMark();
-            } else if (e.target.id === 'action-clear') {
-                var elements = document.getElementsByTagName('x-marker');
-                for(var i=0;i<elements.length;i++) {
-                    elements[i].classList.add('deleted');
+            var render = function (autoMarkText, c) {
+                var r = new Marklib(document, 'fadeInDown');
+                var range = document.createRange();
+                range.setStart(autoMarkText, 0);
+                range.setEnd(autoMarkText, 1);
+                r.renderWithRange(range);
+                if (autoMarkText.parentNode.nextSibling) {
+                    autoMarkText = autoMarkText.parentNode.nextSibling.childNodes[0];
+                    setTimeout(function () {
+                        render(autoMarkText, c++);
+                    }, 10 * c);
                 }
-                savedRanges = [];
-                localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-            }
+            };
+
+            render(autoMarkText, 1);
+
+            var savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+            savedRanges.forEach(function (range) {
+                var marker = new Marklib(document);
+                try {
+                    marker.renderWithPath(range.startContainerPath + ";" + range.startOffset,
+                            range.endContainerPath + ";" + range.endOffset)
+                } catch (e) {
+                    console.warn("Could not render:", range);
+                }
+
+            });
+            var actionMark = function () {
+                try {
+                    var selection = document.getSelection(), renderer = new Marklib(document),
+                            result = renderer.renderWithRange(selection.getRangeAt(0));
+                    selection.removeAllRanges();
+                    savedRanges.push(result);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
+                } catch (e) {
+                    console.warn("Could not add selection: ", e);
+                }
+            };
+
+            document.addEventListener("keydown", function (e) {
+                if (13 === e.keyCode) {
+                    actionMark();
+                }
+            });
+
+            document.addEventListener("click", function (e) {
+                if (e.target.id === 'action-mark') {
+                    return actionMark();
+                } else if (e.target.id === 'action-clear') {
+                    var elements = document.getElementsByTagName('x-marker');
+                    for (var i = 0; i < elements.length; i++) {
+                        elements[i].classList.add('deleted');
+                    }
+                    savedRanges = [];
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+                }
+            });
         });
-    });
+    }(document);
 </script>
