@@ -4,6 +4,8 @@
 
 A simple and fast zero-dependencies-library to transform selections into serializable markings.
 
+[Demo](http://bowlingx.github.io/marklib/)
+
 ## Install
 
 `npm` package is available soon.
@@ -15,4 +17,3 @@ Copyright (c) 2015 David Heidrich
 
 Any contribution is welcome, just issue a pull-request or bug/feature if you found something :)
 
-[Demo](http://bowlingx.github.io/marklib/)
