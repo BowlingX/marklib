@@ -60,6 +60,12 @@ gulp.task('compileMinifiedScripts', ['clean'], function(){
     return createScripts(false, webpackMinConfig);
 });
 
+
+gulp.task('watchCompileMinifiedScripts', ['clean'], function(){
+    return createScripts(true, webpackMinConfig);
+});
+
+
 gulp.task('compileScriptsWithDependencies', ['clean'], function () {
     return createScripts(false, webpackConfig);
 });
@@ -135,6 +141,6 @@ gulp.task('watch', function () {
 });
 
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['watch', 'fonts', 'images', 'sass', 'watchScriptsWithDependencies']);
+gulp.task('default', ['watch', 'fonts', 'images', 'sass', 'watchScriptsWithDependencies', 'watchCompileMinifiedScripts']);
 
 gulp.task('dist', ['fonts', 'images', 'sass', 'compileScriptsWithDependencies', 'compileMinifiedScripts']);

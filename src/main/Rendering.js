@@ -378,7 +378,7 @@ class Rendering {
         //cut off that part and put it into it's own textnode.
         if (startIndex > 0) {
             var textBefore = initialText.slice(0, startIndex);
-            textNode.parentNode.insertBefore(new Text(textBefore), textNode);
+            textNode.parentNode.insertBefore(global.document.createTextNode(textBefore), textNode);
             // wrap cutted text node:
             Util.wrap(textNode.previousSibling, this._createSplitContainer(textNode,
                 initialIndex, Rendering._getOffsetParentIfHas(textNode)));
@@ -387,8 +387,7 @@ class Rendering {
         //cut off that part and put it into it's own textnode.
         if (endIndex < initialText.length) {
             var textAfter = initialText.slice(endIndex, initialText.length);
-            textNode.parentNode.insertBefore(new Text(textAfter), textNode.nextSibling);
-
+            textNode.parentNode.insertBefore(global.document.createTextNode(textAfter), textNode.nextSibling);
             Util.wrap(textNode.nextSibling, this._createSplitContainer(textNode,
                 initialIndex, Rendering._getOffsetParentIfHas(textNode) + endIndex));
         }

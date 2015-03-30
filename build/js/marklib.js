@@ -71,7 +71,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* global Node, Text, Rendering, Document */
+	/* WEBPACK VAR INJECTION */(function(global) {/* global Node, Text, Rendering, Document */
 	"use strict";
 	
 	var _classCallCheck = __webpack_require__(4)["default"];
@@ -482,7 +482,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                //cut off that part and put it into it's own textnode.
 	                if (startIndex > 0) {
 	                    var textBefore = initialText.slice(0, startIndex);
-	                    textNode.parentNode.insertBefore(new Text(textBefore), textNode);
+	                    textNode.parentNode.insertBefore(global.document.createTextNode(textBefore), textNode);
 	                    // wrap cutted text node:
 	                    Util.wrap(textNode.previousSibling, this._createSplitContainer(textNode, initialIndex, Rendering._getOffsetParentIfHas(textNode)));
 	                }
@@ -490,8 +490,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                //cut off that part and put it into it's own textnode.
 	                if (endIndex < initialText.length) {
 	                    var textAfter = initialText.slice(endIndex, initialText.length);
-	                    textNode.parentNode.insertBefore(new Text(textAfter), textNode.nextSibling);
-	
+	                    textNode.parentNode.insertBefore(global.document.createTextNode(textAfter), textNode.nextSibling);
 	                    Util.wrap(textNode.nextSibling, this._createSplitContainer(textNode, initialIndex, Rendering._getOffsetParentIfHas(textNode) + endIndex));
 	                }
 	
@@ -815,6 +814,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 	
 	module.exports = Rendering;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 2 */
@@ -925,7 +925,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	             */
 	
 	            value: function wrap(elms, wrapper) {
-	                // Convert `elms` to an array, if necessary.
+	                if (!elms) {
+	                    return wrapper;
+	                } // Convert `elms` to an array, if necessary.
 	                if (!(elms instanceof NodeList || elms instanceof Array)) elms = [elms];
 	                for (var i = elms.length - 1; i >= 0; i--) {
 	                    var child = i > 0 ? wrapper.cloneNode(true) : wrapper;

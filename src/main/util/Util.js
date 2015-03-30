@@ -77,6 +77,7 @@ class Util {
      * @return {HTMLElement}
      */
     static wrap(elms, wrapper) {
+        if (!elms) return wrapper;
         // Convert `elms` to an array, if necessary.
         if (!(elms instanceof NodeList || elms instanceof Array)) elms = [elms];
         for (var i = elms.length - 1; i >= 0; i--) {
