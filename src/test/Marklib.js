@@ -1,13 +1,13 @@
 import $ from 'jquery';
 import setup from 'setup';
-import Marklib from 'Marklib';
+import Rendering from 'Rendering';
 
 setup();
 
 describe("Test some Instance stuff", () => {
     it("Create an instance", () => {
-        var marklib = new Marklib(document, 'highlight');
-        expect(marklib instanceof Marklib).toBe(true);
+        var marklib = new Rendering(document, 'highlight');
+        expect(marklib instanceof Rendering).toBe(true);
     });
 });
 
@@ -17,19 +17,19 @@ describe("Test some wrappings", () => {
     });
 
     it("should wrapSiblings", () => {
-        var marklib = new Marklib(document, 'wow');
+        var marklib = new Rendering(document, 'wow');
         marklib.wrapSiblings(document.getElementById('startContainer'), document.getElementById('endContainer'));
     });
 
     it("should render a range in different start/end nodes", () => {
-        var marklib = new Marklib(document, 'wow');
+        var marklib = new Rendering(document, 'wow');
         var range = document.createRange();
         range.setStart(document.getElementById("firstP").childNodes[0], 1);
         range.setEnd(document.getElementById("lastP").childNodes[0], 2);
     });
 
     it("should render a range in the same node", () => {
-        var marklib = new Marklib(document, 'highlight');
+        var marklib = new Rendering(document, 'highlight');
         var range = document.createRange();
         range.setStart(document.getElementById("firstP").childNodes[0], 0);
         range.setEnd(document.getElementById("firstP").childNodes[0], 5);

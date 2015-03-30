@@ -175,6 +175,7 @@ class Util {
 
     /**
      * Determines the correct paths and excludes all `marklib` generated content
+     * TODO: To improve performance we could shorten the path if an ID is present in it.
      * @param {HTMLElement} el
      * @param {HTMLElement} [context] if given extraction path is relative to this element
      * @returns {*}

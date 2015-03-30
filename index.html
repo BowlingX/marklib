@@ -13,19 +13,20 @@ layout: default
     <div class="wrapper">
         <h2>Try it</h2>
 
-        <p>Start marking this paragraph as an example and use either <code>enter</code> &#9166; or the button under this
+        <p>Start marking this paragraph as an example and use either <code>enter</code> or the button under this
             section.<br>
-            <code>marklib</code> supports highlighting/marking <strong>textnodes</strong>
-            even if the DOM has been modified by another marking of <code>marklib</code>. If you mark something on this
+            <code>Marklib</code> supports highlighting/marking <strong>textnodes</strong>
+            even if the DOM has been modified by another marking of <code>Marklib</code>. If you mark something on this
             page, it will be stored on your browsers local storage. Try to refresh the page and play a little bit :).
         </p>
 
-        <p class="text-center subline">Show me the Code, Dude</p>
+        <p class="text-center subline tight">Show me the Code, Dude</p>
     </div>
 </div>
 {% highlight javascript %}
 var selection = document.getSelection();
-new Marklib(document).renderWithRange(selection.getRangeAt(0));
+new Marklib.Rendering(document)
+           .renderWithRange(selection.getRangeAt(0));
 {% endhighlight %}
 <div class="presentation" id="secondParagraph">
     <div class="wrapper">
@@ -53,10 +54,13 @@ new Marklib(document).renderWithRange(selection.getRangeAt(0));
             <button id="action-mark"><i class="fa fa-eraser"></i> Mark selection</button>
             <button class="warn" id="action-clear"><i class="fa fa-trash-o"></i></button>
         </div>
-        <p class="text-center subline">marklib depends on zero libraries and is just around 10kb minified</p>
+        <p class="text-center subline tight">Marklib.Rendering depends on zero libraries and is just around 10kb minified</p>
 
     </div>
 </div>
+{% highlight bash %}
+npm install --save-dev marklib
+{% endhighlight %}
 <footer>
     <p class="text-center">Made with ♥ by David Heidrich, licensed under the MIT License</p>
 </footer>
@@ -72,7 +76,7 @@ new Marklib(document).renderWithRange(selection.getRangeAt(0));
                 var autoMarkText = document.getElementById(selector).childNodes[0];
 
                 var render = function (autoMarkText, c) {
-                    var r = new Marklib(document, classNames);
+                    var r = new Marklib.Rendering(document, classNames);
                     var range = document.createRange();
                     range.setStart(autoMarkText, 0);
                     range.setEnd(autoMarkText, 1);
@@ -95,7 +99,7 @@ new Marklib(document).renderWithRange(selection.getRangeAt(0));
             var savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [],  animated = false;;
 
             savedRanges.forEach(function (range) {
-                var marker = new Marklib(document);
+                var marker = new Marklib.Rendering(document);
                 try {
                     marker.renderWithPath(range.startContainerPath + ";" + range.startOffset,
                             range.endContainerPath + ";" + range.endOffset)
@@ -122,7 +126,7 @@ new Marklib(document).renderWithRange(selection.getRangeAt(0));
 
             var actionMark = function () {
                 try {
-                    var selection = document.getSelection(), renderer = new Marklib(document),
+                    var selection = document.getSelection(), renderer = new Marklib.Rendering(document),
                             result = renderer.renderWithRange(selection.getRangeAt(0));
                     selection.removeAllRanges();
                     savedRanges.push(result);

@@ -56,26 +56,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
-	var _interopRequire = __webpack_require__(2)["default"];
+	var _interopRequire = __webpack_require__(3)["default"];
 	
-	var Marklib = _interopRequire(__webpack_require__(1));
+	var Rendering = _interopRequire(__webpack_require__(1));
 	
-	module.exports = Marklib;
+	var Util = _interopRequire(__webpack_require__(2));
+	
+	module.exports = {
+	    Rendering: Rendering,
+	    Util: Util
+	};
 
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* global Node, Text, Marklib, Document */
+	/* global Node, Text, Rendering, Document */
 	"use strict";
 	
-	var _classCallCheck = __webpack_require__(3)["default"];
+	var _classCallCheck = __webpack_require__(4)["default"];
 	
-	var _createClass = __webpack_require__(4)["default"];
+	var _createClass = __webpack_require__(5)["default"];
 	
-	var _interopRequire = __webpack_require__(2)["default"];
+	var _interopRequire = __webpack_require__(3)["default"];
 	
-	var _utilUtil = __webpack_require__(5);
+	var _utilUtil = __webpack_require__(2);
 	
 	var Util = _interopRequire(_utilUtil);
 	
@@ -107,9 +112,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var ATTR_DATA_ID = "data-selection-id";
 	
-	var Marklib = (function () {
-	    function Marklib(document, cssClass, context) {
-	        _classCallCheck(this, Marklib);
+	var Rendering = (function () {
+	    function Rendering(document, cssClass, context) {
+	        _classCallCheck(this, Rendering);
 	
 	        if (!(document instanceof Document)) {
 	            throw "Marklib {0} is required to be a document instance";
@@ -129,7 +134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Class that is set on all highlight nodes
 	         * @type {String}
 	         */
-	        this.cssClass = cssClass || "marking";
+	        this.cssClass = undefined === cssClass ? "marking" : cssClass;
 	
 	        /**
 	         * StartContainer
@@ -159,9 +164,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @type {Node}
 	         */
 	        this.context = context || this.document;
+	
+	        /**
+	         * @type {Function}
+	         * @private
+	         */
+	        this._onWrappedNodeFunc = null;
 	    }
 	
-	    _createClass(Marklib, {
+	    _createClass(Rendering, {
 	        getId: {
 	
 	            /**
@@ -176,12 +187,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            /**
 	             * @param {string} id
-	             * @returns {Marklib}
+	             * @returns {Rendering}
 	             */
 	
 	            value: function setId(id) {
 	                this.id = id;
 	                return this;
+	            }
+	        },
+	        onWrappedNode: {
+	
+	            /**
+	             * Listener that is called when a node is wrapped on this instance
+	             * @param {Function} f
+	             * @returns {Rendering}
+	             */
+	
+	            value: function onWrappedNode(f) {
+	                this._onWrappedNodeFunc = f;
+	                return this;
+	            }
+	        },
+	        _callOnWrappedNode: {
+	
+	            /**
+	             * @private
+	             */
+	
+	            value: function _callOnWrappedNode() {
+	                if ("function" === typeof this._onWrappedNodeFunc) {
+	                    this._onWrappedNodeFunc.apply(this, arguments);
+	                }
 	            }
 	        },
 	        _createWrapTemplate: {
@@ -236,7 +272,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            value: function _createStartOrEndContainer(initialNode, prefix, text, offset, index) {
 	                var wrapper = this._createStartEndWrapTemplate(prefix + this.getId(), text);
-	                wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Marklib._getIndexParentIfHas(initialNode, index));
+	                wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Rendering._getIndexParentIfHas(initialNode, index));
 	                wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
 	                wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
 	                wrapper.marklibInstance = this;
@@ -258,8 +294,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            value: function _createWrap(el, optionalLength, optionalIndex, optionalIsSameNode) {
 	                var originalIndex = optionalIndex >= 0 ? optionalIndex : Util.calcIndex(el);
 	                var wrapper = this._createWrapTemplate();
-	                wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Marklib._getIndexParentIfHas(el, originalIndex));
-	                var offsetLength = optionalLength >= 0 ? optionalLength : Marklib._getOffsetParentIfHas(el);
+	                wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Rendering._getIndexParentIfHas(el, originalIndex));
+	                var offsetLength = optionalLength >= 0 ? optionalLength : Rendering._getOffsetParentIfHas(el);
 	                wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offsetLength);
 	
 	                // Save a reference to original text node in wrapper
@@ -271,8 +307,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (optionalIsSameNode) {
 	                    wrapper.setAttribute(ATTR_DATA_START_END, ATTR_DATA_START_END);
 	                }
-	
-	                return Util.wrap(el, wrapper);
+	                var wrap = Util.wrap(el, wrapper);
+	                this._callOnWrappedNode(el, wrap);
+	                return wrap;
 	            }
 	        },
 	        _createSplitContainer: {
@@ -289,7 +326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var wrapper = this.document.createElement(TAG_NAME),
 	                    vTrue = "true";
 	                wrapper.setAttribute(DATA_IS_SELECTION, vTrue);
-	                wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Marklib._getIndexParentIfHas(originalElement, index));
+	                wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Rendering._getIndexParentIfHas(originalElement, index));
 	                wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
 	                wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
 	                return wrapper;
@@ -447,7 +484,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var textBefore = initialText.slice(0, startIndex);
 	                    textNode.parentNode.insertBefore(new Text(textBefore), textNode);
 	                    // wrap cutted text node:
-	                    Util.wrap(textNode.previousSibling, this._createSplitContainer(textNode, initialIndex, Marklib._getOffsetParentIfHas(textNode)));
+	                    Util.wrap(textNode.previousSibling, this._createSplitContainer(textNode, initialIndex, Rendering._getOffsetParentIfHas(textNode)));
 	                }
 	                //If there is an unmarked part at the end of the text node,
 	                //cut off that part and put it into it's own textnode.
@@ -455,12 +492,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var textAfter = initialText.slice(endIndex, initialText.length);
 	                    textNode.parentNode.insertBefore(new Text(textAfter), textNode.nextSibling);
 	
-	                    Util.wrap(textNode.nextSibling, this._createSplitContainer(textNode, initialIndex, Marklib._getOffsetParentIfHas(textNode) + endIndex));
+	                    Util.wrap(textNode.nextSibling, this._createSplitContainer(textNode, initialIndex, Rendering._getOffsetParentIfHas(textNode) + endIndex));
 	                }
 	
 	                //Cutoff the unmarked parts and wrap the textnode into a span.
 	                textNode.nodeValue = initialText.slice(startIndex, endIndex);
-	                this.startContainer = this._createWrap(textNode, Marklib._getOffsetParentIfHas(textNode) + startIndex, initialIndex, true).parentNode;
+	                this.startContainer = this._createWrap(textNode, Rendering._getOffsetParentIfHas(textNode) + startIndex, initialIndex, true).parentNode;
 	                this.endContainer = this.startContainer;
 	                return this.startContainer;
 	            }
@@ -494,7 +531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    // Set new text to start node
 	                    startContainer.nodeValue = fullTextStartValue.slice(0, startOffset);
 	
-	                    var offsetStart = Marklib._getOffsetParentIfHas(startContainer);
+	                    var offsetStart = Rendering._getOffsetParentIfHas(startContainer);
 	                    // Create a new node for splitted text, offset is the length of new startContainer.nodeValue:
 	                    startT = this._createStartOrEndContainer(startContainer, this.markerPrefix, partTextStartValue, offsetStart === startOffset ? offsetStart : offsetStart + startOffset, startContainerIndex);
 	                    // Append this node after startContainer
@@ -503,7 +540,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                    if (startContainer.nodeValue) {
 	                        // Wrap start container in detection node, offset is always 0 or parent offset.
-	                        Util.wrap(startContainer, this._createSplitContainer(startContainer, startContainerIndex, Marklib._getOffsetParentIfHas(startContainer)));
+	                        Util.wrap(startContainer, this._createSplitContainer(startContainer, startContainerIndex, Rendering._getOffsetParentIfHas(startContainer)));
 	                    }
 	                }
 	
@@ -518,11 +555,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var partTextEndValue = fullTextEndValue.slice(0, endOffset);
 	                    endContainer.nodeValue = fullTextEndValue.slice(endOffset, fullTextEndValue.length);
 	                    // End Container start offset is always 0 or parent offset.
-	                    endT = this._createStartOrEndContainer(endContainer, this.markerSuffix, partTextEndValue, Marklib._getOffsetParentIfHas(endContainer), endContainerIndex);
+	                    endT = this._createStartOrEndContainer(endContainer, this.markerSuffix, partTextEndValue, Rendering._getOffsetParentIfHas(endContainer), endContainerIndex);
 	
 	                    endContainer.parentNode.insertBefore(endT, endContainer);
 	                    this.endContainer = endT;
-	                    var offsetParent = Marklib._getOffsetParentIfHas(endContainer);
+	                    var offsetParent = Rendering._getOffsetParentIfHas(endContainer);
 	                    Util.wrap(endContainer, this._createSplitContainer(endContainer, endContainerIndex, offsetParent === endOffset ? offsetParent : offsetParent + endOffset));
 	                }
 	
@@ -774,10 +811,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    });
 	
-	    return Marklib;
+	    return Rendering;
 	})();
 	
-	module.exports = Marklib;
+	module.exports = Rendering;
 
 /***/ },
 /* 2 */
@@ -785,61 +822,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
-	exports["default"] = function (obj) {
-	  return obj && obj.__esModule ? obj["default"] : obj;
-	};
+	var _classCallCheck = __webpack_require__(4)["default"];
 	
-	exports.__esModule = true;
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	exports["default"] = function (instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError("Cannot call a class as a function");
-	  }
-	};
-	
-	exports.__esModule = true;
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	exports["default"] = (function () {
-	  function defineProperties(target, props) {
-	    for (var key in props) {
-	      var prop = props[key];
-	      prop.configurable = true;
-	      if (prop.value) prop.writable = true;
-	    }
-	
-	    Object.defineProperties(target, props);
-	  }
-	
-	  return function (Constructor, protoProps, staticProps) {
-	    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-	    if (staticProps) defineProperties(Constructor, staticProps);
-	    return Constructor;
-	  };
-	})();
-	
-	exports.__esModule = true;
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	var _classCallCheck = __webpack_require__(3)["default"];
-	
-	var _createClass = __webpack_require__(4)["default"];
+	var _createClass = __webpack_require__(5)["default"];
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -1051,6 +1036,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            /**
 	             * Determines the correct paths and excludes all `marklib` generated content
+	             * TODO: To improve performance we could shorten the path if an ID is present in it.
 	             * @param {HTMLElement} el
 	             * @param {HTMLElement} [context] if given extraction path is relative to this element
 	             * @returns {*}
@@ -1123,6 +1109,58 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 	
 	exports["default"] = Util;
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	exports["default"] = function (obj) {
+	  return obj && obj.__esModule ? obj["default"] : obj;
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	exports["default"] = function (instance, Constructor) {
+	  if (!(instance instanceof Constructor)) {
+	    throw new TypeError("Cannot call a class as a function");
+	  }
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	exports["default"] = (function () {
+	  function defineProperties(target, props) {
+	    for (var key in props) {
+	      var prop = props[key];
+	      prop.configurable = true;
+	      if (prop.value) prop.writable = true;
+	    }
+	
+	    Object.defineProperties(target, props);
+	  }
+	
+	  return function (Constructor, protoProps, staticProps) {
+	    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	    if (staticProps) defineProperties(Constructor, staticProps);
+	    return Constructor;
+	  };
+	})();
+	
+	exports.__esModule = true;
 
 /***/ }
 /******/ ])

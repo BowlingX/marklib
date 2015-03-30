@@ -1,4 +1,4 @@
-/* global Node, Text, Marklib, Document */
+/* global Node, Text, Rendering, Document */
 import Util from 'util/Util';
 
 import {ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION} from 'util/Util';
@@ -29,7 +29,7 @@ const ATTR_DATA_IS_HIGHLIGHT_NODE = 'data-is-highlight-node';
 const ATTR_DATA_ID = 'data-selection-id';
 
 export default
-class Marklib {
+class Rendering {
 
     constructor(document, cssClass, context) {
 
@@ -51,7 +51,7 @@ class Marklib {
          * Class that is set on all highlight nodes
          * @type {String}
          */
-        this.cssClass = cssClass || 'marking';
+        this.cssClass = undefined === cssClass? 'marking' : cssClass;
 
         /**
          * StartContainer
@@ -81,6 +81,12 @@ class Marklib {
          * @type {Node}
          */
         this.context = context || this.document;
+
+        /**
+         * @type {Function}
+         * @private
+         */
+        this._onWrappedNodeFunc = null;
     }
 
     /**
@@ -92,11 +98,30 @@ class Marklib {
 
     /**
      * @param {string} id
-     * @returns {Marklib}
+     * @returns {Rendering}
      */
     setId(id) {
         this.id = id;
         return this;
+    }
+
+    /**
+     * Listener that is called when a node is wrapped on this instance
+     * @param {Function} f
+     * @returns {Rendering}
+     */
+    onWrappedNode(f) {
+        this._onWrappedNodeFunc = f;
+        return this;
+    }
+
+    /**
+     * @private
+     */
+    _callOnWrappedNode() {
+        if ("function" === typeof this._onWrappedNodeFunc) {
+            this._onWrappedNodeFunc.apply(this, arguments);
+        }
     }
 
 
@@ -164,7 +189,7 @@ class Marklib {
      */
     _createStartOrEndContainer(initialNode, prefix, text, offset, index) {
         var wrapper = this._createStartEndWrapTemplate(prefix + this.getId(), text);
-        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Marklib._getIndexParentIfHas(initialNode, index));
+        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Rendering._getIndexParentIfHas(initialNode, index));
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
         wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
         wrapper.marklibInstance = this;
@@ -183,8 +208,8 @@ class Marklib {
     _createWrap(el, optionalLength, optionalIndex, optionalIsSameNode) {
         var originalIndex = optionalIndex >= 0 ? optionalIndex : Util.calcIndex(el);
         var wrapper = this._createWrapTemplate();
-        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Marklib._getIndexParentIfHas(el, originalIndex));
-        var offsetLength = optionalLength >= 0 ? optionalLength : Marklib._getOffsetParentIfHas(el);
+        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Rendering._getIndexParentIfHas(el, originalIndex));
+        var offsetLength = optionalLength >= 0 ? optionalLength : Rendering._getOffsetParentIfHas(el);
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offsetLength);
 
         // Save a reference to original text node in wrapper
@@ -196,8 +221,9 @@ class Marklib {
         if (optionalIsSameNode) {
             wrapper.setAttribute(ATTR_DATA_START_END, ATTR_DATA_START_END);
         }
-
-        return Util.wrap(el, wrapper);
+        var wrap = Util.wrap(el, wrapper);
+        this._callOnWrappedNode(el, wrap);
+        return wrap;
     }
 
     /**
@@ -210,7 +236,7 @@ class Marklib {
     _createSplitContainer(originalElement, index, offset) {
         var wrapper = this.document.createElement(TAG_NAME), vTrue = "true";
         wrapper.setAttribute(DATA_IS_SELECTION, vTrue);
-        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Marklib._getIndexParentIfHas(originalElement, index));
+        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Rendering._getIndexParentIfHas(originalElement, index));
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
         wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
         return wrapper;
@@ -355,7 +381,7 @@ class Marklib {
             textNode.parentNode.insertBefore(new Text(textBefore), textNode);
             // wrap cutted text node:
             Util.wrap(textNode.previousSibling, this._createSplitContainer(textNode,
-                initialIndex, Marklib._getOffsetParentIfHas(textNode)));
+                initialIndex, Rendering._getOffsetParentIfHas(textNode)));
         }
         //If there is an unmarked part at the end of the text node,
         //cut off that part and put it into it's own textnode.
@@ -364,13 +390,13 @@ class Marklib {
             textNode.parentNode.insertBefore(new Text(textAfter), textNode.nextSibling);
 
             Util.wrap(textNode.nextSibling, this._createSplitContainer(textNode,
-                initialIndex, Marklib._getOffsetParentIfHas(textNode) + endIndex));
+                initialIndex, Rendering._getOffsetParentIfHas(textNode) + endIndex));
         }
 
         //Cutoff the unmarked parts and wrap the textnode into a span.
         textNode.nodeValue = initialText.slice(startIndex, endIndex);
         this.startContainer = this._createWrap(textNode,
-            Marklib._getOffsetParentIfHas(textNode) + startIndex, initialIndex, true).parentNode;
+            Rendering._getOffsetParentIfHas(textNode) + startIndex, initialIndex, true).parentNode;
         this.endContainer = this.startContainer;
         return this.startContainer;
     }
@@ -402,7 +428,7 @@ class Marklib {
             // Set new text to start node
             startContainer.nodeValue = fullTextStartValue.slice(0, startOffset);
 
-            var offsetStart = Marklib._getOffsetParentIfHas(startContainer);
+            var offsetStart = Rendering._getOffsetParentIfHas(startContainer);
             // Create a new node for splitted text, offset is the length of new startContainer.nodeValue:
             startT = this._createStartOrEndContainer(startContainer, this.markerPrefix, partTextStartValue,
                 offsetStart === startOffset ? offsetStart : offsetStart + startOffset, startContainerIndex);
@@ -413,7 +439,7 @@ class Marklib {
             if (startContainer.nodeValue) {
                 // Wrap start container in detection node, offset is always 0 or parent offset.
                 Util.wrap(startContainer, this._createSplitContainer(startContainer, startContainerIndex,
-                    Marklib._getOffsetParentIfHas(startContainer)));
+                    Rendering._getOffsetParentIfHas(startContainer)));
             }
         }
 
@@ -429,11 +455,11 @@ class Marklib {
             endContainer.nodeValue = fullTextEndValue.slice(endOffset, fullTextEndValue.length);
             // End Container start offset is always 0 or parent offset.
             endT = this._createStartOrEndContainer(endContainer, this.markerSuffix, partTextEndValue,
-                Marklib._getOffsetParentIfHas(endContainer), endContainerIndex);
+                Rendering._getOffsetParentIfHas(endContainer), endContainerIndex);
 
             endContainer.parentNode.insertBefore(endT, endContainer);
             this.endContainer = endT;
-            var offsetParent = Marklib._getOffsetParentIfHas(endContainer);
+            var offsetParent = Rendering._getOffsetParentIfHas(endContainer);
             Util.wrap(endContainer, this._createSplitContainer(endContainer, endContainerIndex,
                 offsetParent === endOffset ? offsetParent : offsetParent + endOffset));
         }

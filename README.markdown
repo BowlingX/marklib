@@ -8,7 +8,7 @@ A simple and fast zero-dependencies-library to transform text-selections into se
 
 ## Install
 
-`npm` package is available soon.
+`npm install --save-dev marklib`
 
 ## License
 The MIT License (MIT)

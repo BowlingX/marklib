@@ -149,6 +149,11 @@ pre > code {
  @extend .fadeInDownSlow;
 }
 
+.tight {
+  margin-bottom:0;
+}
+
+
 @media (max-width:480px) {
 
   .presentation {
