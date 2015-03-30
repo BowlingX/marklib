@@ -54,7 +54,7 @@ new Marklib.Rendering(document)
             <button id="action-mark"><i class="fa fa-eraser"></i> Mark selection</button>
             <button class="warn" id="action-clear"><i class="fa fa-trash-o"></i></button>
         </div>
-        <p class="text-center subline tight">Marklib.Rendering depends on zero libraries and is just around 10kb minified</p>
+        <p class="text-center subline tight">Marklib depends on zero libraries and is just around 10kb minified</p>
 
     </div>
 </div>
@@ -129,6 +129,7 @@ npm install --save-dev marklib
                     var selection = document.getSelection(), renderer = new Marklib.Rendering(document),
                             result = renderer.renderWithRange(selection.getRangeAt(0));
                     selection.removeAllRanges();
+                    console.log(result);
                     savedRanges.push(result);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
                 } catch (e) {

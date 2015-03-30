@@ -312,7 +312,8 @@ class Rendering {
             if (Node.TEXT_NODE === currentNext.nodeType) {
                 wrapIf(currentNext);
             } else {
-                if (currentNext.contains(endContainer)) {
+
+                if (!!(currentNext.compareDocumentPosition(endContainer) & 16)) {
                     this.walkDom(currentNext, (e) => {
                         if (e === endContainer) {
                             return false;

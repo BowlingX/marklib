@@ -1,4 +1,4 @@
-/* global Node, NodeList */
+/* global Node, NodeList, Element */
 
 /**
  * @type {string}
@@ -16,6 +16,14 @@ export const DATA_IS_SELECTION = 'data-is-selection';
  * @type {string}
  */
 const SERIALIZE_SEPARATOR = ";";
+
+// polyfill for matchesSelector, IE 10/11 does not support Element.matches
+if (Element && !Element.prototype.matches) {
+    var p = Element.prototype;
+    p.matches = p.matchesSelector ||
+    p.mozMatchesSelector || p.msMatchesSelector ||
+    p.oMatchesSelector || p.webkitMatchesSelector;
+}
 
 /**
  * Utility class
