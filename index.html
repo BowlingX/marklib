@@ -80,7 +80,9 @@ new Marklib(document).renderWithRange(selection.getRangeAt(0));
                     if (autoMarkText.parentNode.nextSibling) {
                         autoMarkText = autoMarkText.parentNode.nextSibling.childNodes[0];
                         setTimeout(function () {
-                            render(autoMarkText, c++);
+                            requestAnimationFrame(function(){
+                                render(autoMarkText, c++);
+                            });
                         }, speed * c);
                     }
                 };
