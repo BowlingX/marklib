@@ -1,7 +1,7 @@
 {
   "name": "marklib",
   "version": "0.1.0",
-  "main": "src/main/Marklib.js",
+  "main": "build/js/marklib.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:BowlingX/marklib.git"

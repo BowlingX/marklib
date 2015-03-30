@@ -16,7 +16,8 @@ var
     autoprefixer = require('autoprefixer-core'),
     argv = require('yargs').argv,
     csswring = require('csswring'),
-    webpackConfig = require("./webpack.config.js");
+    webpackConfig = require("./webpack.config.js"),
+    webpackMinConfig = require('./webpack.config.min.js');
 
 var sass = require('gulp-sass');
 
@@ -42,10 +43,10 @@ gulp.task('clean', function (cb) {
     del(['build'], cb);
 });
 
-function createScripts(watch) {
+function createScripts(watch, config) {
     var path = require("path");
 
-    var config = Object.create(webpackConfig);
+    var config = Object.create(config);
     config.watch = watch;
     return gulp.src(paths.exports)
         .pipe($.plumber({
@@ -55,12 +56,16 @@ function createScripts(watch) {
         .pipe(gulp.dest('build/js'))
 }
 
+gulp.task('compileMinifiedScripts', ['clean'], function(){
+    return createScripts(false, webpackMinConfig);
+});
+
 gulp.task('compileScriptsWithDependencies', ['clean'], function () {
-    return createScripts(false);
+    return createScripts(false, webpackConfig);
 });
 
 gulp.task('watchScriptsWithDependencies', ['clean'], function () {
-    return createScripts(true);
+    return createScripts(true, webpackConfig);
 });
 
 // setup tests
@@ -132,4 +137,4 @@ gulp.task('watch', function () {
 // The default task (called when you run `gulp` from cli)
 gulp.task('default', ['watch', 'fonts', 'images', 'sass', 'watchScriptsWithDependencies']);
 
-gulp.task('dist', ['fonts', 'images', 'sass', 'compileScriptsWithDependencies']);
+gulp.task('dist', ['fonts', 'images', 'sass', 'compileScriptsWithDependencies', 'compileMinifiedScripts']);
