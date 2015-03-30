@@ -89,7 +89,6 @@ p {
   }
 
   &.alt {
-    margin:10px 15px 20px;
     background:$buttonAltColor;
     &:hover {
       background:lighten($buttonAltColor, 10%);
