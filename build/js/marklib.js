@@ -71,7 +71,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/* global Node, Text, Rendering, Document */
+	/* WEBPACK VAR INJECTION */(function(global) {/* global Node, Rendering, Document */
 	"use strict";
 	
 	var _classCallCheck = __webpack_require__(4)["default"];
