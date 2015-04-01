@@ -1,4 +1,4 @@
-/* global Node, Rendering, Document */
+/* global Node, Rendering, Document, global */
 import Util from 'util/Util';
 
 import {ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION} from 'util/Util';
