@@ -2,3 +2,4 @@ node_modules
 coverage
 *.iml
 .idea
+_site
