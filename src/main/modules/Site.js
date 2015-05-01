@@ -67,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function () {
             var selection = document.getSelection(), renderer = new Marklib.Rendering(document),
                 result = renderer.renderWithRange(selection.getRangeAt(0));
             selection.removeAllRanges();
-            console.log(result);
             savedRanges.push(result);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
         } catch (e) {
