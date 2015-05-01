@@ -284,15 +284,15 @@ class Rendering {
      * @returns {boolean} (true if endContainer was found)
      */
     wrapSiblings(start, endContainer) {
-        var next = start;
-        var found = false;
+        let next = start,
+            found = false;
 
         // Capsule some logic
         var wrap = ((n) => {
             if (n.parentNode.hasAttribute(ATTR_DATA_START_END) &&
                 n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) &&
                 n.parentNode.getAttribute(ATTR_DATA_ID) == this.getId()) {
-                var thisNode = this._createWrap(n).parentNode;
+                let thisNode = this._createWrap(n).parentNode;
                 thisNode.classList.remove(this.cssClass);
                 thisNode.removeAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE);
             } else {
@@ -370,11 +370,14 @@ class Rendering {
      * @private
      */
     _markTextSameNode(textNode, startIndex, endIndex) {
-        var initialText = textNode.nodeValue;
-        var initialIndex = Util.calcIndex(textNode);
+
+        let initialText   = textNode.nodeValue,
+            initialIndex  = Util.calcIndex(textNode);
+
         if (!initialText) {
             return false;
         }
+
         //If there is an unmarked part in the beginning of the text node,
         //cut off that part and put it into it's own textnode.
         if (startIndex > 0) {
@@ -488,10 +491,11 @@ class Rendering {
      * @param {Node} commonAncestor
      * @param {int} startOffset
      * @param {int} endOffset
+     * @param {boolean} [withoutResult] if true result will not be calculated
      * @returns {{startOffset: (int), endOffset: (int)}} the original offsets found
      * @private
      */
-    _renderWithElements(startContainer, endContainer, commonAncestor, startOffset, endOffset) {
+    _renderWithElements(startContainer, endContainer, commonAncestor, startOffset, endOffset, withoutResult) {
         var outer = Util.parents(startContainer, commonAncestor);
         outer = outer[outer.length - 1];
         var contextContainer = outer ? outer : commonAncestor;
@@ -557,7 +561,7 @@ class Rendering {
             }
         }
 
-        var result = {
+        var result = withoutResult || {
             // Real offset is calculated by relative length and absolute length
             startOffset: originalStartOffset + startOffset,
             endOffset: originalEndOffset + endOffset,
@@ -652,7 +656,7 @@ class Rendering {
             var range = document.createRange();
             range.setStart(startContainer.node, startContainer.offset);
             range.setEnd(endContainer.node, endContainer.offset);
-            this.renderWithRange(range);
+            this.renderWithRange(range, true);
             return range;
         }
         throw 'Could not find start- and/or end-container in document';
@@ -662,11 +666,12 @@ class Rendering {
     /**
      * Prepares a selection with a range object
      * @param {Range} range
+     * @param {boolean} [withoutResult] optional do calculate a result, the selection would not be serializable
      * @returns {*}
      */
-    renderWithRange(range) {
+    renderWithRange(range, withoutResult) {
         return this._renderWithElements(range.startContainer, range.endContainer,
-            range.commonAncestorContainer, range.startOffset, range.endOffset);
+            range.commonAncestorContainer, range.startOffset, range.endOffset, withoutResult);
     }
 }
 

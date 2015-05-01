@@ -7,7 +7,7 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
-                loader: 'babel-loader?experimental&optional=runtime&sourceMap=inline'
+                loader: 'babel-loader?optional=runtime&sourceMap=inline'
             }
         ],
 

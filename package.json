@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git@github.com:BowlingX/marklib.git"
   },
+  "main": [
+    "build/js/marklib.js"
+  ],
   "homepage": "https://bowlingx.com",
   "author": "David Heidrich",
   "license": {
@@ -45,11 +48,11 @@
     "gulp-if": "^1.2.5",
     "autoprefixer-core": "^5.1.5",
     "karma-webpack": "^1.5.0",
-    "webpack": "^1.7.1",
-    "babel": "^4.6.6",
-    "babel-loader": "^4.0.0",
-    "babel-runtime": "^4.6.6",
-    "gulp-webpack": "^1.3.0",
+    "webpack": "^1.8.9",
+    "babel": "^5.1.11",
+    "babel-loader": "^5.0.0",
+    "babel-runtime": "^5.1.11",
+    "gulp-webpack": "^1.4.0",
     "imports-loader": "^0.6.3",
     "exports-loader": "^0.6.2",
     "karma": "^0.12.31",

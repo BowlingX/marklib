@@ -8,7 +8,7 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
-                loader: 'babel-loader?experimental&optional=runtime&sourceMap=inline'
+                loader: 'babel-loader?optional=runtime&sourceMap=inline'
             }
         ],
         preLoaders: [
@@ -24,11 +24,15 @@ module.exports = {
         root: [path.join(__dirname, "bower_components"),
             path.join(__dirname, 'src/main')]
     },
+    entry: {
+        'site': ['modules/Site'],
+        'marklib': ['modules/Marklib']
+    },
     output: {
-        filename: 'marklib.js',
+        filename: '[name].js',
         libraryTarget: 'umd',
         library: 'Marklib',
-        sourceMapFilename: 'marklib.map'
+        sourceMapFilename: '[name].map'
     },
     plugins: [
         new webpack.ResolverPlugin(

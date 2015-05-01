@@ -7,7 +7,7 @@ layout: default
     <p class="subline" id="automark">Damn fast easy marking with serializable selections.</p>
 
     <a class="button alt" href="https://github.com/BowlingX/marklib"><i class="fa fa-github"></i> Fork me on Github</a>
-    <a class="button" href="https://github.com/BowlingX/marklib/archive/v0.4.0.tar.gz"><i class="fa fa-download"></i> <span class="hide-small">Download</span></a>
+    <a class="button" href="{{site.downloadLink}}"><i class="fa fa-download"></i> <span class="hide-small">Download {{site.version}}</span></a>
     <a class="button twitter" href="https://twitter.com/bowlingx"><i class="fa fa-twitter"></i> <span class="hide-small">@bowlingx</span></a>
 </header>
 <div class="presentation">
@@ -55,8 +55,7 @@ new Marklib.Rendering(document)
             <button id="action-mark"><i class="fa fa-eraser"></i> Mark selection</button>
             <button class="warn" id="action-clear"><i class="fa fa-trash-o"></i></button>
         </div>
-        <p class="text-center subline tight">Marklib depends on zero libraries and is just around 10kb minified</p>
-
+        <p class="text-center subline tight">Marklib depends on zero libraries and is just around 4.5kb compressed</p>
     </div>
 </div>
 {% highlight bash %}
@@ -65,99 +64,3 @@ npm install --save-dev marklib
 <footer>
     <p class="text-center">Made with ♥ by David Heidrich, licensed under the MIT License</p>
 </footer>
-<script type="text/javascript">
-    void function (document) {
-        document.addEventListener("DOMContentLoaded", function () {
-            var STORAGE_KEY = 'savedRanges';
-
-            /**
-             * Creates an animated rendering
-             */
-            function presentRendering(selector, classNames, speed) {
-                var autoMarkText = document.getElementById(selector).childNodes[0];
-
-                var render = function (autoMarkText, c) {
-                    var r = new Marklib.Rendering(document, classNames);
-                    var range = document.createRange();
-                    range.setStart(autoMarkText, 0);
-                    range.setEnd(autoMarkText, 1);
-                    r.renderWithRange(range);
-                    if (autoMarkText.parentNode.nextSibling) {
-                        autoMarkText = autoMarkText.parentNode.nextSibling.childNodes[0];
-                        setTimeout(function () {
-                            requestAnimationFrame(function(){
-                                render(autoMarkText, c++);
-                            });
-                        }, speed * c);
-                    }
-                };
-
-                return render(autoMarkText, 1);
-            }
-
-            presentRendering('automark', 'fadeInDown', 10);
-
-            var savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [],  animated = false;;
-
-            savedRanges.forEach(function (range) {
-                var marker = new Marklib.Rendering(document);
-                try {
-                    marker.renderWithPath(range.startContainerPath + ";" + range.startOffset,
-                            range.endContainerPath + ";" + range.endOffset)
-                } catch (e) {
-                    console.warn("Could not render:", range);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-                    throw 'Cleared local storage because of a rendering issue, the page might have been changed ;)'
-                }
-
-            });
-
-            window.addEventListener('scroll', function () {
-                var el = document.getElementById('secondParagraph'), r = el.getBoundingClientRect(),
-                        html = document.documentElement;
-                if (r.top <= html.clientHeight && r.bottom >= 0 && !animated) {
-                    animated = true;
-
-                    el.classList.add('animate');
-                    if(!savedRanges.length) {
-                        presentRendering('secondParagraphItem', 'marking', 25);
-                    }
-                }
-            });
-
-            var actionMark = function () {
-                try {
-                    var selection = document.getSelection(), renderer = new Marklib.Rendering(document),
-                            result = renderer.renderWithRange(selection.getRangeAt(0));
-                    selection.removeAllRanges();
-                    console.log(result);
-                    savedRanges.push(result);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
-                } catch (e) {
-                    console.warn("Could not add selection: ", e);
-                }
-            };
-
-            document.addEventListener("keydown", function (e) {
-                if (13 === e.keyCode) {
-                    actionMark();
-                }
-            });
-
-            document.addEventListener("click", function (e) {
-                if (e.target.id === 'action-mark') {
-                    return actionMark();
-                } else if (e.target.id === 'action-clear') {
-                    var elements = document.getElementsByTagName('x-marker');
-                    for (var i = 0; i < elements.length; i++) {
-                        elements[i].classList.add('deleted');
-                        elements[i].classList.remove('marking');
-
-                    }
-                    savedRanges = [];
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-                }
-            });
-        });
-    }(document);
-</script>

@@ -130,7 +130,7 @@ p {
 }
 
 ::selection {
-  background: $markingColor;
+  background: lighten($markingColor, 20%);
 }
 
 pre {
