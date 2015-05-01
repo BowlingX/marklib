@@ -73,7 +73,8 @@ class Util {
      * @return {int} the index of this node in context to it's siblings
      */
     static index(node, optionalList) {
-        var children = optionalList || (node.nodeType === Node.TEXT_NODE ? node.parentNode.childNodes : node.parentNode.children);
+        const children = optionalList || (node.nodeType === Node.TEXT_NODE ?
+                node.parentNode.childNodes : node.parentNode.children);
         return Array.prototype.indexOf.call(children || [], node);
     }
 
@@ -89,10 +90,10 @@ class Util {
         // Convert `elms` to an array, if necessary.
         if (!(elms instanceof NodeList || elms instanceof Array)) elms = [elms];
         for (var i = elms.length - 1; i >= 0; i--) {
-            var child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
-            var el = elms[i];
+            const child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
+            const el = elms[i];
             // Cache the current parent and sibling.
-            var parent = el.parentNode, sibling = el.nextSibling;
+            const parent = el.parentNode, sibling = el.nextSibling;
 
             child.appendChild(el);
             if (sibling) {
@@ -110,16 +111,16 @@ class Util {
      * @returns {int|boolean}
      */
     static calcIndex(node) {
-        var calculatedIndex = 0;
-        var foundWrapper = false;
-        var nodes = node.childNodes, length = nodes.length;
+        let calculatedIndex = 0,
+            foundWrapper    = false;
+        const nodes = node.childNodes, length = nodes.length;
         for (let thisIndex = 0; thisIndex < length; thisIndex++) {
-            var el = nodes[thisIndex];
+            const el = nodes[thisIndex];
             if (el === node) {
                 return false;
             }
-            var maybeIndexOfOriginal = el.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
-            var isOriginal = maybeIndexOfOriginal !== undefined;
+            const maybeIndexOfOriginal = el.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
+            const isOriginal = maybeIndexOfOriginal !== undefined;
             // Important: do not include pseudo elements
             if (el !== node && (el.nodeType !== Node.TEXT_NODE || isOriginal) && !el.hasAttribute(DATA_PSEUDO)) {
                 if (isOriginal) {
@@ -140,8 +141,8 @@ class Util {
      * @return {Array.<HTMLElement>} an array of all found parents of given element (and optional selector)
      */
     static parents(el, optionalSelector) {
-        var element = el;
-        var foundElements = [];
+        let element = el;
+        const foundElements = [];
         while (element.parentNode !== null) {
             element = element.parentNode;
             if (optionalSelector && ((element === optionalSelector) ||
@@ -161,7 +162,7 @@ class Util {
      * @returns {*}
      */
     static parent(el, selector) {
-        var element = el;
+        let element = el;
         while (element.parentNode !== null) {
             element = element.parentNode;
             if (element.matches && element.matches(selector)) {
@@ -172,7 +173,7 @@ class Util {
     }
 
     static closest(el, selector) {
-        var element = el;
+        let element = el;
         while (element !== null) {
             if (element.matches && element.matches(selector)) {
                 return element;
@@ -204,14 +205,14 @@ class Util {
 
                 // Extract original index of this node:
                 // Outer most data-original-index is original index
-                var outerMostElement = Util.parents(node, '[' + ATTR_DATA_ORIGINAL_INDEX + ']').reverse()[0];
+                const outerMostElement = Util.parents(node, '[' + ATTR_DATA_ORIGINAL_INDEX + ']').reverse()[0];
                 // if element is not yet wrapped in span, recalculate index based on parent container:
                 // We have to do this because text node indexes != element indexes...
-                var calculatedIndex = 0;
+                let calculatedIndex = 0;
                 if (!outerMostElement) {
                     calculatedIndex = Util.calcIndex(node);
                 }
-                var index = outerMostElement ? parseInt(
+                const index = outerMostElement ? parseInt(
                     outerMostElement.getAttribute(ATTR_DATA_ORIGINAL_INDEX)) : calculatedIndex;
                 name = SERIALIZE_SEPARATOR + index;
             } else {
@@ -229,7 +230,7 @@ class Util {
             }
             // Select only siblings that are not part of selection and are of the same type
             // (because we use nth-of-type selector later)
-            var siblings = Util.nodeListFilter(parent.children, (el) => {
+            const siblings = Util.nodeListFilter(parent.children, (el) => {
                 return !el.hasAttribute(DATA_IS_SELECTION) && el.nodeName === node.nodeName;
             }), nodeIndex = Util.index(node, siblings);
 

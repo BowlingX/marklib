@@ -90,7 +90,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+	'use strict';
 	
 	var _createClass = __webpack_require__(7)['default'];
 	
@@ -104,7 +104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	/* global Node, Rendering, Document, global */
+	/* global Node, Rendering, Document */
 	
 	var _Util = __webpack_require__(4);
 	
@@ -495,7 +495,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            //cut off that part and put it into it's own textnode.
 	            if (startIndex > 0) {
 	                var textBefore = initialText.slice(0, startIndex);
-	                textNode.parentNode.insertBefore(global.document.createTextNode(textBefore), textNode);
+	                textNode.parentNode.insertBefore(this.document.createTextNode(textBefore), textNode);
 	                // wrap cutted text node:
 	                _Util2['default'].wrap(textNode.previousSibling, this._createSplitContainer(textNode, initialIndex, Rendering._getOffsetParentIfHas(textNode)));
 	            }
@@ -503,7 +503,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            //cut off that part and put it into it's own textnode.
 	            if (endIndex < initialText.length) {
 	                var textAfter = initialText.slice(endIndex, initialText.length);
-	                textNode.parentNode.insertBefore(global.document.createTextNode(textAfter), textNode.nextSibling);
+	                textNode.parentNode.insertBefore(this.document.createTextNode(textAfter), textNode.nextSibling);
 	                _Util2['default'].wrap(textNode.nextSibling, this._createSplitContainer(textNode, initialIndex, Rendering._getOffsetParentIfHas(textNode) + endIndex));
 	            }
 	
@@ -727,8 +727,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                p = pSplit[0],
 	                objectIndex = parseInt(pSplit[1]),
 	                charOffset = parseInt(pSplit[2]),
-	                container = this.context.querySelector(p),
-	                maybeFoundNode = null;
+	                container = this.context.querySelector(p);
+	            var maybeFoundNode = null;
 	            this.walkDom(container, function (n) {
 	                if (n.nodeType === Node.TEXT_NODE) {
 	                    var atrOffsetStart = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START);
@@ -819,7 +819,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	exports['default'] = Rendering;
 	module.exports = exports['default'];
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 4 */
@@ -943,14 +942,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var child = i > 0 ? wrapper.cloneNode(true) : wrapper;
 	                var el = elms[i];
 	                // Cache the current parent and sibling.
-	                var parent = el.parentNode,
+	                var _parent = el.parentNode,
 	                    sibling = el.nextSibling;
 	
 	                child.appendChild(el);
 	                if (sibling) {
-	                    parent.insertBefore(child, sibling);
+	                    _parent.insertBefore(child, sibling);
 	                } else {
-	                    parent.appendChild(child);
+	                    _parent.appendChild(child);
 	                }
 	            }
 	            return wrapper;
@@ -964,8 +963,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @returns {int|boolean}
 	         */
 	        value: function calcIndex(node) {
-	            var calculatedIndex = 0;
-	            var foundWrapper = false;
+	            var calculatedIndex = 0,
+	                foundWrapper = false;
 	            var nodes = node.childNodes,
 	                length = nodes.length;
 	            for (var thisIndex = 0; thisIndex < length; thisIndex++) {
