@@ -3,6 +3,7 @@ marklib
 
 [![Circle CI](https://circleci.com/gh/BowlingX/marklib.svg?style=svg)](https://circleci.com/gh/BowlingX/marklib)
 [![Code Climate](https://codeclimate.com/github/BowlingX/marklib/badges/gpa.svg)](https://codeclimate.com/github/BowlingX/marklib)
+[![Join the chat at https://gitter.im/BowlingX/marklib](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/BowlingX/marklib?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A simple and fast zero-dependencies-library to transform text-selections into serializable markings.
 
