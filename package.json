@@ -10,10 +10,7 @@
   },
   "homepage": "https://bowlingx.com",
   "author": "David Heidrich",
-  "license": {
-    "type": "MIT",
-    "url": "https://github.com/BowlingX/marklib/blob/master/LICENSE"
-  },
+  "license": "MIT",
   "devDependencies": {
     "autoprefixer-core": "^5.2.0",
     "babel": "^5.5.8",
