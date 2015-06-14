@@ -9,6 +9,8 @@ A simple and fast zero-dependencies-library to transform text-selections into se
 
 [Demo](http://bowlingx.github.io/marklib/)
 
+![Demo-Gif](https://raw.githubusercontent.com/BowlingX/marklib/master/marklib.gif)
+
 ## Install
 
 marklib can be installed with `npm` or `bower`.
