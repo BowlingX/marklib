@@ -18,8 +18,6 @@ var
     csswring = require('csswring'),
     webpackConfig = require("./webpack.config.js");
 
-var sass = require('gulp-sass');
-
 var paths = {
     exports: ['src/export.js'],
     tests: ['src/test/**/*.js'],
@@ -43,8 +41,6 @@ gulp.task('clean', function (cb) {
 });
 
 function createScripts(watch, config) {
-    var path = require("path");
-
     var config = Object.create(config);
     config.watch = watch;
     return gulp.src(paths.exports)
