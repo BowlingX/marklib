@@ -1,0 +1,22 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true,
+    "jasmine": true
+  },
+  "globals": {
+    "jest": false
+  },
+  "ecmaFeatures": {
+    "jsx": true,
+    "globalReturn": false
+  },
+  "rules": {
+    "no-underscore-dangle": false,
+    "no-use-before-define": false,
+    "quotes": 0,
+    "strict":[2, "global"],
+    "comma-dangle": "always"
+  }
+}

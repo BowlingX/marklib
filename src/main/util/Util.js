@@ -1,5 +1,7 @@
 /* global Node, NodeList, Element */
 
+'use strict';
+
 /**
  * @type {string}
  */
@@ -21,8 +23,8 @@ const SERIALIZE_SEPARATOR = ";";
 if (Element && !Element.prototype.matches) {
     var p = Element.prototype;
     p.matches = p.matchesSelector ||
-    p.mozMatchesSelector || p.msMatchesSelector ||
-    p.oMatchesSelector || p.webkitMatchesSelector;
+        p.mozMatchesSelector || p.msMatchesSelector ||
+        p.oMatchesSelector || p.webkitMatchesSelector;
 }
 
 /**
@@ -86,9 +88,13 @@ class Util {
      * @return {HTMLElement}
      */
     static wrap(elms, wrapper) {
-        if (!elms) return wrapper;
+        if (!elms) {
+            return wrapper;
+        }
         // Convert `elms` to an array, if necessary.
-        if (!(elms instanceof NodeList || elms instanceof Array)) elms = [elms];
+        if (!(elms instanceof NodeList || elms instanceof Array)) {
+            elms = [elms];
+        }
         for (var i = elms.length - 1; i >= 0; i--) {
             const child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
             const el = elms[i];
@@ -112,7 +118,7 @@ class Util {
      */
     static calcIndex(node) {
         let calculatedIndex = 0,
-            foundWrapper    = false;
+            foundWrapper = false;
         const nodes = node.childNodes, length = nodes.length;
         for (let thisIndex = 0; thisIndex < length; thisIndex++) {
             const el = nodes[thisIndex];
@@ -159,7 +165,7 @@ class Util {
      * Finds a parent node (the closest) with a given selector
      * @param {Node} el
      * @param {String} selector
-     * @returns {*}
+     * @returns {Node|bool}
      */
     static parent(el, selector) {
         let element = el;
@@ -172,6 +178,12 @@ class Util {
         return false;
     }
 
+    /**
+     * Finds the closest element including itself matching a given selector
+     * @param {Node} el
+     * @param selector
+     * @returns {Node|bool}
+     */
     static closest(el, selector) {
         let element = el;
         while (element !== null) {
@@ -184,14 +196,26 @@ class Util {
     }
 
     /**
+     * @param {HTMLElement} n
+     * @return {bool}
+     */
+    static isMarkNode(n) {
+        return n instanceof HTMLElement && n.hasAttribute(DATA_IS_SELECTION);
+    }
+
+    /**
      * Determines the correct paths and excludes all `marklib` generated content
      * TODO: To improve performance we could shorten the path if an ID is present in it.
      * @param {HTMLElement} el
      * @param {HTMLElement} [context] if given extraction path is relative to this element
-     * @returns {*}
+     * @returns {string}
      */
     static getPath(el, context) {
         var path = null, node = el;
+
+        const filterSiblings = (thisEl) => {
+            return !Util.isMarkNode(thisEl) && thisEl.nodeName === node.nodeName;
+        };
 
         while (node) {
             var name = null;
@@ -219,20 +243,21 @@ class Util {
                 name = node.nodeName;
             }
 
-            if (!name) break;
+            if (!name) {
+                break;
+            }
 
             name = name.toLowerCase();
 
             var parent = node.parentNode;
-            if (node instanceof HTMLElement && node.hasAttribute(DATA_IS_SELECTION)) {
+            if (Util.isMarkNode(node)) {
                 node = parent;
                 continue;
             }
             // Select only siblings that are not part of selection and are of the same type
             // (because we use nth-of-type selector later)
-            const siblings = Util.nodeListFilter(parent.children, (el) => {
-                return !el.hasAttribute(DATA_IS_SELECTION) && el.nodeName === node.nodeName;
-            }), nodeIndex = Util.index(node, siblings);
+            const siblings = Util.nodeListFilter(parent.children, filterSiblings),
+                nodeIndex = Util.index(node, siblings);
 
             if (siblings.length > 1 && nodeIndex >= 0) {
                 name += ':nth-of-type(' + (nodeIndex + 1) + ')';

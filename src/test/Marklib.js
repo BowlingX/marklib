@@ -1,4 +1,7 @@
-import $ from 'jquery';
+/* global loadFixtures */
+
+'use strict';
+
 import setup from 'setup';
 import Rendering from 'Rendering';
 
@@ -26,6 +29,8 @@ describe("Test some wrappings", () => {
         var range = document.createRange();
         range.setStart(document.getElementById("firstP").childNodes[0], 1);
         range.setEnd(document.getElementById("lastP").childNodes[0], 2);
+
+        marklib.renderWithRange(range);
     });
 
     it("should render a range in the same node", () => {
@@ -33,5 +38,7 @@ describe("Test some wrappings", () => {
         var range = document.createRange();
         range.setStart(document.getElementById("firstP").childNodes[0], 0);
         range.setEnd(document.getElementById("firstP").childNodes[0], 5);
+
+        marklib.renderWithRange(range);
     });
 });

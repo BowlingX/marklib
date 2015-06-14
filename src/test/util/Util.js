@@ -1,3 +1,7 @@
+/* global loadFixtures */
+
+'use strict';
+
 import Util from 'util/Util';
 import $ from 'jquery';
 import setup from 'setup';
@@ -17,7 +21,7 @@ describe("Test some DOM stuff", () => {
 
     it("TextNode: Find the right path of a TextNode", () => {
         var el = $('#inline-el')[0].childNodes[2];
-        var splitPath =  Util.getPath(el, document).split(';');
+        var splitPath = Util.getPath(el, document).split(';');
         expect(document.querySelector(splitPath[0]).childNodes[parseInt(splitPath[1])]).toEqual(el);
     });
 

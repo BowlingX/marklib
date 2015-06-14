@@ -1,20 +1,24 @@
+'use strict';
+
 /* global localStorage */
+
 import Marklib from 'modules/Marklib';
+
+const KEY_ENTER = 13;
+
 /**
  * Contains Module for the demonstration
  */
 
 document.addEventListener("DOMContentLoaded", function () {
-    "use strict";
-
     const STORAGE_KEY = 'savedRanges';
 
     /**
      * Creates an animated rendering
      */
     function presentRendering(selector, classNames, speed) {
-        var autoMarkText = document.getElementById(selector).childNodes[0];
-        let thisLength = autoMarkText.length;
+        var text = document.getElementById(selector).childNodes[0];
+        let thisLength = text.length;
 
         var render = function (autoMarkText, c, length) {
             var r = new Marklib.Rendering(document, classNames);
@@ -23,13 +27,13 @@ document.addEventListener("DOMContentLoaded", function () {
             range.setEnd(autoMarkText, 1);
             r.renderWithRange(range, true);
             if (autoMarkText.parentNode.nextSibling) {
-                autoMarkText = autoMarkText.parentNode.nextSibling.childNodes[0];
+                let nextText = autoMarkText.parentNode.nextSibling.childNodes[0];
                 setTimeout(function () {
-                        render(autoMarkText, ++c, length);
+                        render(nextText, ++c, length);
                 }, speed);
             }
         };
-        return render(autoMarkText, 0, thisLength);
+        return render(text, 0, thisLength);
     }
 
     presentRendering('automark', 'fadeInDown', 20);
@@ -75,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     document.addEventListener("keydown", function (e) {
-        if (13 === e.keyCode) {
+        if (e.keyCode === KEY_ENTER) {
             actionMark();
         }
     });

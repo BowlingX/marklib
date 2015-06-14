@@ -1,4 +1,7 @@
-/* global Node, Rendering, Document */
+/* global Node, Document */
+
+'use strict';
+
 import Util from 'util/Util';
 
 import {ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION} from 'util/Util';
@@ -27,6 +30,12 @@ const ATTR_DATA_IS_HIGHLIGHT_NODE = 'data-is-highlight-node';
  * @type {string}
  */
 const ATTR_DATA_ID = 'data-selection-id';
+
+/**
+ * @see https://developer.mozilla.org/de/docs/Web/API/Node/compareDocumentPosition
+ * @type {number}
+ */
+const DOCUMENT_POSITION_CONTAINED_BY = 16;
 
 export default
 class Rendering {
@@ -119,7 +128,7 @@ class Rendering {
      * @private
      */
     _callOnWrappedNode() {
-        if ("function" === typeof this._onWrappedNodeFunc) {
+        if (typeof this._onWrappedNodeFunc === 'function') {
             this._onWrappedNodeFunc.apply(this, arguments);
         }
     }
@@ -291,7 +300,7 @@ class Rendering {
         const wrap = ((n) => {
             if (n.parentNode.hasAttribute(ATTR_DATA_START_END) &&
                 n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) &&
-                n.parentNode.getAttribute(ATTR_DATA_ID) == this.getId()) {
+                n.parentNode.getAttribute(ATTR_DATA_ID) === this.getId()) {
                 let thisNode = this._createWrap(n).parentNode;
                 thisNode.classList.remove(this.cssClass);
                 thisNode.removeAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE);
@@ -300,34 +309,40 @@ class Rendering {
             }
         }).bind(this);
 
-        var wrapIf = (n) => {
+        // helper functions
+
+        const wrapIf = (n) => {
             if (!Util.nodeIsEmpty(n)) {
                 wrap(n);
             }
         };
-        while (null !== next && next !== endContainer) {
+
+        const walkIfContained = (e) => {
+            if (e === endContainer) {
+                return false;
+            }
+            if (Node.TEXT_NODE === e.nodeType) {
+                wrapIf(e);
+            }
+            return true;
+        };
+
+        const walkIfNotContained = (el) => {
+            wrapIf(el);
+        };
+
+        while (next !== null && next !== endContainer) {
             var currentNext = next;
             next = next.nextSibling;
             // Found a text node, directly wrap inside a span
             if (Node.TEXT_NODE === currentNext.nodeType) {
                 wrapIf(currentNext);
             } else {
-
-                if (!!(currentNext.compareDocumentPosition(endContainer) & 16)) {
-                    this.walkDom(currentNext, (e) => {
-                        if (e === endContainer) {
-                            return false;
-                        }
-                        if (Node.TEXT_NODE === e.nodeType) {
-                            wrapIf(e);
-                        }
-                        return true;
-                    });
+                if ((currentNext.compareDocumentPosition(endContainer) & DOCUMENT_POSITION_CONTAINED_BY)) {
+                    this.walkDom(currentNext, walkIfContained);
                     found = true;
                 } else {
-                    this._walkTextNodes(currentNext, (el) => {
-                        wrapIf(el);
-                    });
+                    this._walkTextNodes(currentNext, walkIfNotContained);
                 }
                 if (found) {
                     return true;
@@ -603,7 +618,7 @@ class Rendering {
 
 
     /**
-     * Deserializes a specific path and finds the right textnodes
+     * Deserialize a specific path and finds the right textNodes
      * This even works when DOM has been manipulated before by `marklib`
      * @param {string} path the serialized path (including offsets)
      * @return {Node}
@@ -618,10 +633,10 @@ class Rendering {
         this.walkDom(container, function (n) {
             if (n.nodeType === Node.TEXT_NODE) {
                 var atrOffsetStart = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START);
-                atrOffsetStart = null === atrOffsetStart ? 0 : atrOffsetStart;
+                atrOffsetStart = atrOffsetStart === null ? 0 : atrOffsetStart;
                 var atrIndex = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
-                atrIndex = null === atrIndex ? Util.calcIndex(n) : atrIndex;
-                if (atrIndex == objectIndex && charOffset >= atrOffsetStart &&
+                atrIndex = atrIndex === null ? Util.calcIndex(n) : atrIndex;
+                if (parseInt(atrIndex) === objectIndex && charOffset >= atrOffsetStart &&
                     ((parseInt(atrOffsetStart) + n.length) >= charOffset)) {
                     var thisOffset = n.parentNode
                         .hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START) ? charOffset -
