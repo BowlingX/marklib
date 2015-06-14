@@ -41,7 +41,7 @@ gulp.task('clean', function (cb) {
 });
 
 function createScripts(watch, config) {
-    var config = Object.create(config);
+    config = Object.create(config);
     config.watch = watch;
     return gulp.src(paths.exports)
         .pipe($.plumber({
