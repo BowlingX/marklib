@@ -84,6 +84,12 @@ A Serialized results consist of 2 strings (start end end) in the following form
 
 ```
 
+## Use-Cases
+
+- Annotations
+- Collaboration tools
+- Inline-Commenting (I actually started a project that will do something like this: https://github.com/BowlingX/commentp)
+
 ## License
 
 The MIT License (MIT)
