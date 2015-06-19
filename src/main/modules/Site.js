@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (autoMarkText.parentNode.nextSibling) {
                 let nextText = autoMarkText.parentNode.nextSibling.childNodes[0];
                 setTimeout(function () {
-                        render(nextText, ++c, length);
+                    render(nextText, ++c, length);
                 }, speed);
             }
         };
@@ -46,9 +46,9 @@ document.addEventListener("DOMContentLoaded", function () {
             marker.renderWithPath(range.startContainerPath + ";" + range.startOffset,
                 range.endContainerPath + ";" + range.endOffset);
         } catch (e) {
-            console.warn("Could not render:", range);
+            console.warn("Could not render:", range, e);
             localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-            throw 'Cleared local storage because of a rendering issue, the page might have been changed ;)';
+            console.error('Cleared local storage because of a rendering issue, the page might have been changed ;)');
         }
 
     });
@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var selection = document.getSelection(), renderer = new Marklib.Rendering(document),
                 result = renderer.renderWithRange(selection.getRangeAt(0));
             selection.removeAllRanges();
+            console.info("stored:", result);
             savedRanges.push(result);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
         } catch (e) {

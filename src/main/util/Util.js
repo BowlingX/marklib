@@ -119,18 +119,19 @@ class Util {
     static calcIndex(node) {
         let calculatedIndex = 0,
             foundWrapper = false;
-        const nodes = node.childNodes, length = nodes.length;
+        const nodes = node.parentNode.childNodes, length = nodes.length;
         for (let thisIndex = 0; thisIndex < length; thisIndex++) {
             const el = nodes[thisIndex];
             if (el === node) {
-                return false;
+                break;
             }
-            const maybeIndexOfOriginal = el.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
-            const isOriginal = maybeIndexOfOriginal !== undefined;
+            const maybeIndexOfOriginal = el.getAttribute ? el.getAttribute(ATTR_DATA_ORIGINAL_INDEX) : null;
+            const isOriginal = maybeIndexOfOriginal !== null;
             // Important: do not include pseudo elements
-            if (el !== node && (el.nodeType !== Node.TEXT_NODE || isOriginal) && !el.hasAttribute(DATA_PSEUDO)) {
+            if ((el.nodeType !== Node.TEXT_NODE || isOriginal)) {
                 if (isOriginal) {
-                    calculatedIndex = parseInt(maybeIndexOfOriginal);
+                    calculatedIndex
+                        = parseInt(maybeIndexOfOriginal) + 1; // + 1 because the textnode itself must be counted too
                     foundWrapper = true;
                 } else {
                     calculatedIndex++;

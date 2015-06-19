@@ -663,7 +663,7 @@ class Rendering {
      * ``
      * @param {string} startPath
      * @param {string} endPath
-     * @returns {*}
+     * @returns {Range}
      */
     renderWithPath(startPath, endPath) {
         const startContainer = this._deserializePath(startPath);
@@ -678,12 +678,23 @@ class Rendering {
         throw 'Could not find start- and/or end-container in document';
     }
 
+    /**
+     * Renders a result (that returned from `renderWithRange`)
+     * @param result
+     * @returns {Range}
+     */
+    renderWithResult(result) {
+       return this.renderWithPath(
+           `${result.startContainerPath};${result.startOffset}`,
+           `${result.endContainerPath};${result.endOffset}`);
+    }
+
 
     /**
      * Prepares a selection with a range object
      * @param {Range} range
      * @param {boolean} [withoutResult] optional do calculate a result, the selection would not be serializable
-     * @returns {*}
+     * @returns {Object}
      */
     renderWithRange(range, withoutResult) {
         return this._renderWithElements(range.startContainer, range.endContainer,
