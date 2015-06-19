@@ -68,7 +68,7 @@ A Serialized results consist of 2 strings (start end end) in the following form
 
  // This is the result we get from the renderWithRange method
  
- var range = {
+ var result = {
     startContainerPath: 'body>section;0',
     endContainerPath: 'body>section;1',
     startOffset: 2,
@@ -77,10 +77,7 @@ A Serialized results consist of 2 strings (start end end) in the following form
 
  var rendering = new Marklib.Rendering(document);
  
- rendering.renderWithPath(
-                range.startContainerPath + ";" + range.startOffset,
-                range.endContainerPath   + ";" + range.endOffset
-                );
+ rendering.renderWithResult(result);
 
 ```
 
