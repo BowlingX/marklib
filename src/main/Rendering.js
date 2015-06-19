@@ -663,7 +663,7 @@ class Rendering {
      * ``
      * @param {string} startPath
      * @param {string} endPath
-     * @returns {Range}
+     * @returns {string}
      */
     renderWithPath(startPath, endPath) {
         const startContainer = this._deserializePath(startPath);
@@ -672,8 +672,9 @@ class Rendering {
             var range = document.createRange();
             range.setStart(startContainer.node, startContainer.offset);
             range.setEnd(endContainer.node, endContainer.offset);
+            const text = range.toString();
             this.renderWithRange(range, true);
-            return range;
+            return text;
         }
         throw 'Could not find start- and/or end-container in document';
     }

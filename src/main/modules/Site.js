@@ -43,8 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
     savedRanges.forEach(function (range) {
         var marker = new Marklib.Rendering(document);
         try {
-            marker.renderWithPath(range.startContainerPath + ";" + range.startOffset,
-                range.endContainerPath + ";" + range.endOffset);
+            marker.renderWithResult(range);
         } catch (e) {
             console.warn("Could not render:", range, e);
             localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
