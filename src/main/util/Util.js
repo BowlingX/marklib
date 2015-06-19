@@ -125,18 +125,14 @@ class Util {
             if (el === node) {
                 break;
             }
+            // reset index when original index is found
             const maybeIndexOfOriginal = el.getAttribute ? el.getAttribute(ATTR_DATA_ORIGINAL_INDEX) : null;
-            const isOriginal = maybeIndexOfOriginal !== null;
-            // Important: do not include pseudo elements
-            if ((el.nodeType !== Node.TEXT_NODE || isOriginal)) {
-                if (isOriginal) {
-                    calculatedIndex
-                        = parseInt(maybeIndexOfOriginal) + 1; // + 1 because the textnode itself must be counted too
-                    foundWrapper = true;
-                } else {
-                    calculatedIndex++;
-                }
+
+            if (maybeIndexOfOriginal) {
+                calculatedIndex = parseInt(maybeIndexOfOriginal);
+                foundWrapper = true;
             }
+            calculatedIndex++;
         }
         return foundWrapper ? calculatedIndex : Util.index(node);
     }

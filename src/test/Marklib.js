@@ -79,36 +79,34 @@ describe("Bug #4, set the right indices, event if the markup has been modified b
         loadFixtures('bug-4-case-1.html');
     });
 
-    it("should render a range", () => {
+    it("indices must be correct in different situations", () => {
 
         // first render something
         var marklib = new Rendering(document, 'aFirst');
         var range = document.createRange();
         range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
-        range.setEnd(document.getElementById("Paragraph").childNodes[8], 77);
+        range.setEnd(document.getElementById("Paragraph").childNodes[8], 72);
 
-        var result = marklib.renderWithRange(range);
+        const result = marklib.renderWithRange(range);
 
         // Serialized result must be equal our range before
         expect(result.startOffset).toBe(0);
-        expect(result.endOffset).toBe(77);
+        expect(result.endOffset).toBe(72);
         expect(result.startContainerPath).toBe("html>body>div>p>strong:nth-of-type(1);0");
         expect(result.endContainerPath).toBe("html>body>div>p;8");
-
         // render something else in the same document:
 
-        var secondMarklib = new Rendering(document, 'aSecond');
+        const secondMarklib = new Rendering(document, 'aSecond');
 
-        var secondResult = secondMarklib.renderWithResult({
+        const secondResult = secondMarklib.renderWithResult({
             startOffset: 1,
             endOffset: 6,
             startContainerPath: 'html>body>div>p;8',
             endContainerPath: 'html>body>div>p;8'
         });
-
         expect(secondResult).toBe('clita');
 
-        var thirdResult = secondMarklib.renderWithResult({
+        const thirdResult = secondMarklib.renderWithResult({
             startOffset: 11,
             endOffset: 16,
             startContainerPath: 'html>body>div>p;6',
@@ -116,5 +114,93 @@ describe("Bug #4, set the right indices, event if the markup has been modified b
         });
 
         expect(thirdResult).toBe('magna');
+
+        const fourthResult = secondMarklib.renderWithResult({
+            startOffset: 0,
+            endOffset: 20,
+            startContainerPath: "html>body>div>p:nth-child(1);8",
+            endContainerPath: "html>body>div>p:nth-child(1);8"
+        });
+
+        expect(fourthResult).toBe(' clita kasd gubergre');
+    });
+});
+
+describe("Must fail and fallback", () => {
+    beforeEach(() => {
+        loadFixtures('bug-4-case-1.html');
+    });
+
+    it("fails when no start/end container was found (node) ", () => {
+        const renderer = new Rendering(document, 'aSecond');
+        expect(() => {
+            renderer.renderWithResult({
+                startOffset: 1,
+                endOffset: 6,
+                startContainerPath: 'html>body>div>p:nth-child(2);8',
+                endContainerPath: 'html>body>div>p;8'
+            });
+        }).toThrow('Could not find start- and/or end-container in document');
+    });
+
+    it("fallback to last text-node if element (body) is given", () => {
+        const renderer = new Rendering(document, 'aSecond');
+        var range = document.createRange();
+        range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
+        range.setEnd(document.body, 0);
+        const result = renderer.renderWithRange(range);
+        expect(result).toEqual({
+            startOffset: 0,
+            endOffset: 87,
+            startContainerPath: 'html>body;0',
+            endContainerPath: 'html>body>div>p;8'
+        });
+    });
+
+    it("Fallback to first text-node if element is given", () => {
+        var range = document.createRange();
+        range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
+        range.setEnd(document.getElementById("Paragraph"), 0);
+
+        const renderer = new Rendering(document, 'aSecond');
+        const result = renderer.renderWithRange(range);
+
+        expect(result).toEqual({
+            startOffset: 0,
+            endOffset: 87,
+            startContainerPath: 'html>body>div>p;0',
+            endContainerPath: 'html>body>div>p;8'
+        });
+    });
+});
+
+describe("Multiple nodes", () => {
+    beforeEach(() => {
+        loadFixtures('multiple-node-case.html');
+    });
+
+    it("must have the right indices later", () => {
+        var range = document.createRange();
+        range.setStart(document.getElementsByTagName("h2")[0].childNodes[0], 0);
+        range.setEnd(document.getElementById("Paragraph").childNodes[0], 30);
+
+        const renderer = new Rendering(document, 'aSecond');
+        const result = renderer.renderWithRange(range);
+
+        expect(result).toEqual({
+            startOffset: 0,
+            endOffset: 30,
+            startContainerPath: 'html>body>div>h2;0',
+            endContainerPath: 'html>body>div>p;0'
+        });
+
+        const secondResult = renderer.renderWithResult({
+            startOffset: 0,
+            endOffset: 20,
+            startContainerPath: "html>body>div>p;8",
+            endContainerPath: "html>body>div>p;8"
+        });
+
+        expect(secondResult).toBe(' clita kasd gubergre');
     });
 });

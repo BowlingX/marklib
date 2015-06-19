@@ -682,7 +682,7 @@ class Rendering {
     /**
      * Renders a result (that returned from `renderWithRange`)
      * @param result
-     * @returns {Range}
+     * @returns {string}
      */
     renderWithResult(result) {
        return this.renderWithPath(
