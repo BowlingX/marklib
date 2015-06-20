@@ -65,7 +65,9 @@
     "main-bower-files": "^2.8.0",
     "node-libs-browser": "^0.5.2",
     "webpack": "^1.9.10",
-    "yargs": "^3.10.0"
+    "yargs": "^3.10.0",
+    "coveralls": "^2.11.2"
+
   },
   "engines": {
     "node": ">=0.10.1"

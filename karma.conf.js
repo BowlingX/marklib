@@ -15,8 +15,10 @@ module.exports = function (config) {
         preprocessors: {'./src/**/*.js': ['webpack']},
         reporters: ['progress', 'coverage'],
         coverageReporter: {
-            type: 'html',
-            dir: 'coverage/'
+            dir: 'reports',
+            reporters: [
+                { type: 'lcov', subdir: 'report-lcov' }
+            ]
         },
         plugins: [
             'karma-chrome-launcher',

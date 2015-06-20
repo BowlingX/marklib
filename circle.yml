@@ -4,3 +4,4 @@ test:
   post:
       - mkdir -p $CIRCLE_TEST_REPORTS/junit/
       - find . -type f -regex ".*/test_out/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+      - cat ./reports/report-lcov/lcov.info | ./node_modules/coveralls/bin/coveralls.js
