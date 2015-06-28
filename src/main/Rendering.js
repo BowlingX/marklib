@@ -173,15 +173,13 @@ class Rendering {
 
     /**
      * Creates a Template to use as start and end marks
-     * @param {String} id
      * @param {String} text
      * @returns {Node}
      * @private
      */
-    _createStartEndWrapTemplate(id, text) {
+    _createStartEndWrapTemplate(text) {
         var el = this._createWrapTemplate(), vTrue = "true";
         el.setAttribute(ATTR_DATA_START_END, vTrue);
-        el.id = id;
         el.textContent = text;
         return el;
     }
@@ -197,7 +195,7 @@ class Rendering {
      * @returns {Node}
      */
     _createStartOrEndContainer(initialNode, prefix, text, offset, index) {
-        const wrapper = this._createStartEndWrapTemplate(prefix + this.getId(), text);
+        const wrapper = this._createStartEndWrapTemplate(text);
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Rendering._getIndexParentIfHas(initialNode, index));
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
         wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
