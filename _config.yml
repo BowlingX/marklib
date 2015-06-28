@@ -2,5 +2,5 @@
 permalink:        pretty
 
 exclude: ['src', 'scripts', 'assets', 'node_modules', 'bower_components', 'coverage','examples']
-version: 'v0.4.5'
-downloadLink: 'https://github.com/BowlingX/marklib/archive/v.0.4.5.zip'
+version: 'v0.4.6'
+downloadLink: 'https://github.com/BowlingX/marklib/archive/v.0.4.6.zip'
