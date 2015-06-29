@@ -247,10 +247,16 @@ class Util {
             name = name.toLowerCase();
 
             var parent = node.parentNode;
+
             if (Util.isMarkNode(node)) {
-                node = parent;
-                continue;
+                if(parent !== context) {
+                    node = parent;
+                    continue;
+                } else {
+                    break;
+                }
             }
+
             // Select only siblings that are not part of selection and are of the same type
             // (because we use nth-of-type selector later)
             const siblings = Util.nodeListFilter(parent.children, filterSiblings),
@@ -261,6 +267,7 @@ class Util {
             }
 
             path = name + (path ? '>' + path : '');
+
 
             if (parent === context) {
                 break;

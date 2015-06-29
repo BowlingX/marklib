@@ -38,3 +38,27 @@ describe("Test some DOM stuff in manipulated state", () => {
         expect(path).toEqual('html>body>div>section>div:nth-of-type(2)>p>i;0');
     });
 });
+
+describe("Scoping", () => {
+    beforeEach(() => {
+        loadFixtures('scoped.html');
+    });
+
+    it("The correct scoped path should be determined", () => {
+        var scope = $('#B')[0], el = $('#Content')[0].childNodes[0];
+        var path = Util.getPath(el, scope);
+        expect(path).toEqual('div>p;0');
+    });
+
+    it("The correct scoped path should be determined, even inside markers", () => {
+        var scope = $('#B')[0], el = $('#Marker')[0].childNodes[0];
+        var path = Util.getPath(el, scope);
+        expect(path).toEqual('div>p;0');
+    });
+
+    it("The correct scoped path should be determined, when scope === el", () => {
+        var scope = $('#Content')[0], el = $('#Marker')[0].childNodes[0];
+        var path = Util.getPath(el, scope);
+        expect(path).toEqual(';0');
+    });
+});
