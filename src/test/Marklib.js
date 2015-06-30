@@ -204,3 +204,21 @@ describe("Multiple nodes", () => {
         expect(secondResult).toBe(' clita kasd gubergre');
     });
 });
+
+describe("Scoped/Contexted rendering", () => {
+    beforeEach(() => {
+        loadFixtures('scoped-marking.html');
+    });
+
+    it("must render correct when a scope element is given", () => {
+        const renderer = new Rendering(document, 'aSecond', document.getElementById('Test'));
+        const result = renderer.renderWithResult({
+            startOffset: 0,
+            endOffset: 4,
+            startContainerPath: ";0",
+            endContainerPath: ";0"
+        });
+
+       expect(result).toBe('This');
+    });
+});

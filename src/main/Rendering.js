@@ -561,7 +561,7 @@ class Rendering {
                             endOffset = f.length;
                             if (f.parentNode.hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) {
                                 endOffset = parseInt(f.parentNode
-                                    .getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) + endOffset;
+                                        .getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) + endOffset;
                             }
                         }
                         f = f.lastChild;
@@ -626,7 +626,7 @@ class Rendering {
         const pSplit = path.split(';'), p = pSplit[0],
             objectIndex = parseInt(pSplit[1]),
             charOffset = parseInt(pSplit[2]),
-            container = this.context.querySelector(p);
+            container = !p.trim() ? this.context : this.context.querySelector(p);
         let maybeFoundNode = null;
         this.walkDom(container, function (n) {
             if (n.nodeType === Node.TEXT_NODE) {
@@ -683,9 +683,9 @@ class Rendering {
      * @returns {string}
      */
     renderWithResult(result) {
-       return this.renderWithPath(
-           `${result.startContainerPath};${result.startOffset}`,
-           `${result.endContainerPath};${result.endOffset}`);
+        return this.renderWithPath(
+            `${result.startContainerPath};${result.startOffset}`,
+            `${result.endContainerPath};${result.endOffset}`);
     }
 
 
