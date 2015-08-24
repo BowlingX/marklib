@@ -42,9 +42,6 @@ class Rendering {
 
     constructor(document, cssClass, context) {
 
-        if (!(document instanceof Document)) {
-            throw 'Marklib {0} is required to be a document instance';
-        }
         /**
          * @type {Document}
          */
