@@ -1,3 +1,9 @@
+// convert args to named args
+var namedArgs = process.argv.reduce(function (o, v) {
+    o[v] = true;
+    return o;
+}, {});
+
 module.exports = function (config) {
     config.set({
         basePath: '',
@@ -13,7 +19,7 @@ module.exports = function (config) {
         frameworks: ['jasmine-jquery', 'jasmine'],
         browsers: ['Chrome'],
         preprocessors: {'./src/**/*.js': ['webpack']},
-        reporters: ['progress', 'coverage'],
+        reporters: '--ci' in namedArgs ? ['progress', 'junit', 'coverage'] : ['progress'],
         coverageReporter: {
             dir: 'reports',
             reporters: [
@@ -34,7 +40,7 @@ module.exports = function (config) {
             noInfo: true
         },
         junitReporter: {
-            outputFile: 'test_out/unit.xml',
+            outputDir: 'test_out',
             suite: 'unit'
         },
         webpack: require('./webpack.test.config.js')
