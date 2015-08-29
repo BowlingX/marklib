@@ -1,6 +1,6 @@
 test:
   override:
-    - node_modules/gulp/bin/gulp.js test --writeTestResults
+    - npm test
   post:
       - mkdir -p $CIRCLE_TEST_REPORTS/junit/
       - find . -type f -regex ".*/test_out/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
