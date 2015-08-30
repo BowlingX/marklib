@@ -154,9 +154,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Rendering(document, cssClass, context) {
 	        _classCallCheck(this, Rendering);
 	
-	        if (!(document instanceof Document)) {
-	            throw 'Marklib {0} is required to be a document instance';
-	        }
 	        /**
 	         * @type {Document}
 	         */

@@ -88,6 +88,10 @@ A Serialized results consist of 2 strings (start end end) in the following form
 - Collaboration tools
 - Inline-Commenting (I actually started a project that will do something like this: https://github.com/BowlingX/commentp)
 
+## Develop
+
+`npm run develop` or `npm run tdd` (to start karma in watch mode)
+
 ## License
 
 The MIT License (MIT)
