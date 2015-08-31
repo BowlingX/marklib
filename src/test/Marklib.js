@@ -219,6 +219,36 @@ describe("Scoped/Contexted rendering", () => {
             endContainerPath: ";0"
         });
 
-       expect(result).toBe('This');
+        expect(result).toBe('This');
+    });
+});
+
+describe("iFrame", () => {
+    let frame, frameDocument;
+    beforeEach((cb) => {
+        loadFixtures('iframe.html');
+        frame = document.getElementById('iframe');
+        frame.onload = () => {
+            frameDocument = frame.contentDocument;
+            cb();
+        }
+    });
+
+    it("must work inside an iframe", () => {
+        const renderer = new Rendering(frameDocument, 'iframe-rendering');
+        var range = frameDocument.createRange();
+        range.setStart(frameDocument.getElementById("p1").childNodes[0], 0);
+        range.setEnd(frameDocument.getElementById("p1").childNodes[0], 7);
+        const selection = range.toString();
+        expect(selection).toEqual('This is');
+
+        const result = renderer.renderWithRange(range);
+
+        expect(result).toEqual({
+            startOffset: 0,
+            endOffset: 7,
+            startContainerPath: 'html>body>p;0',
+            endContainerPath: 'html>body>p;0'
+        })
     });
 });
