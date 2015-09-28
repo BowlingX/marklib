@@ -57,7 +57,9 @@ class Rendering {
          * Class that is set on all highlight nodes
          * @type {String}
          */
-        this.cssClass = undefined === cssClass ? 'marking' : cssClass;
+        this.cssClass = undefined === cssClass
+            ? ['marking']
+            : cssClass.constructor === Array ? cssClass : cssClass.split(' ');
 
         /**
          * StartContainer
@@ -160,7 +162,7 @@ class Rendering {
      */
     _createWrapTemplate() {
         var el = this.document.createElement(TAG_NAME), vTrue = "true";
-        el.className = this.cssClass;
+        el.className = this.cssClass.join(' ');
         el.setAttribute(DATA_IS_SELECTION, vTrue);
         el.setAttribute(ATTR_DATA_ID, this.getId());
         el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
@@ -297,7 +299,9 @@ class Rendering {
                 n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) &&
                 n.parentNode.getAttribute(ATTR_DATA_ID) === this.getId()) {
                 let thisNode = this._createWrap(n).parentNode;
-                thisNode.classList.remove(this.cssClass);
+                this.cssClass.forEach(function (cssClass) {
+                    thisNode.classList.remove(cssClass);
+                });
                 thisNode.removeAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE);
             } else {
                 this._createWrap(n);

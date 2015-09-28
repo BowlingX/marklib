@@ -169,7 +169,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Class that is set on all highlight nodes
 	         * @type {String}
 	         */
-	        this.cssClass = undefined === cssClass ? 'marking' : cssClass;
+					this.cssClass = undefined === cssClass
+							? ['marking']
+							: cssClass.constructor === Array ? cssClass : cssClass.split(' ');
+
 	
 	        /**
 	         * StartContainer
@@ -268,7 +271,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function _createWrapTemplate() {
 	            var el = this.document.createElement(TAG_NAME),
 	                vTrue = "true";
-	            el.className = this.cssClass;
+							el.className = this.cssClass.join(' ');
 	            el.setAttribute(_utilUtil.DATA_IS_SELECTION, vTrue);
 	            el.setAttribute(ATTR_DATA_ID, this.getId());
 	            el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
@@ -419,7 +422,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var wrap = (function (n) {
 	                if (n.parentNode.hasAttribute(ATTR_DATA_START_END) && n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) && n.parentNode.getAttribute(ATTR_DATA_ID) === _this.getId()) {
 	                    var thisNode = _this._createWrap(n).parentNode;
-	                    thisNode.classList.remove(_this.cssClass);
+											this.cssClass.forEach(function (cssClass) {
+												thisNode.classList.remove(cssClass);
+											});
 	                    thisNode.removeAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE);
 	                } else {
 	                    _this._createWrap(n);
