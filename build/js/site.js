@@ -648,17 +648,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	
-	            var result = new _RenderResult2['default'](
+	            this._renderResult = new _RenderResult2['default'](
 	            // Real offset is calculated by relative length and absolute length
 	            originalStartOffset + startOffset, originalEndOffset + endOffset,
 	            // get the path for this selection
 	            _utilUtil2['default'].getPath(startContainer, this.context), _utilUtil2['default'].getPath(endContainer, this.context));
 	
-	            result.instance = this;
+	            this._renderResult.instance = this;
 	
 	            this._renderSelection(startContainer, endContainer, startOffset, endOffset, contextContainer, !!outer);
 	
-	            return result;
+	            return this._renderResult;
 	        }
 	
 	        /**
@@ -1387,7 +1387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
-	         * @param {HTMLElement} el
+	         * @param {HTMLElement|Node} el
 	         * @param {String} [optionalSelector] will test given element against a selector
 	         *  if matches, returns this element immediately
 	         *

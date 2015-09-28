@@ -501,7 +501,7 @@ class Rendering extends EventEmitter {
             }
         }
 
-        const result = new RenderResult(
+        this._renderResult = new RenderResult(
                 // Real offset is calculated by relative length and absolute length
                 originalStartOffset + startOffset,
                 originalEndOffset + endOffset,
@@ -510,11 +510,12 @@ class Rendering extends EventEmitter {
                 Util.getPath(endContainer, this.context)
             );
 
-        result.instance = this;
+        this._renderResult.instance = this;
+
 
         this._renderSelection(startContainer, endContainer, startOffset, endOffset, contextContainer, !!outer);
 
-        return result;
+        return this._renderResult;
     }
 
     /**

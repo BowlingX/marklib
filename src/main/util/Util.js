@@ -147,7 +147,7 @@ class Util {
     }
 
     /**
-     * @param {HTMLElement} el
+     * @param {HTMLElement|Node} el
      * @param {String} [optionalSelector] will test given element against a selector
      *  if matches, returns this element immediately
      *
