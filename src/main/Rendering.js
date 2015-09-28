@@ -40,6 +40,16 @@ const ATTR_DATA_ID = 'data-selection-id';
 const DOCUMENT_POSITION_CONTAINED_BY = 16;
 
 /**
+ * @type {string}
+ */
+export const EVENT_CLICK = 'click';
+
+/**
+ * @type {string}
+ */
+export const EVENT_WRAPPED_NODE = 'wrapped-node';
+
+/**
  * Manages a single Render
  */
 class Rendering extends EventEmitter {
@@ -100,12 +110,6 @@ class Rendering extends EventEmitter {
          * @private
          */
         this._wrapperNodes = [];
-
-        /**
-         * @type {Function}
-         * @private
-         */
-        this._onWrappedNodeFunc = null;
 
         if(cssClasses instanceof Array) {
             this.cssClass = cssClasses;
@@ -204,7 +208,7 @@ class Rendering extends EventEmitter {
         }
         const wrap = Util.wrap(el, wrapper);
 
-        this.emit('wrapped-node', el, wrap);
+        this.emit(EVENT_WRAPPED_NODE, el, wrap);
 
         return wrap;
     }
@@ -614,7 +618,7 @@ if(!global.MARKLIB_EVENTS) {
         if(e.target && e.target.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE)) {
             if(e.target.marklibInstance && e.target.marklibInstance instanceof Rendering) {
                 const instance = e.target.marklibInstance;
-                instance.emit('hover', e);
+                instance.emit(EVENT_CLICK, e);
             }
         }
     }, true);

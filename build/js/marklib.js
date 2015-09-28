@@ -164,6 +164,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	var DOCUMENT_POSITION_CONTAINED_BY = 16;
 	
 	/**
+	 * @type {string}
+	 */
+	var EVENT_CLICK = 'click';
+	
+	exports.EVENT_CLICK = EVENT_CLICK;
+	/**
+	 * @type {string}
+	 */
+	var EVENT_WRAPPED_NODE = 'wrapped-node';
+	
+	exports.EVENT_WRAPPED_NODE = EVENT_WRAPPED_NODE;
+	/**
 	 * Manages a single Render
 	 */
 	
@@ -228,12 +240,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @private
 	         */
 	        this._wrapperNodes = [];
-	
-	        /**
-	         * @type {Function}
-	         * @private
-	         */
-	        this._onWrappedNodeFunc = null;
 	
 	        if (cssClasses instanceof Array) {
 	            this.cssClass = cssClasses;
@@ -346,7 +352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            var wrap = _utilUtil2['default'].wrap(el, wrapper);
 	
-	            this.emit('wrapped-node', el, wrap);
+	            this.emit(EVENT_WRAPPED_NODE, el, wrap);
 	
 	            return wrap;
 	        }
@@ -769,7 +775,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (e.target && e.target.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE)) {
 	            if (e.target.marklibInstance && e.target.marklibInstance instanceof Rendering) {
 	                var instance = e.target.marklibInstance;
-	                instance.emit('hover', e);
+	                instance.emit(EVENT_CLICK, e);
 	            }
 	        }
 	    }, true);
