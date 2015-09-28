@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
             var range = document.createRange();
             range.setStart(autoMarkText, 0);
             range.setEnd(autoMarkText, 1);
-            r.renderWithRange(range, true);
+            r.renderWithRange(range);
             if (autoMarkText.parentNode.nextSibling) {
                 let nextText = autoMarkText.parentNode.nextSibling.childNodes[0];
                 setTimeout(function () {
