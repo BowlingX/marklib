@@ -2321,7 +2321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                result = renderer.renderWithRange(selection.getRangeAt(0));
 	            selection.removeAllRanges();
 	            console.info("stored:", result);
-	            savedRanges.push(result);
+	            savedRanges.push(result.serialize());
 	            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
 	        } catch (e) {
 	            console.warn("Could not add selection: ", e);
