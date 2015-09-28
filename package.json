@@ -55,5 +55,8 @@
     "tdd": "node_modules/karma/bin/karma start --auto-watch",
     "dist": "rm -Rf build && export NODE_ENV=production && node_modules/webpack/bin/webpack.js --optimize-minimize --optimize-occurence-order && export NODE_ENV=dev && node_modules/webpack/bin/webpack.js",
     "develop": "node_modules/webpack/bin/webpack.js --watch"
+  },
+  "dependencies": {
+    "wolfy87-eventemitter": "^4.2.11"
   }
 }

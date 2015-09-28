@@ -4,6 +4,7 @@
 
 import setup from 'setup';
 import Rendering from 'Rendering';
+import RenderResult from 'RenderResult';
 
 setup();
 
@@ -21,7 +22,10 @@ describe("Test some wrappings", () => {
 
     it("should wrapSiblings", () => {
         var marklib = new Rendering(document, 'wow');
-        marklib.wrapSiblings(document.getElementById('startContainer'), document.getElementById('endContainer'));
+        marklib.wrapSiblings(
+            document.getElementById('startContainer'),
+            document.getElementById('endContainer')
+        );
     });
 
     it("should render a range in different start/end nodes", () => {
@@ -39,7 +43,7 @@ describe("Test some wrappings", () => {
             endContainerPath: 'html>body>div>div>p:nth-of-type(4);0'
         };
 
-        expect(result).toEqual(expectedResult);
+        expect(result.serialize()).toEqual(expectedResult);
     });
 
     it("should render a range in the same node", () => {
@@ -55,16 +59,14 @@ describe("Test some wrappings", () => {
 
         var result = marklib.renderWithRange(range);
 
-
-        const rangeResult =
-        {
+        const rangeResult = {
             startOffset: 0,
             endOffset: 4,
             startContainerPath: 'html>body>div>div>p:nth-of-type(1);0',
             endContainerPath: 'html>body>div>div>p:nth-of-type(1);0'
         };
 
-        expect(result).toEqual(rangeResult);
+        expect(result.serialize()).toEqual(rangeResult);
 
         // do a second marking over the old one
         const resultedText = new Rendering(document, 'second').renderWithResult(rangeResult);
@@ -149,7 +151,7 @@ describe("Must fail and fallback", () => {
         range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
         range.setEnd(document.body, 0);
         const result = renderer.renderWithRange(range);
-        expect(result).toEqual({
+        expect(result.serialize()).toEqual({
             startOffset: 0,
             endOffset: 87,
             startContainerPath: 'html>body;0',
@@ -165,7 +167,7 @@ describe("Must fail and fallback", () => {
         const renderer = new Rendering(document, 'aSecond');
         const result = renderer.renderWithRange(range);
 
-        expect(result).toEqual({
+        expect(result.serialize()).toEqual({
             startOffset: 0,
             endOffset: 87,
             startContainerPath: 'html>body>div>p;0',
@@ -187,7 +189,7 @@ describe("Multiple nodes", () => {
         const renderer = new Rendering(document, 'aSecond');
         const result = renderer.renderWithRange(range);
 
-        expect(result).toEqual({
+        expect(result.serialize()).toEqual({
             startOffset: 0,
             endOffset: 30,
             startContainerPath: 'html>body>div>h2;0',
@@ -244,11 +246,42 @@ describe("iFrame", () => {
 
         const result = renderer.renderWithRange(range);
 
-        expect(result).toEqual({
+        expect(result.serialize()).toEqual({
             startOffset: 0,
             endOffset: 7,
             startContainerPath: 'html>body>p;0',
             endContainerPath: 'html>body>p;0'
-        })
+        });
+    });
+});
+
+describe('Constructor Arguments', () => {
+    beforeEach(() => {
+        loadFixtures('simple-text.html');
+    });
+
+    it('Must support arrays as classNames', () => {
+        const renderer = new Rendering(document, ['highlight', 'comment']);
+        expect(renderer.cssClass instanceof Array).toEqual(true);
+        const range = document.createRange();
+        range.setStart(document.getElementById("p").childNodes[0], 0);
+        range.setEnd(document.getElementById("p").childNodes[0], 10);
+
+        renderer.renderWithRange(range);
+        expect(document.getElementById("p").childNodes[0].className)
+            .toEqual('highlight comment');
+    });
+
+    it('Must support strings as classNames', () => {
+        const renderer = new Rendering(document, 'highlight comment');
+        expect(renderer.cssClass instanceof Array).toEqual(true);
+        const range = document.createRange();
+
+        range.setStart(document.getElementById("p").childNodes[0], 0);
+        range.setEnd(document.getElementById("p").childNodes[0], 10);
+
+        renderer.renderWithRange(range);
+        expect(document.getElementById("p").childNodes[0].className)
+            .toEqual('highlight comment');
     });
 });

@@ -1,8 +1,10 @@
-/* global Node, Document */
+/* global Node, Document, MARKLIB_EVENTS */
 
 'use strict';
 
 import Util from 'util/Util';
+import RenderResult from 'RenderResult';
+import EventEmitter from 'wolfy87-eventemitter';
 
 import {ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION} from 'util/Util';
 
@@ -13,7 +15,7 @@ const TAG_NAME = 'x-marker';
 /**
  * @type {string}
  */
-const ATTR_DATA_ORIGINAL_OFFSET_START = 'data-original-offset-start';
+export const ATTR_DATA_ORIGINAL_OFFSET_START = 'data-original-offset-start';
 /**
  * @type {string}
  */
@@ -37,10 +39,19 @@ const ATTR_DATA_ID = 'data-selection-id';
  */
 const DOCUMENT_POSITION_CONTAINED_BY = 16;
 
-export default
-class Rendering {
+/**
+ * Manages a single Render
+ */
+class Rendering extends EventEmitter {
 
-    constructor(document, cssClass, context) {
+    /**
+     * @param {Document} document
+     * @param {String|Array} cssClasses
+     * @param {Node} context
+     */
+    constructor(document, cssClasses, context) {
+
+        super();
 
         /**
          * @type {Document}
@@ -55,11 +66,9 @@ class Rendering {
 
         /**
          * Class that is set on all highlight nodes
-         * @type {String}
+         * @type {Array}
          */
-        this.cssClass = undefined === cssClass
-            ? ['marking']
-            : cssClass.constructor === Array ? cssClass : cssClass.split(' ');
+        this.cssClass = ['marking'];
 
         /**
          * StartContainer
@@ -74,27 +83,35 @@ class Rendering {
         this.endContainer = null;
 
         /**
-         * Prefix before ID
-         * @type {string}
-         */
-        this.markerPrefix = 'marker-start-';
-
-        /**
-         * Suffix before ID
-         * @type {string}
-         */
-        this.markerSuffix = 'marker-end-';
-
-        /**
          * @type {Node}
          */
         this.context = context || this.document;
+
+        /**
+         * Flag if this instance has been rendered
+         * @type {RenderResult}
+         * @private
+         */
+        this._renderResult = null;
+
+        /**
+         * A collection of all nodes that are part of this marking
+         * @type {Array}
+         * @private
+         */
+        this._wrapperNodes = [];
 
         /**
          * @type {Function}
          * @private
          */
         this._onWrappedNodeFunc = null;
+
+        if(cssClasses instanceof Array) {
+            this.cssClass = cssClasses;
+        } else if(typeof cssClasses === 'string') {
+            this.cssClass = cssClasses.split(' ');
+        }
     }
 
     /**
@@ -114,58 +131,20 @@ class Rendering {
     }
 
     /**
-     * Listener that is called when a node is wrapped on this instance
-     * @param {Function} f
-     * @returns {Rendering}
-     */
-    onWrappedNode(f) {
-        this._onWrappedNodeFunc = f;
-        return this;
-    }
-
-    /**
-     * @private
-     */
-    _callOnWrappedNode() {
-        if (typeof this._onWrappedNodeFunc === 'function') {
-            this._onWrappedNodeFunc.apply(this, arguments);
-        }
-    }
-
-
-    /**
-     * @param {Node} container
-     * @param {Number} thisIndex
-     * @returns {int} index of parent or original
-     * @private
-     */
-    static _getIndexParentIfHas(container, thisIndex) {
-        var p = container.parentNode;
-        var index = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_INDEX));
-        return index > thisIndex ? index : thisIndex;
-    }
-
-    /**
-     * @param container
-     * @returns {int} offset start of parent if has, else 0
-     */
-    static _getOffsetParentIfHas(container) {
-        var p = container.parentNode;
-        var offset = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START));
-        return offset > 0 ? offset : 0;
-    }
-
-    /**
-     * Creates a Template used as a wrapper
+     * Creates a Template used as a wrapper and an indication that this is a highlight node
      * @returns {Node}
      * @private
      */
     _createWrapTemplate() {
-        var el = this.document.createElement(TAG_NAME), vTrue = "true";
+        const el = this.document.createElement(TAG_NAME), vTrue = "true";
         el.className = this.cssClass.join(' ');
         el.setAttribute(DATA_IS_SELECTION, vTrue);
         el.setAttribute(ATTR_DATA_ID, this.getId());
         el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
+        // save this marker instance to given node
+        el.marklibInstance = this;
+        // keep track of highlight nodes
+        this._wrapperNodes.push(el);
 
         return el;
     }
@@ -177,7 +156,7 @@ class Rendering {
      * @private
      */
     _createStartEndWrapTemplate(text) {
-        var el = this._createWrapTemplate(), vTrue = "true";
+        const el = this._createWrapTemplate(), vTrue = "true";
         el.setAttribute(ATTR_DATA_START_END, vTrue);
         el.textContent = text;
         return el;
@@ -187,18 +166,17 @@ class Rendering {
     /**
      * Creates Start or End Container Element
      * @param initialNode
-     * @param prefix
      * @param text
      * @param offset
      * @param index
      * @returns {Node}
      */
-    _createStartOrEndContainer(initialNode, prefix, text, offset, index) {
+    _createStartOrEndContainer(initialNode, text, offset, index) {
         const wrapper = this._createStartEndWrapTemplate(text);
-        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Rendering._getIndexParentIfHas(initialNode, index));
+        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Util.getIndexParentIfHas(initialNode, index));
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
         wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
-        wrapper.marklibInstance = this;
+
         return wrapper;
     }
 
@@ -214,21 +192,20 @@ class Rendering {
     _createWrap(el, optionalLength, optionalIndex, optionalIsSameNode) {
         const originalIndex = optionalIndex >= 0 ? optionalIndex : Util.calcIndex(el);
         const wrapper = this._createWrapTemplate();
-        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Rendering._getIndexParentIfHas(el, originalIndex));
-        const offsetLength = optionalLength >= 0 ? optionalLength : Rendering._getOffsetParentIfHas(el);
+        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Util.getIndexParentIfHas(el, originalIndex));
+        const offsetLength = optionalLength >= 0 ? optionalLength : Util.getOffsetParentIfHas(el);
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offsetLength);
 
         // Save a reference to original text node in wrapper
         wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, originalIndex);
 
-        // save this marker instance to given node
-        wrapper.marklibInstance = this;
-
         if (optionalIsSameNode) {
             wrapper.setAttribute(ATTR_DATA_START_END, ATTR_DATA_START_END);
         }
         const wrap = Util.wrap(el, wrapper);
-        this._callOnWrappedNode(el, wrap);
+
+        this.emit('wrapped-node', el, wrap);
+
         return wrap;
     }
 
@@ -242,24 +219,10 @@ class Rendering {
     _createSplitContainer(originalElement, index, offset) {
         const wrapper = this.document.createElement(TAG_NAME), vTrue = "true";
         wrapper.setAttribute(DATA_IS_SELECTION, vTrue);
-        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Rendering._getIndexParentIfHas(originalElement, index));
+        wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Util.getIndexParentIfHas(originalElement, index));
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
         wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
         return wrapper;
-    }
-
-    /**
-     * Extracts all TextNodes inside a container
-     * @param {Node} el
-     * @returns {Array.<Text>}
-     */
-    _walkTextNodes(el, func) {
-        this.walkDom(el, function (node) {
-            if (Node.TEXT_NODE === node.nodeType && !Util.nodeIsEmpty(node)) {
-                func(node);
-            }
-            return true;
-        });
     }
 
     /**
@@ -271,7 +234,7 @@ class Rendering {
     walk(start, endContainer, nextParent) {
         let nextParentNode = start;
         while (nextParentNode && nextParentNode !== nextParent.parentNode) {
-            var currentParentNode = nextParentNode;
+            const currentParentNode = nextParentNode;
             nextParentNode = nextParentNode.parentNode;
             if (this.wrapSiblings(currentParentNode.nextSibling, endContainer)) {
                 break;
@@ -331,17 +294,17 @@ class Rendering {
         };
 
         while (next !== null && next !== endContainer) {
-            var currentNext = next;
+            const currentNext = next;
             next = next.nextSibling;
             // Found a text node, directly wrap inside a span
             if (Node.TEXT_NODE === currentNext.nodeType) {
                 wrapIf(currentNext);
             } else {
                 if ((currentNext.compareDocumentPosition(endContainer) & DOCUMENT_POSITION_CONTAINED_BY)) {
-                    this.walkDom(currentNext, walkIfContained);
+                    Util.walkDom(currentNext, walkIfContained);
                     found = true;
                 } else {
-                    this._walkTextNodes(currentNext, walkIfNotContained);
+                    Util.walkTextNodes(currentNext, walkIfNotContained);
                 }
                 if (found) {
                     return true;
@@ -352,31 +315,6 @@ class Rendering {
     }
 
     /**
-     * Recursively walks the dom tree unless func returns false
-     * This is a lot more efficient then using any jQuery operations
-     *
-     * Applies node to function
-     * @param node
-     * @param func
-     * @returns {*}
-     */
-    walkDom(node, func) {
-        if (!node) {
-            return false;
-        }
-        const children = node.childNodes;
-        if (!children) {
-            return false;
-        }
-        for (var i = 0; i < children.length; i++) {
-            if (!this.walkDom(children[i], func)) {
-                return false;
-            }
-        }
-        return func(node);
-    }
-
-    /**
      * Marks text of the same node
      * @param {Node} textNode
      * @param {int} startIndex
@@ -384,14 +322,12 @@ class Rendering {
      * @private
      */
     _markTextSameNode(textNode, startIndex, endIndex) {
-
         const initialText = textNode.nodeValue,
             initialIndex = Util.calcIndex(textNode);
 
         if (!initialText) {
             return false;
         }
-
         //If there is an unmarked part in the beginning of the text node,
         //cut off that part and put it into it's own textnode.
         if (startIndex > 0) {
@@ -399,7 +335,7 @@ class Rendering {
             textNode.parentNode.insertBefore(this.document.createTextNode(textBefore), textNode);
             // wrap cutted text node:
             Util.wrap(textNode.previousSibling, this._createSplitContainer(textNode,
-                initialIndex, Rendering._getOffsetParentIfHas(textNode)));
+                initialIndex, Util.getOffsetParentIfHas(textNode)));
         }
         //If there is an unmarked part at the end of the text node,
         //cut off that part and put it into it's own textnode.
@@ -407,13 +343,13 @@ class Rendering {
             const textAfter = initialText.slice(endIndex, initialText.length);
             textNode.parentNode.insertBefore(this.document.createTextNode(textAfter), textNode.nextSibling);
             Util.wrap(textNode.nextSibling, this._createSplitContainer(textNode,
-                initialIndex, Rendering._getOffsetParentIfHas(textNode) + endIndex));
+                initialIndex, Util.getOffsetParentIfHas(textNode) + endIndex));
         }
 
         //Cutoff the unmarked parts and wrap the textnode into a span.
         textNode.nodeValue = initialText.slice(startIndex, endIndex);
         this.startContainer = this._createWrap(textNode,
-            Rendering._getOffsetParentIfHas(textNode) + startIndex, initialIndex, true).parentNode;
+            Util.getOffsetParentIfHas(textNode) + startIndex, initialIndex, true).parentNode;
         this.endContainer = this.startContainer;
         return this.startContainer;
     }
@@ -441,13 +377,13 @@ class Rendering {
         let startT = startContainer;
 
         if (undefined !== fullTextStartValue) {
-            var partTextStartValue = fullTextStartValue.slice(startOffset, fullTextStartValue.length);
+            const partTextStartValue = fullTextStartValue.slice(startOffset, fullTextStartValue.length);
             // Set new text to start node
             startContainer.nodeValue = fullTextStartValue.slice(0, startOffset);
 
-            var offsetStart = Rendering._getOffsetParentIfHas(startContainer);
+            const offsetStart = Util.getOffsetParentIfHas(startContainer);
             // Create a new node for splitted text, offset is the length of new startContainer.nodeValue:
-            startT = this._createStartOrEndContainer(startContainer, this.markerPrefix, partTextStartValue,
+            startT = this._createStartOrEndContainer(startContainer, partTextStartValue,
                 offsetStart === startOffset ? offsetStart : offsetStart + startOffset, startContainerIndex);
             // Append this node after startContainer
             startContainer.parentNode.insertBefore(startT, startContainer.nextSibling);
@@ -456,7 +392,7 @@ class Rendering {
             if (startContainer.nodeValue) {
                 // Wrap start container in detection node, offset is always 0 or parent offset.
                 Util.wrap(startContainer, this._createSplitContainer(startContainer, startContainerIndex,
-                    Rendering._getOffsetParentIfHas(startContainer)));
+                    Util.getOffsetParentIfHas(startContainer)));
             }
         }
 
@@ -468,34 +404,20 @@ class Rendering {
         // It's possible that end container value is null (if a whole paragraph is marked)
         if (undefined !== fullTextEndValue) {
             // Split text
-            var partTextEndValue = fullTextEndValue.slice(0, endOffset);
+            const partTextEndValue = fullTextEndValue.slice(0, endOffset);
             endContainer.nodeValue = fullTextEndValue.slice(endOffset, fullTextEndValue.length);
             // End Container start offset is always 0 or parent offset.
-            endT = this._createStartOrEndContainer(endContainer, this.markerSuffix, partTextEndValue,
-                Rendering._getOffsetParentIfHas(endContainer), endContainerIndex);
+            endT = this._createStartOrEndContainer(endContainer, partTextEndValue,
+                Util.getOffsetParentIfHas(endContainer), endContainerIndex);
 
             endContainer.parentNode.insertBefore(endT, endContainer);
             this.endContainer = endT;
-            var offsetParent = Rendering._getOffsetParentIfHas(endContainer);
+            const offsetParent = Util.getOffsetParentIfHas(endContainer);
             Util.wrap(endContainer, this._createSplitContainer(endContainer, endContainerIndex,
                 offsetParent === endOffset ? offsetParent : offsetParent + endOffset));
         }
 
         return {startT: startT, endT: endT};
-    }
-
-    /**
-     * Will return the original first offset
-     * @param element
-     * @returns {int}
-     * @private
-     */
-    _findOriginalOffset(element) {
-        if (!element.parentNode.hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) {
-            return 0;
-        }
-        const lengthElement = Util.parent(element, '[' + ATTR_DATA_ORIGINAL_OFFSET_START + ']');
-        return lengthElement ? parseInt(lengthElement.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) : 0;
     }
 
     /**
@@ -505,11 +427,15 @@ class Rendering {
      * @param {Node} commonAncestor
      * @param {int} startOffset
      * @param {int} endOffset
-     * @param {boolean} [withoutResult] if true result will not be calculated
-     * @returns {{startOffset: (int), endOffset: (int)}} the original offsets found
+     * @returns RenderResult
      * @private
      */
-    _renderWithElements(startContainer, endContainer, commonAncestor, startOffset, endOffset, withoutResult) {
+    _renderWithElements(startContainer, endContainer, commonAncestor, startOffset, endOffset) {
+
+        if(this._renderResult) {
+           return this._renderResult;
+        }
+
         let outer = Util.parents(startContainer, commonAncestor);
         outer = outer[outer.length - 1];
         const contextContainer = outer ? outer : commonAncestor;
@@ -522,8 +448,8 @@ class Rendering {
 
         // That works by selecting the highest wrapper and get original-offset-start data element, see "findOriginalOffset"
         // So first select that container:
-        const originalStartOffset = this._findOriginalOffset(startContainer);
-        const originalEndOffset = this._findOriginalOffset(endContainer);
+        const originalStartOffset = Util.findOriginalOffset(startContainer);
+        const originalEndOffset = Util.findOriginalOffset(endContainer);
 
         // We may run into Browser Bugs:
 
@@ -537,7 +463,7 @@ class Rendering {
         // We run in some bugs with firefox here that selects no text-nodes sometimes, trying to fix this here
         // Sometimes does not work correctly... (specially when DOM was modified)
         if (startContainer.nodeType !== Node.TEXT_NODE) {
-            this.walkDom(startContainer, function (el) {
+            Util.walkDom(startContainer, function (el) {
                 if (el.nodeType === Node.TEXT_NODE) {
                     startContainer = el;
                     return false;
@@ -575,16 +501,18 @@ class Rendering {
             }
         }
 
-        var result = withoutResult || {
+        const result = new RenderResult(
                 // Real offset is calculated by relative length and absolute length
-                startOffset: originalStartOffset + startOffset,
-                endOffset: originalEndOffset + endOffset,
+                originalStartOffset + startOffset,
+                originalEndOffset + endOffset,
                 // get the path for this selection
-                startContainerPath: Util.getPath(startContainer, this.context),
-                endContainerPath: Util.getPath(endContainer, this.context)
-            };
+                Util.getPath(startContainer, this.context),
+                Util.getPath(endContainer, this.context)
+            );
 
-        this._renderSelection(startContainer, endContainer, startOffset, endOffset, contextContainer, outer);
+        result.instance = this;
+
+        this._renderSelection(startContainer, endContainer, startOffset, endOffset, contextContainer, !!outer);
 
         return result;
     }
@@ -597,60 +525,21 @@ class Rendering {
      * @param {int} startOffset
      * @param {int} endOffset
      * @param {Node} contextContainer
-     * @param {Node} outer
+     * @param {Boolean} outer
      * @private
      */
     _renderSelection(startContainer, endContainer, startOffset, endOffset, contextContainer, outer) {
-
         // if start and end-container are the same, mark text on the same node
         if (startContainer === endContainer) {
             this._markTextSameNode(startContainer, startOffset, endOffset);
         } else {
-            var result = this._markTextDifferentNode(startContainer, endContainer, startOffset, endOffset);
+            const result = this._markTextDifferentNode(startContainer, endContainer, startOffset, endOffset);
             if (!outer) {
                 this.wrapSiblings(result.startT.nextSibling, endContainer);
             } else {
                 this.walk(result.startT, endContainer, contextContainer);
             }
         }
-    }
-
-
-    /**
-     * Deserialize a specific path and finds the right textNodes
-     * This even works when DOM has been manipulated before by `marklib`
-     * @param {string} path the serialized path (including offsets)
-     * @return {Node}
-     * @private
-     */
-    _deserializePath(path) {
-        const pSplit = path.split(';'), p = pSplit[0],
-            objectIndex = parseInt(pSplit[1]),
-            charOffset = parseInt(pSplit[2]),
-            container = !p.trim() ? this.context : this.context.querySelector(p);
-        let maybeFoundNode = null;
-        this.walkDom(container, function (n) {
-            if (n.nodeType === Node.TEXT_NODE) {
-                var atrOffsetStart = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START);
-                atrOffsetStart = atrOffsetStart === null ? 0 : atrOffsetStart;
-                var atrIndex = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
-                atrIndex = atrIndex === null ? Util.calcIndex(n) : atrIndex;
-                if (parseInt(atrIndex) === objectIndex && charOffset >= atrOffsetStart &&
-                    ((parseInt(atrOffsetStart) + n.length) >= charOffset)) {
-                    var thisOffset = n.parentNode
-                        .hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START) ? charOffset -
-                    parseInt(n.parentNode
-                        .getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) : charOffset;
-                    maybeFoundNode = {node: n, offset: thisOffset};
-                    return false;
-                }
-            } else {
-                return true;
-            }
-            return true;
-        });
-
-        return maybeFoundNode;
     }
 
     /**
@@ -665,22 +554,29 @@ class Rendering {
      * @returns {string}
      */
     renderWithPath(startPath, endPath) {
-        const startContainer = this._deserializePath(startPath);
-        const endContainer = this._deserializePath(endPath);
+        const startContainer = Util.deserializePath(startPath, this.context);
+        const endContainer = Util.deserializePath(endPath, this.context);
         if (startContainer && endContainer && startContainer.node && endContainer.node) {
-            var range = document.createRange();
+            const range = document.createRange();
             range.setStart(startContainer.node, startContainer.offset);
             range.setEnd(endContainer.node, endContainer.offset);
             const text = range.toString();
-            this.renderWithRange(range, true);
+            this.renderWithRange(range);
             return text;
         }
         throw 'Could not find start- and/or end-container in document';
     }
 
     /**
+     * @returns {RenderResult}
+     */
+    get result() {
+        return this._renderResult;
+    }
+
+    /**
      * Renders a result (that returned from `renderWithRange`)
-     * @param result
+     * @param {RenderResult|Object} result
      * @returns {string}
      */
     renderWithResult(result) {
@@ -689,16 +585,39 @@ class Rendering {
             `${result.endContainerPath};${result.endOffset}`);
     }
 
-
     /**
      * Prepares a selection with a range object
      * @param {Range} range
-     * @param {boolean} [withoutResult] optional do calculate a result, the selection would not be serializable
      * @returns {Object}
      */
-    renderWithRange(range, withoutResult) {
+    renderWithRange(range) {
         return this._renderWithElements(range.startContainer, range.endContainer,
-            range.commonAncestorContainer, range.startOffset, range.endOffset, withoutResult);
+            range.commonAncestorContainer, range.startOffset, range.endOffset);
+    }
+
+    /**
+     * Removes bindings to nodes
+     */
+    destroy() {
+        this._wrapperNodes.forEach((node) => {
+            delete node.marklibInstance;
+            node.className = '';
+        });
     }
 }
 
+if(!global.MARKLIB_EVENTS) {
+    global.MARKLIB_EVENTS = true;
+
+    global.addEventListener('click', (e) => {
+        if(e.target && e.target.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE)) {
+            if(e.target.marklibInstance && e.target.marklibInstance instanceof Rendering) {
+                const instance = e.target.marklibInstance;
+                instance.emit('hover', e);
+            }
+        }
+    }, true);
+
+}
+
+export default Rendering;

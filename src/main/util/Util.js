@@ -19,6 +19,8 @@ export const DATA_IS_SELECTION = 'data-is-selection';
  */
 const SERIALIZE_SEPARATOR = ";";
 
+import {ATTR_DATA_ORIGINAL_OFFSET_START} from 'Rendering';
+
 // polyfill for matchesSelector, IE 10/11 does not support Element.matches
 if (Element && !Element.prototype.matches) {
     var p = Element.prototype;
@@ -33,10 +35,12 @@ if (Element && !Element.prototype.matches) {
  */
 export default
 class Util {
+
     /**
      * Filter for a NodeList
      * @param {NodeList} nodes
      * @param {Function} func
+     *
      * @returns {Array.<HTMLElement>}
      */
     static nodeListFilter(nodes, func) {
@@ -46,6 +50,7 @@ class Util {
 
     /**
      * Generates a unique id
+     *
      * @return {String}
      */
     static guid() {
@@ -62,6 +67,7 @@ class Util {
     /**
      * Checks if a given node is empty
      * @param {HTMLElement} node
+     *
      * @returns {*}
      */
     static nodeIsEmpty(node) {
@@ -72,6 +78,7 @@ class Util {
     /**
      * @param {HTMLElement} node
      * @param [optionalList]
+     *
      * @return {int} the index of this node in context to it's siblings
      */
     static index(node, optionalList) {
@@ -83,8 +90,9 @@ class Util {
     /**
      * Wraps given `elms` in given `wrapper`
      *
-     * @param {HTMLElement} wrapper
-     * @param {HTMLElement|Array.<HTMLElement>} elms
+     * @param {HTMLElement|Array.<HTMLElement>|Node} elms
+     * @param {HTMLElement|Node} wrapper
+     *
      * @return {HTMLElement}
      */
     static wrap(elms, wrapper) {
@@ -114,6 +122,7 @@ class Util {
     /**
      * Will calculate an index depending on an already modified dom by marklib
      * @param {HTMLElement} node
+     *
      * @returns {int|boolean}
      */
     static calcIndex(node) {
@@ -141,6 +150,7 @@ class Util {
      * @param {HTMLElement} el
      * @param {String} [optionalSelector] will test given element against a selector
      *  if matches, returns this element immediately
+     *
      * @return {Array.<HTMLElement>} an array of all found parents of given element (and optional selector)
      */
     static parents(el, optionalSelector) {
@@ -162,6 +172,7 @@ class Util {
      * Finds a parent node (the closest) with a given selector
      * @param {Node} el
      * @param {String} selector
+     *
      * @returns {Node|bool}
      */
     static parent(el, selector) {
@@ -179,6 +190,7 @@ class Util {
      * Finds the closest element including itself matching a given selector
      * @param {Node} el
      * @param selector
+     *
      * @returns {Node|bool}
      */
     static closest(el, selector) {
@@ -194,6 +206,7 @@ class Util {
 
     /**
      * @param {HTMLElement} n
+     *
      * @return {bool}
      */
     static isMarkNode(n) {
@@ -204,7 +217,7 @@ class Util {
      * Determines the correct paths and excludes all `marklib` generated content
      * TODO: To improve performance we could shorten the path if an ID is present in it.
      * @param {HTMLElement} el
-     * @param {HTMLElement} [context] if given extraction path is relative to this element
+     * @param {HTMLElement|Node} [context] if given extraction path is relative to this element
      * @returns {string}
      */
     static getPath(el, context) {
@@ -277,6 +290,123 @@ class Util {
         }
 
         return path.replace("#document>", "").replace('>;', ';');
+    }
+
+    /**
+     * Will return the first original offset value that is found
+     * @param {Node} element
+     *
+     * @returns {int}
+     */
+    static findOriginalOffset(element) {
+        if (!element.parentNode.hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) {
+            return 0;
+        }
+        const lengthElement = Util.parent(element, '[' + ATTR_DATA_ORIGINAL_OFFSET_START + ']');
+        return lengthElement ? parseInt(lengthElement.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) : 0;
+    }
+
+
+    /**
+     * Deserialize a specific path and finds the right textNodes
+     * This even works when DOM has been manipulated before by `marklib`
+     * @param {string} path the serialized path (including offsets)
+     * @param {Node|HTMLElement} context
+     *
+     * @return {Node}
+     */
+    static deserializePath(path, context) {
+        const pSplit = path.split(';'), p = pSplit[0],
+            objectIndex = parseInt(pSplit[1]),
+            charOffset = parseInt(pSplit[2]),
+            container = !p.trim() ? context : context.querySelector(p);
+        let maybeFoundNode = null;
+        Util.walkDom(container, function (n) {
+            if (n.nodeType === Node.TEXT_NODE) {
+                let atrOffsetStart = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START);
+                atrOffsetStart = atrOffsetStart === null ? 0 : atrOffsetStart;
+                let atrIndex = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
+                atrIndex = atrIndex === null ? Util.calcIndex(n) : atrIndex;
+                if (parseInt(atrIndex) === objectIndex && charOffset >= atrOffsetStart &&
+                    ((parseInt(atrOffsetStart) + n.length) >= charOffset)) {
+                    const thisOffset = n.parentNode
+                        .hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START) ? charOffset -
+                    parseInt(n.parentNode
+                        .getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) : charOffset;
+                    maybeFoundNode = {node: n, offset: thisOffset};
+                    return false;
+                }
+            } else {
+                return true;
+            }
+            return true;
+        });
+
+        return maybeFoundNode;
+    }
+
+
+    /**
+     * Recursively walks the dom tree unless func returns false
+     * This is a lot more efficient then using any jQuery operations
+     *
+     * Applies node to function
+     * @param {Node} node
+     * @param {Function} func
+     *
+     * @returns {*}
+     */
+    static walkDom(node, func) {
+        if (!node) {
+            return false;
+        }
+        const children = node.childNodes;
+        if (!children) {
+            return false;
+        }
+        for (var i = 0; i < children.length; i++) {
+            if (!Util.walkDom(children[i], func)) {
+                return false;
+            }
+        }
+        return func(node);
+    }
+
+    /**
+     * Extracts all TextNodes inside a container
+     * @param {Node} el
+     * @param {Function} func
+     * @returns {Array.<Text>}
+     */
+    static walkTextNodes(el, func) {
+        Util.walkDom(el, function (node) {
+            if (Node.TEXT_NODE === node.nodeType && !Util.nodeIsEmpty(node)) {
+                func(node);
+            }
+            return true;
+        });
+    }
+
+
+    /**
+     * @param {Node} container
+     * @param {Number} thisIndex
+     * @returns {int|string} index of parent or original
+     */
+    static getIndexParentIfHas(container, thisIndex) {
+        var p = container.parentNode;
+        var index = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_INDEX));
+        return index > thisIndex ? index : thisIndex;
+    }
+
+    /**
+     * @param container
+     * @returns {int} offset start of parent if has, else 0
+     */
+    static getOffsetParentIfHas(container) {
+        var p = container.parentNode;
+        var offset = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START));
+        return offset > 0 ? offset : 0;
     }
 
 }
