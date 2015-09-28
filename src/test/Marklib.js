@@ -285,3 +285,30 @@ describe('Constructor Arguments', () => {
             .toEqual('highlight comment');
     });
 });
+
+describe("Cleanup", () => {
+    beforeEach(() => {
+        loadFixtures('simple-text.html');
+    });
+
+    it("Must cleanup bindings to nodes after destroying", () => {
+        const renderer = new Rendering(document, 'highlight comment');
+        expect(renderer.cssClass instanceof Array).toEqual(true);
+        const range = document.createRange();
+
+        range.setStart(document.getElementById("p").childNodes[0], 0);
+        range.setEnd(document.getElementById("p").childNodes[0], 10);
+
+        renderer.renderWithRange(range);
+        const nodes = document.getElementById("p").childNodes[0];
+        expect(nodes.className)
+            .toEqual('highlight comment');
+        expect(nodes.marklibInstance instanceof Rendering).toEqual(true);
+        renderer.destroy();
+
+        expect(document.getElementById("p").childNodes[0].className)
+            .toBe('');
+
+        expect(nodes.marklibInstance).toBeUndefined();
+    });
+});
