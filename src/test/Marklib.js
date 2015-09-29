@@ -4,7 +4,6 @@
 
 import setup from 'setup';
 import Rendering from 'Rendering';
-import RenderResult from 'RenderResult';
 
 setup();
 

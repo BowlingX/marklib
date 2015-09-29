@@ -1,4 +1,4 @@
-/* global Node, MARKLIB_EVENTS */
+/* global Node */
 
 'use strict';
 
