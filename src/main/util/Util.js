@@ -154,14 +154,28 @@ class Util {
      * @return {Array.<HTMLElement>} an array of all found parents of given element (and optional selector)
      */
     static parents(el, optionalSelector) {
+        return Util.parentsCallback(el, (element) => {
+            if (optionalSelector && ((element === optionalSelector) ||
+                ( (typeof optionalSelector === 'string') && element.matches && element.matches(optionalSelector)))) {
+                return true;
+            } else if (!optionalSelector) {
+                return true;
+            }
+            return false;
+        })
+    }
+
+    /**
+     * @param {HTMLElement|Node} el
+     * @param {Function} callback
+     * @return {Array.<HTMLElement>} an array of all found parents of given element (and optional selector)
+     */
+    static parentsCallback(el, callback) {
         let element = el;
         const foundElements = [];
         while (element.parentNode !== null) {
             element = element.parentNode;
-            if (optionalSelector && ((element === optionalSelector) ||
-                ( (typeof optionalSelector === 'string') && element.matches && element.matches(optionalSelector)))) {
-                foundElements.push(element);
-            } else if (!optionalSelector) {
+            if(callback(element)) {
                 foundElements.push(element);
             }
         }
@@ -194,14 +208,41 @@ class Util {
      * @returns {Node|bool}
      */
     static closest(el, selector) {
+        return Util.closestCallback(el, (element) => element.matches && element.matches(selector));
+    }
+
+    /**
+     * Finds the closest element including itself matching a callback
+     * @param {Node} el
+     * @param {Function} callback
+     * @returns {Node|bool}
+     */
+    static closestCallback(el, callback) {
         let element = el;
         while (element !== null) {
-            if (element.matches && element.matches(selector)) {
+            if (callback(element)) {
                 return element;
             }
             element = element.parentNode;
         }
         return false;
+    }
+
+    /**
+     * Finds the outermost fitting element that matches callback
+     * @param {Node} el
+     * @param {Function} callback
+     * @returns {Node|bool}
+     */
+    static outerMostCallback(el, callback) {
+        let element = el, lastValid = false;
+        while (element !== null) {
+            if (callback(element)) {
+                lastValid = element;
+            }
+            element = element.parentNode;
+        }
+        return lastValid;
     }
 
     /**

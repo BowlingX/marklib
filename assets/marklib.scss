@@ -114,6 +114,17 @@ p {
 .marking {
   transition:background .5s ease;
   background: $markingColor;
+
+    &.marklib--hover {
+      cursor: pointer;
+      background: darken($markingColor, 20%) !important;
+    }
+      &.marklib--tree {
+        background: darken($markingColor, 20%) !important;
+        .marklib--tree, .marklib--hover {
+          background: darken($markingColor, 30%) !important;
+        }
+      }
 }
 
 .deleted {

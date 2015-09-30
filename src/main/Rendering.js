@@ -4,7 +4,8 @@
 
 import Util from 'util/Util';
 import RenderResult from 'RenderResult';
-import EventEmitter from 'wolfy87-eventemitter';
+
+import RenderingEvents from 'RenderingEvents';
 
 import {ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION} from 'util/Util';
 
@@ -39,10 +40,6 @@ const ATTR_DATA_ID = 'data-selection-id';
  */
 const DOCUMENT_POSITION_CONTAINED_BY = 16;
 
-/**
- * @type {string}
- */
-export const EVENT_CLICK = 'click';
 
 /**
  * @type {string}
@@ -52,16 +49,16 @@ export const EVENT_WRAPPED_NODE = 'wrapped-node';
 /**
  * Manages a single Render
  */
-class Rendering extends EventEmitter {
+class Rendering extends RenderingEvents {
 
     /**
      * @param {Document} document
-     * @param {String|Array} cssClasses
+     * @param {object} options
      * @param {Node} context
      */
-    constructor(document, cssClasses, context) {
+    constructor(document, options, context) {
 
-        super();
+        super(options, document);
 
         /**
          * @type {Document}
@@ -73,12 +70,6 @@ class Rendering extends EventEmitter {
          * @type {String}
          */
         this.id = Util.guid();
-
-        /**
-         * Class that is set on all highlight nodes
-         * @type {Array}
-         */
-        this.cssClass = ['marking'];
 
         /**
          * StartContainer
@@ -104,18 +95,6 @@ class Rendering extends EventEmitter {
          */
         this._renderResult = null;
 
-        /**
-         * A collection of all nodes that are part of this marking
-         * @type {Array}
-         * @private
-         */
-        this._wrapperNodes = [];
-
-        if(cssClasses instanceof Array) {
-            this.cssClass = cssClasses;
-        } else if(typeof cssClasses === 'string') {
-            this.cssClass = cssClasses.split(' ');
-        }
     }
 
     /**
@@ -136,19 +115,22 @@ class Rendering extends EventEmitter {
 
     /**
      * Creates a Template used as a wrapper and an indication that this is a highlight node
+     * @param {Boolean} [omitHighlight]
      * @returns {Node}
      * @private
      */
-    _createWrapTemplate() {
+    _createWrapTemplate(omitHighlight) {
         const el = this.document.createElement(TAG_NAME), vTrue = "true";
-        el.className = this.cssClass.join(' ');
+        if (!omitHighlight) {
+            el.className = this.options.className.join(' ');
+            // save this marker instance to given node
+            el.marklibInstance = this;
+            // keep track of highlight nodes
+            this.wrapperNodes.push(el);
+            el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
+        }
         el.setAttribute(DATA_IS_SELECTION, vTrue);
         el.setAttribute(ATTR_DATA_ID, this.getId());
-        el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
-        // save this marker instance to given node
-        el.marklibInstance = this;
-        // keep track of highlight nodes
-        this._wrapperNodes.push(el);
 
         return el;
     }
@@ -186,16 +168,17 @@ class Rendering extends EventEmitter {
 
     /**
      * Wraps given element
-     * @param {Node} el
+     * @param {Node|HTMLElement} el
      * @param [optionalLength]
      * @param [optionalIndex]
      * @param [optionalIsSameNode]
+     * @param {Boolean} [omitHighlight] set to true to prevent node to be a highlight node
      * @returns {Node}
      * @private
      */
-    _createWrap(el, optionalLength, optionalIndex, optionalIsSameNode) {
+    _createWrap(el, optionalLength, optionalIndex, optionalIsSameNode, omitHighlight) {
         const originalIndex = optionalIndex >= 0 ? optionalIndex : Util.calcIndex(el);
-        const wrapper = this._createWrapTemplate();
+        const wrapper = this._createWrapTemplate(omitHighlight);
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Util.getIndexParentIfHas(el, originalIndex));
         const offsetLength = optionalLength >= 0 ? optionalLength : Util.getOffsetParentIfHas(el);
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offsetLength);
@@ -265,11 +248,7 @@ class Rendering extends EventEmitter {
             if (n.parentNode.hasAttribute(ATTR_DATA_START_END) &&
                 n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) &&
                 n.parentNode.getAttribute(ATTR_DATA_ID) === this.getId()) {
-                let thisNode = this._createWrap(n).parentNode;
-                this.cssClass.forEach(function (cssClass) {
-                    thisNode.classList.remove(cssClass);
-                });
-                thisNode.removeAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE);
+                this._createWrap(n, undefined, undefined, undefined, true);
             } else {
                 this._createWrap(n);
             }
@@ -436,8 +415,8 @@ class Rendering extends EventEmitter {
      */
     _renderWithElements(startContainer, endContainer, commonAncestor, startOffset, endOffset) {
 
-        if(this._renderResult) {
-           return this._renderResult;
+        if (this._renderResult) {
+            return this._renderResult;
         }
 
         let outer = Util.parents(startContainer, commonAncestor);
@@ -506,13 +485,13 @@ class Rendering extends EventEmitter {
         }
 
         this._renderResult = new RenderResult(
-                // Real offset is calculated by relative length and absolute length
-                originalStartOffset + startOffset,
-                originalEndOffset + endOffset,
-                // get the path for this selection
-                Util.getPath(startContainer, this.context),
-                Util.getPath(endContainer, this.context)
-            );
+            // Real offset is calculated by relative length and absolute length
+            originalStartOffset + startOffset,
+            originalEndOffset + endOffset,
+            // get the path for this selection
+            Util.getPath(startContainer, this.context),
+            Util.getPath(endContainer, this.context)
+        );
 
         this._renderResult.instance = this;
 
@@ -604,25 +583,11 @@ class Rendering extends EventEmitter {
      * Removes bindings to nodes
      */
     destroy() {
-        this._wrapperNodes.forEach((node) => {
+        this.wrapperNodes.forEach((node) => {
             delete node.marklibInstance;
             node.className = '';
         });
     }
-}
-
-if(!global.MARKLIB_EVENTS) {
-    global.MARKLIB_EVENTS = true;
-
-    global.addEventListener('click', (e) => {
-        if(e.target && e.target.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE)) {
-            if(e.target.marklibInstance && e.target.marklibInstance instanceof Rendering) {
-                const instance = e.target.marklibInstance;
-                instance.emit(EVENT_CLICK, e);
-            }
-        }
-    }, true);
-
 }
 
 export default Rendering;

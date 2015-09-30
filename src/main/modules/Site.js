@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
         let thisLength = text.length;
 
         var render = function (autoMarkText, c, length) {
-            var r = new Marklib.Rendering(document, classNames);
+            var r = new Marklib.Rendering(document, {className: classNames});
             var range = document.createRange();
             range.setStart(autoMarkText, 0);
             range.setEnd(autoMarkText, 1);
@@ -92,7 +92,6 @@ document.addEventListener("DOMContentLoaded", function () {
             for (var i = 0; i < elements.length; i++) {
                 elements[i].classList.add('deleted');
                 elements[i].classList.remove('marking');
-
             }
             savedRanges = [];
             localStorage.setItem(STORAGE_KEY, JSON.stringify([]));

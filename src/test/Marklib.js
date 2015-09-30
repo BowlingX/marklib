@@ -9,7 +9,7 @@ setup();
 
 describe("Test some Instance stuff", () => {
     it("Create an instance", () => {
-        var marklib = new Rendering(document, 'highlight');
+        var marklib = new Rendering(document);
         expect(marklib instanceof Rendering).toBe(true);
     });
 });
@@ -20,7 +20,7 @@ describe("Test some wrappings", () => {
     });
 
     it("should wrapSiblings", () => {
-        var marklib = new Rendering(document, 'wow');
+        var marklib = new Rendering(document);
         marklib.wrapSiblings(
             document.getElementById('startContainer'),
             document.getElementById('endContainer')
@@ -28,7 +28,7 @@ describe("Test some wrappings", () => {
     });
 
     it("should render a range in different start/end nodes", () => {
-        var marklib = new Rendering(document, 'wow');
+        var marklib = new Rendering(document);
         var range = document.createRange();
         range.setStart(document.getElementById("firstP").childNodes[0], 1);
         range.setEnd(document.getElementById("lastP").childNodes[0], 2);
@@ -46,7 +46,7 @@ describe("Test some wrappings", () => {
     });
 
     it("should render a range in the same node", () => {
-        var marklib = new Rendering(document, 'highlight');
+        var marklib = new Rendering(document);
         var range = document.createRange();
 
         range.setStart(document.getElementById("firstP").childNodes[0], 0);
@@ -68,7 +68,7 @@ describe("Test some wrappings", () => {
         expect(result.serialize()).toEqual(rangeResult);
 
         // do a second marking over the old one
-        const resultedText = new Rendering(document, 'second').renderWithResult(rangeResult);
+        const resultedText = new Rendering(document).renderWithResult(rangeResult);
         expect(resultedText).toEqual('This');
 
     });
@@ -83,7 +83,7 @@ describe("Bug #4, set the right indices, event if the markup has been modified b
     it("indices must be correct in different situations", () => {
 
         // first render something
-        var marklib = new Rendering(document, 'aFirst');
+        var marklib = new Rendering(document);
         var range = document.createRange();
         range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
         range.setEnd(document.getElementById("Paragraph").childNodes[8], 72);
@@ -97,7 +97,7 @@ describe("Bug #4, set the right indices, event if the markup has been modified b
         expect(result.endContainerPath).toBe("html>body>div>p;8");
         // render something else in the same document:
 
-        const secondMarklib = new Rendering(document, 'aSecond');
+        const secondMarklib = new Rendering(document);
 
         const secondResult = secondMarklib.renderWithResult({
             startOffset: 1,
@@ -133,7 +133,7 @@ describe("Must fail and fallback", () => {
     });
 
     it("fails when no start/end container was found (node) ", () => {
-        const renderer = new Rendering(document, 'aSecond');
+        const renderer = new Rendering(document);
         expect(() => {
             renderer.renderWithResult({
                 startOffset: 1,
@@ -145,7 +145,7 @@ describe("Must fail and fallback", () => {
     });
 
     it("fallback to last text-node if element (body) is given", () => {
-        const renderer = new Rendering(document, 'aSecond');
+        const renderer = new Rendering(document);
         var range = document.createRange();
         range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
         range.setEnd(document.body, 0);
@@ -163,7 +163,7 @@ describe("Must fail and fallback", () => {
         range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
         range.setEnd(document.getElementById("Paragraph"), 0);
 
-        const renderer = new Rendering(document, 'aSecond');
+        const renderer = new Rendering(document);
         const result = renderer.renderWithRange(range);
 
         expect(result.serialize()).toEqual({
@@ -185,7 +185,7 @@ describe("Multiple nodes", () => {
         range.setStart(document.getElementsByTagName("h2")[0].childNodes[0], 0);
         range.setEnd(document.getElementById("Paragraph").childNodes[0], 30);
 
-        const renderer = new Rendering(document, 'aSecond');
+        const renderer = new Rendering(document);
         const result = renderer.renderWithRange(range);
 
         expect(result.serialize()).toEqual({
@@ -212,7 +212,7 @@ describe("Scoped/Contexted rendering", () => {
     });
 
     it("must render correct when a scope element is given", () => {
-        const renderer = new Rendering(document, 'aSecond', document.getElementById('Test'));
+        const renderer = new Rendering(document, {}, document.getElementById('Test'));
         const result = renderer.renderWithResult({
             startOffset: 0,
             endOffset: 4,
@@ -236,7 +236,7 @@ describe("iFrame", () => {
     });
 
     it("must work inside an iframe", () => {
-        const renderer = new Rendering(frameDocument, 'iframe-rendering');
+        const renderer = new Rendering(frameDocument);
         var range = frameDocument.createRange();
         range.setStart(frameDocument.getElementById("p1").childNodes[0], 0);
         range.setEnd(frameDocument.getElementById("p1").childNodes[0], 7);
@@ -260,8 +260,7 @@ describe('Constructor Arguments', () => {
     });
 
     it('Must support arrays as classNames', () => {
-        const renderer = new Rendering(document, ['highlight', 'comment']);
-        expect(renderer.cssClass instanceof Array).toEqual(true);
+        const renderer = new Rendering(document, {className: ['highlight', 'comment']});
         const range = document.createRange();
         range.setStart(document.getElementById("p").childNodes[0], 0);
         range.setEnd(document.getElementById("p").childNodes[0], 10);
@@ -272,8 +271,7 @@ describe('Constructor Arguments', () => {
     });
 
     it('Must support strings as classNames', () => {
-        const renderer = new Rendering(document, 'highlight comment');
-        expect(renderer.cssClass instanceof Array).toEqual(true);
+        const renderer = new Rendering(document, {className:'highlight comment'});
         const range = document.createRange();
 
         range.setStart(document.getElementById("p").childNodes[0], 0);
@@ -291,8 +289,7 @@ describe("Cleanup", () => {
     });
 
     it("Must cleanup bindings to nodes after destroying", () => {
-        const renderer = new Rendering(document, 'highlight comment');
-        expect(renderer.cssClass instanceof Array).toEqual(true);
+        const renderer = new Rendering(document, {className: 'highlight comment'});
         const range = document.createRange();
 
         range.setStart(document.getElementById("p").childNodes[0], 0);

@@ -251,6 +251,19 @@ p {
   background: #2ecc71;
 }
 
+.marking.marklib--hover {
+  cursor: pointer;
+  background: #1b7943 !important;
+}
+
+.marking.marklib--tree {
+  background: #1b7943 !important;
+}
+
+.marking.marklib--tree .marklib--tree, .marking.marklib--tree .marklib--hover {
+  background: #124f2c !important;
+}
+
 .deleted {
   transition: background 0.5s ease;
   background: none !important;
