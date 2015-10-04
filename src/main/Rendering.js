@@ -545,7 +545,8 @@ class Rendering extends RenderingEvents {
             range.setStart(startContainer.node, startContainer.offset);
             range.setEnd(endContainer.node, endContainer.offset);
             const text = range.toString();
-            this.renderWithRange(range);
+            const result = this.renderWithRange(range);
+            result.text = text;
             return text;
         }
         throw 'Could not find start- and/or end-container in document';
@@ -575,8 +576,11 @@ class Rendering extends RenderingEvents {
      * @returns {Object}
      */
     renderWithRange(range) {
-        return this._renderWithElements(range.startContainer, range.endContainer,
+        const text = range.toString();
+        const result = this._renderWithElements(range.startContainer, range.endContainer,
             range.commonAncestorContainer, range.startOffset, range.endOffset);
+        result.text = text;
+        return result;
     }
 
     /**

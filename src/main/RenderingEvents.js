@@ -9,9 +9,9 @@ import Util from 'util/Util';
  */
 export const EVENT_CLICK = 'click';
 
-export const EVENT_MOUSEENTER = 'mouse-enter';
+export const EVENT_MOUSEENTER = 'hover-enter';
 
-export const EVENT_MOUSELEAVE = 'mouse-leave';
+export const EVENT_MOUSELEAVE = 'hover-leave';
 
 export const EVENT_PART_TREE_ENTER = 'tree-enter';
 
@@ -80,7 +80,7 @@ export default class RenderingEvents extends EventEmitter {
             document.MARKLIB_EVENTS = true;
             (function () {
                 const currentHoverInstances = new Set(),
-                      betweenInstances = new Set();
+                    betweenInstances = new Set();
 
                 function isInstance(e) {
                     const closest = Util.closestCallback(
@@ -91,6 +91,13 @@ export default class RenderingEvents extends EventEmitter {
                         return closest.marklibInstance;
                     }
                     return false;
+                }
+
+                function getInstancesBetween(e, instance) {
+                    return Util.parentsCallback(e.target, (el) =>
+                        el.marklibInstance && el.marklibInstance instanceof Rendering
+                        && el.marklibInstance !== instance
+                    ).map(el => el.marklibInstance);
                 }
 
                 function mouseOutClear() {
@@ -106,32 +113,51 @@ export default class RenderingEvents extends EventEmitter {
                     betweenInstances.clear();
                 }
 
-                document.addEventListener('click', (e) => {
-                    const instance = isInstance(e);
+                /**
+                 * @param {Event} e
+                 * @returns {Array|boolean}
+                 */
+                function findTarget(e) {
+                    let instance = isInstance(e);
                     if (instance) {
-                        instance.emit(EVENT_CLICK, e);
+                        const between = getInstancesBetween(e, instance);
+                        if (e.target.textContent !== instance.result.text && between.length > 0) {
+                            let allInstances = between;
+                            allInstances.unshift(instance);
+                            // take the smallest selection
+                            allInstances = allInstances.sort(
+                                (a, b) => a.result.text.length > b.result.text.length
+                            );
+                            instance = allInstances[0];
+                        }
+                        return [instance, between];
+                    }
+                    return false;
+                }
+
+                document.addEventListener('click', (e) => {
+                    let target = findTarget(e);
+                    if (target) {
+                        target[0].emit(EVENT_CLICK, e, target[1]);
                     }
                 }, true);
 
                 document.addEventListener('mouseover', (e) => {
-                    const instance = isInstance(e);
-                    if (instance) {
+                    let target = findTarget(e);
+                    if (target) {
+                        const [instance, between] = target;
                         // find instances that lay in between the node
-                        let instancesInBetween = Util.parentsCallback(e.target, (el) =>
-                            el.marklibInstance && el.marklibInstance instanceof Rendering
-                        );
-                        instancesInBetween = instancesInBetween.map(el => el.marklibInstance);
                         mouseOutClear();
-                        instancesInBetween.forEach((instanceBetween) => {
+                        between.forEach((instanceBetween) => {
                             betweenInstances.add(instanceBetween);
-                            instanceBetween.emit(EVENT_PART_TREE_ENTER, e, instancesInBetween);
+                            instanceBetween.emit(EVENT_PART_TREE_ENTER, e, between);
                         });
-                        instance.emit(EVENT_MOUSEENTER, e, instancesInBetween);
+                        instance.emit(EVENT_MOUSEENTER, e, between);
                         currentHoverInstances.add(instance);
                     } else {
                         mouseOutClear();
                     }
-                });
+                }, true);
 
             })();
         }

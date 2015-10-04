@@ -15,7 +15,6 @@ export default class RenderResult {
         this.endOffset = endOffset;
         this.startContainerPath = startContainerPath;
         this.endContainerPath = endContainerPath;
-
         this._renderingInstance = null;
     }
 
@@ -42,6 +41,20 @@ export default class RenderResult {
             startContainerPath: this.startContainerPath,
             endContainerPath: this.endContainerPath
         }
+    }
+
+    /**
+     * @param {String} text
+     */
+    set text(text) {
+        this._text = text;
+    }
+
+    /**
+     * @returns {String}
+     */
+    get text() {
+        return this._text;
     }
 
     /**
