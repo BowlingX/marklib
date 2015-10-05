@@ -72,9 +72,9 @@ Additionally, marklib will add hover classes to the current hovered marking.
 #### Constructor Arguments
 
 - 1) `HTMLDocument` document -> the document instance used
-- 2) `string` [cssClass], optional -> a class that is applied on each marking container (for styling)
+- 2) `Object` [options], optional -> an object containing setting for marklib (see Options)
 - 3) `HTMLElement` [context], optional -> 
-    the context used to serialize / deserialize the rendering, if not given the document instance
+    the context used to serialize / deserialize the rendering, if not given the document instance.
 
 
 ### Render by serialized result
@@ -96,7 +96,7 @@ A Serialized results consist of 2 strings (start end end) in the following form
 
 ``` javascript
 
- // This is the result we get from the renderWithRange method
+ // This is the result we get from `RenderResult#serialize()`
  
  var result = {
     startContainerPath: 'body>section;0',
