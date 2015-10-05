@@ -62,10 +62,10 @@ Marklib triggers events that can be listened to with `instance.on('event-name')`
 `wolfy87-eventemitter` (https://github.com/Olical/EventEmitter). The following Events are available:
 
 | Event-Name    | Description | Arguments |
-| :------------- |:-------------|:-------------|
-| click         | triggered when clicked on a marking.  | (`originalEvent`, `instanceHierarchy`)
-| hover-enter   | triggered when a pointer-device starts hovering over a marking      | (`originalEvent`, `instanceHierarchy`)
-| hover-leave   | triggered when a pointer-device leaves a marking                    | (`originalEvent`, `instanceHierarchy`)
+| ------------- |-------------|-------------|
+| `click`         | triggered when clicked on a marking.  | `(originalEvent, instanceHierarchy)`
+| `hover-enter`   | triggered when a pointer-device starts hovering over a marking      | `(originalEvent, instanceHierarchy)`
+| `hover-leave`   | triggered when a pointer-device leaves a marking                    | `(originalEvent, instanceHierarchy)`
 
 Additionally, marklib will add hover classes to the current hovered marking.
 
