@@ -124,7 +124,7 @@ class Rendering extends RenderingEvents {
         if (!omitHighlight) {
             el.className = this.options.className.join(' ');
             // save this marker instance to given node
-            el.marklibInstance = this;
+            Rendering.setMarklibInstance(el, this);
             // keep track of highlight nodes
             this.wrapperNodes.push(el);
             el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
@@ -591,6 +591,25 @@ class Rendering extends RenderingEvents {
             delete node.marklibInstance;
             node.className = '';
         });
+        this.removeEvent();
+    }
+
+    /**
+     * @param {Node} el
+     * @param {Rendering} instance
+     * @returns {Node}
+     */
+    static setMarklibInstance(el, instance) {
+        el.marklibInstance = instance;
+        return el;
+    }
+
+    /**
+     * @param {Node} el
+     * @returns {Rendering|null|undefined}
+     */
+    static getMarklibInstance(el) {
+        return el.marklibInstance;
     }
 }
 

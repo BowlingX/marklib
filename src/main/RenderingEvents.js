@@ -52,6 +52,16 @@ export default class RenderingEvents extends EventEmitter {
          */
         this.wrapperNodes = [];
 
+        this._registerEvents(document);
+    }
+
+    /**
+     * Will register events if not already bind.
+     * @param {Document} document
+     * @private
+     */
+    _registerEvents(document) {
+
         this.on(EVENT_MOUSEENTER, () => {
             this.wrapperNodes.forEach((node) => {
                 node.classList.add(this.options.hoverClass);
@@ -76,28 +86,36 @@ export default class RenderingEvents extends EventEmitter {
             });
         });
 
+
         if (!document.MARKLIB_EVENTS) {
             document.MARKLIB_EVENTS = true;
             (function () {
                 const currentHoverInstances = new Set(),
                     betweenInstances = new Set();
 
-                function isInstance(e) {
+                function checkMarklibInstance(e) {
+                    const instance = Rendering.getMarklibInstance(e);
+                    // instanceof check will fail if used in test scenario where different DOMS are used
+                    // see also http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
+                    return instance && (instance instanceof Rendering || 'wrapperNodes' in instance);
+                }
+
+                function closestInstance(e) {
                     const closest = Util.closestCallback(
                         e.target,
-                        (e) => e.marklibInstance && e.marklibInstance instanceof Rendering
+                        (e) => checkMarklibInstance(e)
                     );
                     if (typeof closest === 'object') {
-                        return closest.marklibInstance;
+                        return Rendering.getMarklibInstance(closest);
                     }
                     return false;
                 }
 
                 function getInstancesBetween(e, instance) {
-                    return Util.parentsCallback(e.target, (el) =>
-                        el.marklibInstance && el.marklibInstance instanceof Rendering
-                        && el.marklibInstance !== instance
-                    ).map(el => el.marklibInstance);
+                    return Util.parentsCallback(
+                        e.target,
+                        (el) => checkMarklibInstance(el) && Rendering.getMarklibInstance(el) !== instance
+                    ).map(el => Rendering.getMarklibInstance(el));
                 }
 
                 function mouseOutClear() {
@@ -118,7 +136,7 @@ export default class RenderingEvents extends EventEmitter {
                  * @returns {Array|boolean}
                  */
                 function findTarget(e) {
-                    let instance = isInstance(e);
+                    let instance = closestInstance(e);
                     if (instance) {
                         const between = getInstancesBetween(e, instance);
                         if (e.target.textContent !== instance.result.text && between.length > 0) {

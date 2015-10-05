@@ -263,7 +263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!omitHighlight) {
 	                el.className = this.options.className.join(' ');
 	                // save this marker instance to given node
-	                el.marklibInstance = this;
+	                Rendering.setMarklibInstance(el, this);
 	                // keep track of highlight nodes
 	                this.wrapperNodes.push(el);
 	                el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
@@ -739,11 +739,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	                delete node.marklibInstance;
 	                node.className = '';
 	            });
+	            this.removeEvent();
 	        }
+	
+	        /**
+	         * @param {Node} el
+	         * @param {Rendering} instance
+	         * @returns {Node}
+	         */
 	    }, {
 	        key: 'result',
 	        get: function get() {
 	            return this._renderResult;
+	        }
+	    }], [{
+	        key: 'setMarklibInstance',
+	        value: function setMarklibInstance(el, instance) {
+	            el.marklibInstance = instance;
+	            return el;
+	        }
+	
+	        /**
+	         * @param {Node} el
+	         * @returns {Rendering|null|undefined}
+	         */
+	    }, {
+	        key: 'getMarklibInstance',
+	        value: function getMarklibInstance(el) {
+	            return el.marklibInstance;
 	        }
 	    }]);
 	
@@ -1803,6 +1826,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _inherits = __webpack_require__(18)['default'];
 	
+	var _createClass = __webpack_require__(29)['default'];
+	
 	var _classCallCheck = __webpack_require__(32)['default'];
 	
 	var _slicedToArray = __webpack_require__(36)['default'];
@@ -1860,8 +1885,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	
 	    function RenderingEvents(options, document) {
-	        var _this = this;
-	
 	        _classCallCheck(this, RenderingEvents);
 	
 	        _get(Object.getPrototypeOf(RenderingEvents.prototype), 'constructor', this).call(this);
@@ -1888,121 +1911,143 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        this.wrapperNodes = [];
 	
-	        this.on(EVENT_MOUSEENTER, function () {
-	            _this.wrapperNodes.forEach(function (node) {
-	                node.classList.add(_this.options.hoverClass);
-	            });
-	        });
-	
-	        this.on(EVENT_MOUSELEAVE, function () {
-	            _this.wrapperNodes.forEach(function (node) {
-	                node.classList.remove(_this.options.hoverClass);
-	            });
-	        });
-	
-	        this.on(EVENT_PART_TREE_ENTER, function () {
-	            _this.wrapperNodes.forEach(function (node) {
-	                node.classList.add(_this.options.treeClass);
-	            });
-	        });
-	
-	        this.on(EVENT_PART_TREE_LEAVE, function () {
-	            _this.wrapperNodes.forEach(function (node) {
-	                node.classList.remove(_this.options.treeClass);
-	            });
-	        });
-	
-	        if (!document.MARKLIB_EVENTS) {
-	            document.MARKLIB_EVENTS = true;
-	            (function () {
-	                var currentHoverInstances = new _Set(),
-	                    betweenInstances = new _Set();
-	
-	                function isInstance(e) {
-	                    var closest = _utilUtil2['default'].closestCallback(e.target, function (e) {
-	                        return e.marklibInstance && e.marklibInstance instanceof _Rendering2['default'];
-	                    });
-	                    if (typeof closest === 'object') {
-	                        return closest.marklibInstance;
-	                    }
-	                    return false;
-	                }
-	
-	                function getInstancesBetween(e, instance) {
-	                    return _utilUtil2['default'].parentsCallback(e.target, function (el) {
-	                        return el.marklibInstance && el.marklibInstance instanceof _Rendering2['default'] && el.marklibInstance !== instance;
-	                    }).map(function (el) {
-	                        return el.marklibInstance;
-	                    });
-	                }
-	
-	                function mouseOutClear() {
-	                    currentHoverInstances.forEach(function (thisInstance) {
-	                        thisInstance.emit(EVENT_MOUSELEAVE);
-	                    });
-	                    currentHoverInstances.clear();
-	
-	                    betweenInstances.forEach(function (thisInstance) {
-	                        thisInstance.emit(EVENT_PART_TREE_LEAVE);
-	                    });
-	
-	                    betweenInstances.clear();
-	                }
-	
-	                /**
-	                 * @param {Event} e
-	                 * @returns {Array|boolean}
-	                 */
-	                function findTarget(e) {
-	                    var instance = isInstance(e);
-	                    if (instance) {
-	                        var between = getInstancesBetween(e, instance);
-	                        if (e.target.textContent !== instance.result.text && between.length > 0) {
-	                            var allInstances = between;
-	                            allInstances.unshift(instance);
-	                            // take the smallest selection
-	                            allInstances = allInstances.sort(function (a, b) {
-	                                return a.result.text.length > b.result.text.length;
-	                            });
-	                            instance = allInstances[0];
-	                        }
-	                        return [instance, between];
-	                    }
-	                    return false;
-	                }
-	
-	                document.addEventListener('click', function (e) {
-	                    var target = findTarget(e);
-	                    if (target) {
-	                        target[0].emit(EVENT_CLICK, e, target[1]);
-	                    }
-	                }, true);
-	
-	                document.addEventListener('mouseover', function (e) {
-	                    var target = findTarget(e);
-	                    if (target) {
-	                        (function () {
-	                            var _target = _slicedToArray(target, 2);
-	
-	                            var instance = _target[0];
-	                            var between = _target[1];
-	
-	                            // find instances that lay in between the node
-	                            mouseOutClear();
-	                            between.forEach(function (instanceBetween) {
-	                                betweenInstances.add(instanceBetween);
-	                                instanceBetween.emit(EVENT_PART_TREE_ENTER, e, between);
-	                            });
-	                            instance.emit(EVENT_MOUSEENTER, e, between);
-	                            currentHoverInstances.add(instance);
-	                        })();
-	                    } else {
-	                        mouseOutClear();
-	                    }
-	                }, true);
-	            })();
-	        }
+	        this._registerEvents(document);
 	    }
+	
+	    /**
+	     * Will register events if not already bind.
+	     * @param {Document} document
+	     * @private
+	     */
+	
+	    _createClass(RenderingEvents, [{
+	        key: '_registerEvents',
+	        value: function _registerEvents(document) {
+	            var _this = this;
+	
+	            this.on(EVENT_MOUSEENTER, function () {
+	                _this.wrapperNodes.forEach(function (node) {
+	                    node.classList.add(_this.options.hoverClass);
+	                });
+	            });
+	
+	            this.on(EVENT_MOUSELEAVE, function () {
+	                _this.wrapperNodes.forEach(function (node) {
+	                    node.classList.remove(_this.options.hoverClass);
+	                });
+	            });
+	
+	            this.on(EVENT_PART_TREE_ENTER, function () {
+	                _this.wrapperNodes.forEach(function (node) {
+	                    node.classList.add(_this.options.treeClass);
+	                });
+	            });
+	
+	            this.on(EVENT_PART_TREE_LEAVE, function () {
+	                _this.wrapperNodes.forEach(function (node) {
+	                    node.classList.remove(_this.options.treeClass);
+	                });
+	            });
+	
+	            if (!document.MARKLIB_EVENTS) {
+	                document.MARKLIB_EVENTS = true;
+	                (function () {
+	                    var currentHoverInstances = new _Set(),
+	                        betweenInstances = new _Set();
+	
+	                    function checkMarklibInstance(e) {
+	                        var instance = _Rendering2['default'].getMarklibInstance(e);
+	                        // instanceof check will fail if used in test scenario where different DOMS are used
+	                        // see also http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
+	                        return instance && (instance instanceof _Rendering2['default'] || 'wrapperNodes' in instance);
+	                    }
+	
+	                    function closestInstance(e) {
+	                        var closest = _utilUtil2['default'].closestCallback(e.target, function (e) {
+	                            return checkMarklibInstance(e);
+	                        });
+	                        if (typeof closest === 'object') {
+	                            return _Rendering2['default'].getMarklibInstance(closest);
+	                        }
+	                        return false;
+	                    }
+	
+	                    function getInstancesBetween(e, instance) {
+	                        return _utilUtil2['default'].parentsCallback(e.target, function (el) {
+	                            return checkMarklibInstance(el) && _Rendering2['default'].getMarklibInstance(el) !== instance;
+	                        }).map(function (el) {
+	                            return _Rendering2['default'].getMarklibInstance(el);
+	                        });
+	                    }
+	
+	                    function mouseOutClear() {
+	                        currentHoverInstances.forEach(function (thisInstance) {
+	                            thisInstance.emit(EVENT_MOUSELEAVE);
+	                        });
+	                        currentHoverInstances.clear();
+	
+	                        betweenInstances.forEach(function (thisInstance) {
+	                            thisInstance.emit(EVENT_PART_TREE_LEAVE);
+	                        });
+	
+	                        betweenInstances.clear();
+	                    }
+	
+	                    /**
+	                     * @param {Event} e
+	                     * @returns {Array|boolean}
+	                     */
+	                    function findTarget(e) {
+	                        var instance = closestInstance(e);
+	                        if (instance) {
+	                            var between = getInstancesBetween(e, instance);
+	                            if (e.target.textContent !== instance.result.text && between.length > 0) {
+	                                var allInstances = between;
+	                                allInstances.unshift(instance);
+	                                // take the smallest selection
+	                                allInstances = allInstances.sort(function (a, b) {
+	                                    return a.result.text.length > b.result.text.length;
+	                                });
+	                                instance = allInstances[0];
+	                            }
+	                            return [instance, between];
+	                        }
+	                        return false;
+	                    }
+	
+	                    document.addEventListener('click', function (e) {
+	                        var target = findTarget(e);
+	                        if (target) {
+	                            target[0].emit(EVENT_CLICK, e, target[1]);
+	                        }
+	                    }, true);
+	
+	                    document.addEventListener('mouseover', function (e) {
+	                        var target = findTarget(e);
+	                        if (target) {
+	                            (function () {
+	                                var _target = _slicedToArray(target, 2);
+	
+	                                var instance = _target[0];
+	                                var between = _target[1];
+	
+	                                // find instances that lay in between the node
+	                                mouseOutClear();
+	                                between.forEach(function (instanceBetween) {
+	                                    betweenInstances.add(instanceBetween);
+	                                    instanceBetween.emit(EVENT_PART_TREE_ENTER, e, between);
+	                                });
+	                                instance.emit(EVENT_MOUSEENTER, e, between);
+	                                currentHoverInstances.add(instance);
+	                            })();
+	                        } else {
+	                            mouseOutClear();
+	                        }
+	                    }, true);
+	                })();
+	            }
+	        }
+	    }]);
 	
 	    return RenderingEvents;
 	})(_wolfy87Eventemitter2['default']);
