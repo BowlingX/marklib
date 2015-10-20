@@ -1,6 +1,6 @@
 {
   "name": "marklib",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "main": "build/js/marklib.js",
   "description": "A simple and fast zero-dependencies-library to transform text-selections into serializable markings.",
   "repository": {
@@ -45,7 +45,8 @@
     "sass-loader": "^2.0.1",
     "style-loader": "^0.12.3",
     "url-loader": "^0.5.6",
-    "webpack": "^1.10.1"
+    "webpack": "^1.10.1",
+    "flexcss": "git+https://github.com/BowlingX/flexcss.git"
   },
   "engines": {
     "node": ">=0.10.1"

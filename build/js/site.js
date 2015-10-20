@@ -245,7 +245,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'setId',
 	        value: function setId(id) {
+	            var _this = this;
+	
 	            this.id = id;
+	
+	            if (this._renderResult) {
+	                this.wrapperNodes.forEach(function (node) {
+	                    return node.setAttribute(ATTR_DATA_ID, _this.id);
+	                });
+	            }
+	
 	            return this;
 	        }
 	
@@ -267,9 +276,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // keep track of highlight nodes
 	                this.wrapperNodes.push(el);
 	                el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
+	                el.setAttribute(ATTR_DATA_ID, this.getId());
 	            }
 	            el.setAttribute(_utilUtil.DATA_IS_SELECTION, vTrue);
-	            el.setAttribute(ATTR_DATA_ID, this.getId());
 	
 	            return el;
 	        }
@@ -391,17 +400,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'wrapSiblings',
 	        value: function wrapSiblings(start, endContainer) {
-	            var _this = this;
+	            var _this2 = this;
 	
 	            var next = start,
 	                found = false;
 	
 	            // Capsule some logic
 	            var wrap = (function (n) {
-	                if (n.parentNode.hasAttribute(ATTR_DATA_START_END) && n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) && n.parentNode.getAttribute(ATTR_DATA_ID) === _this.getId()) {
-	                    _this._createWrap(n, undefined, undefined, undefined, true);
+	                var instance = Rendering.getMarklibInstance(n.parentNode);
+	                if (n.parentNode.hasAttribute(ATTR_DATA_START_END) && n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) && instance === _this2) {
+	                    _this2._createWrap(n, undefined, undefined, undefined, true);
 	                } else {
-	                    _this._createWrap(n);
+	                    _this2._createWrap(n);
 	                }
 	            }).bind(this);
 	
@@ -730,7 +740,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
-	         * Removes bindings to nodes
+	         * Removes bindings and classNames to nodes
 	         */
 	    }, {
 	        key: 'destroy',
@@ -766,7 +776,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getMarklibInstance',
 	        value: function getMarklibInstance(el) {
-	            return el.marklibInstance;
+	            return el ? el.marklibInstance : null;
 	        }
 	    }]);
 	
@@ -1957,7 +1967,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                    function checkMarklibInstance(e) {
 	                        var instance = _Rendering2['default'].getMarklibInstance(e);
-	                        // instanceof check will fail if used in test scenario where different DOMS are used
+	                        // instanceof check will fail if used in test scenario where different DOMs are used
 	                        // see also http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
 	                        return instance && (instance instanceof _Rendering2['default'] || 'wrapperNodes' in instance);
 	                    }
@@ -3424,7 +3434,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	/* global localStorage */
+	/* global localStorage, document */
 	
 	var _interopRequireDefault = __webpack_require__(2)['default'];
 	
@@ -3436,6 +3446,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _modulesMarklib2 = _interopRequireDefault(_modulesMarklib);
 	
+	var _flexcss = __webpack_require__(89);
+	
 	var KEY_ENTER = 13;
 	
 	/**
@@ -3443,7 +3455,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	
 	document.addEventListener("DOMContentLoaded", function () {
+	
 	    var STORAGE_KEY = 'savedRanges';
+	    var ANIMATIONEND = 'animationend';
+	    var allRanges = [];
+	    var tooltip = new _flexcss.Tooltip(document.body);
 	
 	    /**
 	     * Creates an animated rendering
@@ -3475,10 +3491,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [],
 	        animated = false;
 	
+	    /**
+	     * OnClick event for renderings
+	     */
+	    var onClick = function onClick() {
+	        var self = this;
+	        this.wrapperNodes.forEach(function (n) {
+	            n.addEventListener(ANIMATIONEND, function self(e) {
+	                e.target.classList.remove('bubble');
+	                e.target.removeEventListener(ANIMATIONEND, self);
+	            });
+	            n.classList.add('bubble');
+	        });
+	
+	        if (tooltip.getCurrentTarget() === this.wrapperNodes[0]) {
+	            return;
+	        }
+	
+	        tooltip.createTooltip(this.wrapperNodes[0], this.result.text);
+	
+	        setTimeout(function () {
+	            if (tooltip.getCurrentTarget()) {
+	                document.addEventListener('click', function thisFunction(e) {
+	                    if (tooltip.getCurrentTarget() && tooltip.getCurrentTarget() === self.wrapperNodes[0]) {
+	                        tooltip.removeTooltip();
+	                    }
+	                    document.removeEventListener('click', thisFunction);
+	                });
+	            }
+	        }, 0);
+	    };
+	
 	    savedRanges.forEach(function (range) {
 	        var marker = new _modulesMarklib2['default'].Rendering(document);
 	        try {
 	            marker.renderWithResult(range);
+	            allRanges.push(marker);
+	            marker.on('click', onClick);
 	        } catch (e) {
 	            console.warn("Could not render:", range, e);
 	            localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
@@ -3505,8 +3554,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var selection = document.getSelection(),
 	                renderer = new _modulesMarklib2['default'].Rendering(document),
 	                result = renderer.renderWithRange(selection.getRangeAt(0));
+	
+	            renderer.on('click', onClick);
+	            allRanges.push(renderer);
+	
 	            selection.removeAllRanges();
-	            console.info("stored:", result);
 	            savedRanges.push(result.serialize());
 	            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedRanges));
 	        } catch (e) {
@@ -3524,18 +3576,6002 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (e.target.id === 'action-mark') {
 	            return actionMark();
 	        } else if (e.target.id === 'action-clear') {
-	            var elements = document.getElementsByTagName('x-marker');
-	            for (var i = 0; i < elements.length; i++) {
-	                elements[i].classList.add('deleted');
-	                elements[i].classList.remove('marking');
-	            }
+	            allRanges.forEach(function (range) {
+	                return range.destroy();
+	            });
 	            savedRanges = [];
+	            allRanges = [];
 	            localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
 	        }
 	    });
 	});
 	
 	exports['default'] = _modulesMarklib2['default'];
+	module.exports = exports['default'];
+
+/***/ },
+/* 89 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _interopRequireDefault = __webpack_require__(2)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _Form = __webpack_require__(90);
+	
+	var _Form2 = _interopRequireDefault(_Form);
+	
+	var _Tooltip = __webpack_require__(113);
+	
+	var _Tooltip2 = _interopRequireDefault(_Tooltip);
+	
+	var _Modal = __webpack_require__(120);
+	
+	var _Modal2 = _interopRequireDefault(_Modal);
+	
+	var _Widget = __webpack_require__(121);
+	
+	var _Widget2 = _interopRequireDefault(_Widget);
+	
+	var _utilSettings = __webpack_require__(117);
+	
+	var _utilSettings2 = _interopRequireDefault(_utilSettings);
+	
+	var _Toggleable = __webpack_require__(122);
+	
+	var _Toggleable2 = _interopRequireDefault(_Toggleable);
+	
+	var _OffCanvas = __webpack_require__(123);
+	
+	var _OffCanvas2 = _interopRequireDefault(_OffCanvas);
+	
+	var _Dropdown = __webpack_require__(124);
+	
+	var _Dropdown2 = _interopRequireDefault(_Dropdown);
+	
+	var _LightBox = __webpack_require__(125);
+	
+	var _LightBox2 = _interopRequireDefault(_LightBox);
+	
+	var _Showcase = __webpack_require__(126);
+	
+	var _Showcase2 = _interopRequireDefault(_Showcase);
+	
+	// default export as component object
+	exports['default'] = {
+	    Form: _Form2['default'],
+	    Tooltip: _Tooltip2['default'],
+	    Modal: _Modal2['default'],
+	    Widget: _Widget2['default'],
+	    Settings: _utilSettings2['default'],
+	    Toggleable: _Toggleable2['default'],
+	    OffCanvas: _OffCanvas2['default'],
+	    Dropdown: _Dropdown2['default'],
+	    LightBox: _LightBox2['default'],
+	    Showcase: _Showcase2['default']
+	};
+	module.exports = exports['default'];
+
+/***/ },
+/* 90 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	/*!
+	 * FlexCss.Form
+	 * Licensed under the MIT License (MIT)
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 */
+	
+	'use strict';
+	
+	/*global HTMLFormElement, fetch, FormData, clearTimeout, NodeList*/
+	
+	var _get = __webpack_require__(4)['default'];
+	
+	var _inherits = __webpack_require__(18)['default'];
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _Promise = __webpack_require__(91)['default'];
+	
+	var _Object$assign = __webpack_require__(66)['default'];
+	
+	var _Array$from = __webpack_require__(101)['default'];
+	
+	var _Object$keys = __webpack_require__(104)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(2)['default'];
+	
+	var _defaults = __webpack_require__(107)['default'];
+	
+	var _interopExportWildcard = __webpack_require__(112)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _Tooltip = __webpack_require__(113);
+	
+	var _Tooltip2 = _interopRequireDefault(_Tooltip);
+	
+	var _utilEvent = __webpack_require__(116);
+	
+	var _utilEvent2 = _interopRequireDefault(_utilEvent);
+	
+	var _utilUtil = __webpack_require__(114);
+	
+	var _utilUtil2 = _interopRequireDefault(_utilUtil);
+	
+	var _utilSettings = __webpack_require__(117);
+	
+	var _utilSettings2 = _interopRequireDefault(_utilSettings);
+	
+	var _DestroyableWidget2 = __webpack_require__(115);
+	
+	var _DestroyableWidget3 = _interopRequireDefault(_DestroyableWidget2);
+	
+	var _isomorphicFetch = __webpack_require__(118);
+	
+	_defaults(exports, _interopExportWildcard(_isomorphicFetch, _defaults));
+	
+	var LOADING_CLASS = 'loading';
+	var DATA_ELEMENT_INVALID = 'data-flexcss-invalid';
+	var REMOTE = 'data-remote';
+	var REMOTE_ACTION = 'data-remote-action';
+	var ATTR_DISABLE_INLINE = 'data-disable-inline-validation';
+	var ATTR_DISABLE_REALTIME = 'data-disable-realtime-validation';
+	var ATTR_VALIDATOR = 'data-validate';
+	var ATTR_DATA_CUSTOM_MESSAGE = 'data-validation-message';
+	var ATTR_DATA_CUSTOM_LABEL = 'data-custom-label';
+	var ATTR_VALIDATE_VISIBILITY = 'data-validate-visibility';
+	var ATTR_ERROR_TARGET_ID = 'data-error-target';
+	var ATTR_DEPENDS = 'data-depends-selector';
+	var CONST_USE_JSON = 'json';
+	var CONST_REALTIME_EVENT = 'input';
+	var FOCUS_TOOLTIP_DELAY = 20;
+	var CLICK_TOOLTIP_DELAY = 150;
+	/**
+	 * Triggered when form is fully initialized and handlers are binded
+	 * @type {string}
+	 */
+	var EVENT_FORM_READY = 'flexcss.form.ready';
+	exports.EVENT_FORM_READY = EVENT_FORM_READY;
+	/**
+	 * Fires when a form is submitted, cancelable
+	 * @type {string}
+	 */
+	var EVENT_FORM_SUBMIT = 'flexcss.form.submit';
+	exports.EVENT_FORM_SUBMIT = EVENT_FORM_SUBMIT;
+	/**
+	 * Fired directly after the form has been submitted via ajax
+	 * @type {string}
+	 */
+	var EVENT_FORM_AFTER_AJAX_SUBMIT = 'flexcss.form.afterAjaxSubmit';
+	exports.EVENT_FORM_AFTER_AJAX_SUBMIT = EVENT_FORM_AFTER_AJAX_SUBMIT;
+	/**
+	 * Fired when ajax events did complete
+	 * @type {string}
+	 */
+	var EVENT_FORM_AJAX_COMPLETED = 'flexcss.form.ajaxCompleted';
+	
+	exports.EVENT_FORM_AJAX_COMPLETED = EVENT_FORM_AJAX_COMPLETED;
+	/**
+	 * A HTML5 Form Validation replacement
+	 */
+	
+	var Form = (function (_DestroyableWidget) {
+	    _inherits(Form, _DestroyableWidget);
+	
+	    /**
+	     * @param {HTMLElement} form
+	     * @param [options] optional options
+	     */
+	
+	    function Form(form, options) {
+	        _classCallCheck(this, Form);
+	
+	        _get(Object.getPrototypeOf(Form.prototype), 'constructor', this).call(this);
+	
+	        if (!(form instanceof HTMLFormElement)) {
+	            throw 'argument {0} form needs to be an form element';
+	        }
+	
+	        /**
+	         * The Form
+	         * @type {HTMLElement}
+	         */
+	        this.form = form;
+	
+	        /**
+	         * @type {Tooltip}
+	         */
+	        this.tooltips = null;
+	
+	        /**
+	         * @type {Promise}
+	         */
+	        this.currentValidationFuture = new _Promise(function () {});
+	
+	        /**
+	         * Default options
+	         * @type {Object}
+	         */
+	        this.options = {
+	            // if true creates tooltips above element, uses FlexCss Tooltips
+	            createTooltips: true,
+	            // if true appends error message after input element
+	            appendError: false,
+	            // type of ajax submit
+	            ajaxSubmitType: 'POST',
+	            // json content type if ajax method is set to json
+	            ajaxJsonContentType: 'application/json; charset=utf-8',
+	            // allow inline validation
+	            inlineValidation: true,
+	            // validate in realtime (on `input` event)
+	            realtime: true,
+	            // timeout when realtime event should be captured
+	            realtimeTimeout: 250,
+	            // formatting method for an error
+	            formatErrorTooltip: function formatErrorTooltip(error) {
+	                return '<i class="icon-attention"></i> ' + error;
+	            },
+	            // the class that will be put on the element to mark it failed validation
+	            inputErrorClass: 'invalid',
+	            // the container class for error messages below an element
+	            containerErrorClass: 'form-error',
+	            // additional options for fetch
+	            fetchOptions: {
+	                credentials: 'include'
+	            },
+	            // the container for tooltips
+	            tooltipContainer: form,
+	            // if you have a fixed header, either set a number or function here
+	            scrollToElementDiff: 0
+	        };
+	
+	        // overwrite default options
+	        _Object$assign(this.options, options);
+	
+	        // apply settings from attributes
+	        _utilUtil2['default'].applyOptionsFromElement(form, this.options);
+	
+	        // set form class as widget
+	        // Forms are very different to classical widgets,
+	        // we will not use our base widget class for this but just self
+	        form.hfWidgetInstance = this;
+	
+	        /**
+	         * A List of Validators
+	         * @type {Object}
+	         * @private
+	         */
+	        this._validators = Form.globalValidators;
+	
+	        /**
+	         * @type {Function}
+	         * @private
+	         */
+	        this._remoteValidationFunction = null;
+	
+	        this.initFormValidation();
+	    }
+	
+	    /**
+	     * Global validators
+	     * @type {Array}
+	     */
+	
+	    _createClass(Form, [{
+	        key: 'destroy',
+	        value: function destroy() {
+	            _get(Object.getPrototypeOf(Form.prototype), 'destroy', this).call(this);
+	            if (this.tooltips) {
+	                this.tooltips.destroy();
+	            }
+	        }
+	
+	        /**
+	         * Submits this form, either via ajax or just classical (default)
+	         * @param {HTMLFormElement} thisForm
+	         * @param {Event} e
+	         * @private
+	         * @returns {Promise|boolean} returns false if submit is cancled
+	         */
+	    }, {
+	        key: '_submitFunction',
+	        value: function _submitFunction(thisForm, e) {
+	            var shouldUseAjax = thisForm.getAttribute(REMOTE),
+	                ajaxPostUrl = thisForm.getAttribute(REMOTE_ACTION) || thisForm.getAttribute('action') || window.location.href,
+	                useJson = CONST_USE_JSON === shouldUseAjax,
+	                self = this;
+	
+	            var ev = _utilEvent2['default'].dispatch(thisForm, EVENT_FORM_SUBMIT).withOriginal(e).fire();
+	
+	            // abort execution is event was prevented
+	            if (ev.defaultPrevented) {
+	                self._formStopLoading();
+	                return false;
+	            }
+	
+	            if (shouldUseAjax === null) {
+	                // submit
+	                return thisForm.submit();
+	            }
+	            // prevent form from submit normally
+	            e.preventDefault();
+	
+	            // add information that this is an XMLHttpRequest request (used by some frameworks)
+	            var defaultHeaders = {
+	                'X-Requested-With': 'XMLHttpRequest'
+	            };
+	
+	            // setup default headers
+	            if (useJson) {
+	                _Object$assign(defaultHeaders, {
+	                    'Content-Type': this.options.ajaxJsonContentType
+	                });
+	            }
+	            var defaultOptions = _Object$assign(this.options.fetchOptions, {
+	                headers: defaultHeaders,
+	                method: this.options.ajaxSubmitType
+	            });
+	
+	            // support either JSON request payload or normal payload submission
+	            var serverCall = useJson ? fetch(ajaxPostUrl, _Object$assign(defaultOptions, {
+	                body: JSON.stringify(this.serialize())
+	            })) : fetch(ajaxPostUrl, _Object$assign(defaultOptions, {
+	                body: new FormData(thisForm)
+	            }));
+	
+	            _utilEvent2['default'].dispatch(thisForm, EVENT_FORM_AFTER_AJAX_SUBMIT).withOriginal(e).fire();
+	
+	            return serverCall.then(function (r) {
+	                (self._remoteValidationFunction || Form.globalRemoteValidationFunction).apply(self, [r]);
+	
+	                _utilEvent2['default'].dispatch(thisForm, EVENT_FORM_AJAX_COMPLETED).withOriginal(e).withDetail({ response: r }).fire();
+	                // always remove error class
+	                self._formStopLoading();
+	            });
+	        }
+	
+	        /**
+	         * Serializes a form to a json object
+	         * @returns {Object}
+	         */
+	    }, {
+	        key: 'serialize',
+	        value: function serialize() {
+	            var selectors = ['input[name]:not([type="radio"]):enabled', 'input[type="radio"][name]:checked', 'select[name]:enabled', 'textarea[name]:enabled'],
+	                inputs = this.form.querySelectorAll(selectors.join(',')),
+	                result = {};
+	
+	            Array.prototype.forEach.call(inputs, function (input) {
+	                var exists = result[input.name],
+	                    value = input.value;
+	                if (exists instanceof Array) {
+	                    exists.push(value);
+	                } else if (exists) {
+	                    result[input.name] = [result[input.name], value];
+	                } else {
+	                    result[input.name] = value;
+	                }
+	            });
+	
+	            return result;
+	        }
+	
+	        /**
+	         * Handles the chain of validation on given fields
+	         *
+	         * @param {HTMLElement|Array|NodeList} field
+	         * @param [focus] optional focus first error
+	         * @returns {Promise}
+	         */
+	    }, {
+	        key: 'handleValidation',
+	        value: function handleValidation(field, focus) {
+	            var _this = this;
+	
+	            var fields = field instanceof Array || field instanceof NodeList ? field : [field];
+	            return this._handleValidation(fields, focus, true).then((function (r) {
+	                if (!r.foundAnyError) {
+	                    // remove tooltips
+	                    if (_this.tooltips) {
+	                        _this.tooltips.removeTooltip();
+	                    }
+	                }
+	                return r;
+	            }).bind(this));
+	        }
+	
+	        /**
+	         * Handles errors on given node list
+	         * @param {NodeList} toValidateFields
+	         * @param {boolean} focus
+	         * @param {boolean} scoped if true, will only validate the fields `invalidFields`
+	         * @returns {Promise}
+	         * @private
+	         */
+	    }, {
+	        key: '_handleValidation',
+	        value: function _handleValidation(toValidateFields, focus, scoped) {
+	            var self = this;
+	            var arr = Form._createArrayFromInvalidFieldList(toValidateFields),
+	                isLocalInvalid = arr.length > 0;
+	            // focus must appear in the same frame for iOS devices
+	            if (isLocalInvalid && focus) {
+	                self._focusElement(arr[0]);
+	            }
+	            var validation = scoped ? this._customValidationsForElements(toValidateFields) : self.validateCustomFields();
+	            return validation.then(function (r) {
+	                if (isLocalInvalid) {
+	                    // combine browser and custom validators
+	                    r.foundAnyError = true;
+	                }
+	                // get a unique field list of all fields that need to be checked and rendered
+	                // it's possible that we have duplicates in non scoped mode
+	                var thisToValidateFields = scoped ? toValidateFields : _Array$from(arr).concat(r.checkedFields);
+	                r.checkedFields = thisToValidateFields;
+	                var foundInvalidFields = self.prepareErrors(thisToValidateFields, false),
+	                    firstInvalidField = foundInvalidFields[0];
+	                if (firstInvalidField) {
+	                    if (focus) {
+	                        self._focusElement(firstInvalidField);
+	                        // if element could not be focused:
+	                        if (document.activeElement !== firstInvalidField) {
+	                            self._handleTooltipHideClickAfterChange();
+	                        }
+	                    } else {
+	                        self._handleTooltipHideClickAfterChange();
+	                    }
+	                    self.showAndOrCreateTooltip(firstInvalidField);
+	                }
+	                return r;
+	            });
+	        }
+	
+	        /**
+	         * @param {HTMLElement} field
+	         * @param {ValidityState} validity
+	         * @returns {*}
+	         * @private
+	         */
+	
+	    }, {
+	        key: '_setupErrorMessages',
+	        value: function _setupErrorMessages(field, validity) {
+	            return Form.globalErrorMessageHandler ? Form.globalErrorMessageHandler.apply(this, [field, validity]) : false;
+	        }
+	
+	        /**
+	         * Handles class labels for elements
+	         * @param {Object} fields
+	         * @private
+	         */
+	    }, {
+	        key: '_handleLabels',
+	        value: function _handleLabels(fields) {
+	            _Object$keys(fields).forEach((function (id) {
+	                var labels = this.getForm().querySelectorAll('[for="' + id + '"]'),
+	                    invalid = fields[id];
+	                if (labels.length) {
+	                    for (var labelsIndex = 0; labelsIndex < labels.length; labelsIndex++) {
+	                        var labelEl = labels[labelsIndex];
+	                        // we can't use toggle attribute, not supported in IE
+	                        if (invalid) {
+	                            this._markElementInvalid(labelEl);
+	                        } else {
+	                            this._markElementValid(labelEl);
+	                        }
+	                    }
+	                }
+	            }).bind(this));
+	        }
+	
+	        /**
+	         * @param el
+	         * @private
+	         */
+	    }, {
+	        key: '_markElementInvalid',
+	        value: function _markElementInvalid(el) {
+	            el.setAttribute(DATA_ELEMENT_INVALID, "true");
+	            el.classList.add(this.options.inputErrorClass);
+	        }
+	
+	        /**
+	         * @param el
+	         * @private
+	         */
+	    }, {
+	        key: '_markElementValid',
+	        value: function _markElementValid(el) {
+	            el.removeAttribute(DATA_ELEMENT_INVALID);
+	            el.classList.remove(this.options.inputErrorClass);
+	        }
+	
+	        /**
+	         * A List of invalid elements (:invalid)
+	         * @returns {Array}
+	         * @private
+	         */
+	    }, {
+	        key: '_getInvalidElements',
+	        value: function _getInvalidElements() {
+	            return Array.prototype.filter.call(this.getForm().querySelectorAll(":invalid"), function (r) {
+	                return !(r instanceof HTMLFieldSetElement);
+	            });
+	        }
+	
+	        /**
+	         * @param {HTMLElement} thisParent
+	         * @private
+	         */
+	    }, {
+	        key: '_removeElementErrors',
+	        value: function _removeElementErrors(thisParent) {
+	            var errors = thisParent.querySelectorAll('.' + this.options.containerErrorClass),
+	                inputsWithErrorClasses = thisParent.querySelectorAll('[' + DATA_ELEMENT_INVALID + ']');
+	            for (var elementErrorIndex = 0; elementErrorIndex < errors.length; elementErrorIndex++) {
+	                errors[elementErrorIndex].parentNode.removeChild(errors[elementErrorIndex]);
+	            }
+	            for (var inputErrorIndex = 0; inputErrorIndex < inputsWithErrorClasses.length; inputErrorIndex++) {
+	                var el = inputsWithErrorClasses[inputErrorIndex];
+	                this._markElementValid(el);
+	            }
+	        }
+	
+	        /**
+	         * Registers a custom validator
+	         * @param {String} name
+	         * @param {Function} validator a validation function should always return either a Future(true) or Future(false)
+	         * even when the field has been invalidated with `setCustomValidity`, because of different browser `bugs`
+	         * we can't rely on that
+	         * @returns {Form}
+	         */
+	    }, {
+	        key: 'registerValidator',
+	        value: function registerValidator(name, validator) {
+	            this._validators[name] = validator;
+	            return this;
+	        }
+	
+	        /**
+	         * Runs async validation
+	         * @param {String} validationRef
+	         * @param {HTMLElement} field
+	         * @returns {Promise}
+	         * @private
+	         */
+	    }, {
+	        key: '_runValidation',
+	        value: function _runValidation(validationRef, field) {
+	            if (!this._validators[validationRef]) {
+	                throw 'Could not found validator: ' + validationRef;
+	            }
+	            var cl = field.classList,
+	                future = this._validators[validationRef].apply(this, [field, this.form]);
+	            cl.add(LOADING_CLASS);
+	            future.then(function () {
+	                cl.remove(LOADING_CLASS);
+	            });
+	            return future;
+	        }
+	
+	        /**
+	         * Run custom validations for elements, validations are done async do support XHR Requests or other stuff
+	         *
+	         * @param {Array|NodeList} fields
+	         * @returns {Promise} contains either true if validations passed or false if something went wrong
+	         * @private
+	         */
+	    }, {
+	        key: '_customValidationsForElements',
+	        value: function _customValidationsForElements(fields) {
+	            var futures = [],
+	                fieldsLength = fields.length,
+	                checkedFields = [];
+	            for (var iVal = 0; iVal < fieldsLength; iVal++) {
+	                var field = fields[iVal],
+	                    validationRef = field.getAttribute(ATTR_VALIDATOR),
+	                    validity = field.validity;
+	                if (this._validators[validationRef]) {
+	                    // use local validation first and then continue with custom validations
+	                    if (Form._shouldNotValidateField(field) || validity && !validity.customError && !validity.valid) {
+	                        continue;
+	                    }
+	                    checkedFields.push(field);
+	                    futures.push(this._runValidation(validationRef, field));
+	                } else {
+	                    if (validationRef) {
+	                        console.warn('data-validate was set but no validator was found');
+	                    }
+	                }
+	            }
+	            return _Promise.all(futures).then(function (allFutures) {
+	                var l = allFutures.length;
+	                var result = {
+	                    checkedFields: checkedFields,
+	                    foundAnyError: false
+	                };
+	                for (var fI = 0; fI < l; fI++) {
+	                    if (!allFutures[fI]) {
+	                        result.foundAnyError = true;
+	                        break;
+	                    }
+	                }
+	                return result;
+	            });
+	        }
+	
+	        /**
+	         * Remove all errors for this form
+	         * @returns {Form}
+	         */
+	    }, {
+	        key: 'removeErrors',
+	        value: function removeErrors() {
+	            this._removeElementErrors(this.form);
+	            if (this.tooltips) {
+	                this.tooltips.removeTooltip();
+	            }
+	            return this;
+	        }
+	
+	        /**
+	         * Will handle errors for given fields
+	         * @param {Array|NodeList} fields
+	         * @param {Boolean} removeAllErrors
+	         */
+	    }, {
+	        key: 'prepareErrors',
+	        value: function prepareErrors(fields, removeAllErrors) {
+	            if (removeAllErrors) {
+	                this.removeErrors();
+	            }
+	            var labelGroups = {},
+	                invalidFields = [];
+	
+	            function handleAdditionalLabels(isInvalid, thisLabelGroup, field) {
+	                var additionalLabels = field.getAttribute(ATTR_DATA_CUSTOM_LABEL) || field.id,
+	                    group = thisLabelGroup[additionalLabels];
+	                if (additionalLabels) {
+	                    // check additionally if field is currently marked as invalid
+	                    // so the label is not marked as error if no field is marked as one
+	                    group = group ? group : isInvalid;
+	                    thisLabelGroup[additionalLabels] = group;
+	                }
+	            }
+	
+	            // We save all validations in an extra property because we need to reset the validity due some
+	            // implementation errors in other browsers then chrome
+	            for (var i = 0; i < fields.length; i++) {
+	                var field = fields[i],
+	                    errorTarget = Form._findErrorTarget(field),
+	                    _parent = errorTarget.parentNode,
+	                    validity = field.validity,
+	                    isInvalid = validity && !validity.valid;
+	                if (Form._shouldNotValidateField(field)) {
+	                    continue;
+	                }
+	                field.flexFormsSavedValidity = JSON.parse(JSON.stringify(validity));
+	                handleAdditionalLabels(isInvalid, labelGroups, field);
+	                if (isInvalid) {
+	                    if (!removeAllErrors) {
+	                        // Remove current errors:
+	                        this._removeElementErrors(_parent);
+	                    }
+	                    // setup custom error messages:
+	                    this._setupErrorMessages(field, validity);
+	                    var msg = field.validationMessage;
+	
+	                    // mark fields as invalid
+	                    this._markElementInvalid(errorTarget);
+	                    this._markElementInvalid(field);
+	
+	                    if (this.options.appendError) {
+	                        _parent.insertAdjacentHTML("beforeend", '<div class="' + this.options.containerErrorClass + '">' + msg + '</div>');
+	                    }
+	                    invalidFields.push(field);
+	                    field.flexFormsSavedValidationMessage = msg;
+	                } else {
+	                    // restore invalid fields
+	                    this._markElementValid(errorTarget);
+	                    this._markElementValid(field);
+	
+	                    // cleanup
+	                    delete field.flexFormsSavedValidationMessage;
+	
+	                    // remove error markup
+	                    this._removeElementErrors(_parent);
+	                }
+	                // We have to reset the custom validity here to allow native validations work again
+	                field.setCustomValidity('');
+	            }
+	            // if validates a single field we need to check the linked fields to a label:
+	            if (fields.length === 1) {
+	                var field = fields[0];
+	                var id = field.getAttribute(ATTR_DATA_CUSTOM_LABEL) || field.id;
+	                if (id) {
+	                    var linkedFields = _Array$from(this.getForm().querySelectorAll('[' + ATTR_DATA_CUSTOM_LABEL + '="' + id + '"], #' + id));
+	                    linkedFields.forEach((function (thisField) {
+	                        var validity = thisField.validity,
+	                            isInvalid = validity && !validity.valid && this._isElementInvalidElement(thisField);
+	                        handleAdditionalLabels(isInvalid, labelGroups, thisField);
+	                    }).bind(this));
+	                }
+	            }
+	            this._handleLabels(labelGroups);
+	            return invalidFields;
+	        }
+	
+	        /**
+	         * Validates all custom fields
+	         * @returns {Promise}
+	         */
+	    }, {
+	        key: 'validateCustomFields',
+	        value: function validateCustomFields() {
+	            return this._customValidationsForElements(this.form.querySelectorAll("[data-validate]"));
+	        }
+	
+	        /**
+	         * Tests if a field should be validated
+	         * @param {HTMLElement} field
+	         * @returns {boolean}
+	         * @private
+	         */
+	    }, {
+	        key: 'getForm',
+	
+	        /**
+	         * This form
+	         * @returns {HTMLElement}
+	         */
+	        value: function getForm() {
+	            return this.form;
+	        }
+	
+	        /**
+	         * Registers a function that handles remote validation
+	         * @param {Function} func
+	         * @returns {Form}
+	         */
+	    }, {
+	        key: 'registerRemoteValidation',
+	        value: function registerRemoteValidation(func) {
+	            this._remoteValidationFunction = func;
+	            return this;
+	        }
+	
+	        /**
+	         * Formats the error content for the tooltip
+	         * @param {String} error
+	         * @returns {String}
+	         * @private
+	         */
+	    }, {
+	        key: '_formatErrorTooltip',
+	        value: function _formatErrorTooltip(error) {
+	            return this.options.formatErrorTooltip.apply(this, [error]);
+	        }
+	
+	        /**
+	         * Tries to find a custom error target on given target
+	         * @param target
+	         * @returns {HTMLElement}
+	         * @private
+	         */
+	    }, {
+	        key: 'showAndOrCreateTooltip',
+	
+	        /**
+	         * Creates a tooltip at given element, will only create a new instance if not created
+	         * @param {HTMLElement} target
+	         * @param {Boolean} [remove]
+	         */
+	        value: function showAndOrCreateTooltip(target, remove) {
+	            var self = this;
+	            if (!this.tooltips && this.options.createTooltips) {
+	                this.tooltips = new _Tooltip2['default'](this.options.tooltipContainer, {
+	                    containerClass: 'error-tooltip'
+	                });
+	            }
+	            if (!this.options.createTooltips) {
+	                return false;
+	            }
+	
+	            if (!target.flexFormsSavedValidity) {
+	                return false;
+	            }
+	            var errorTarget = Form._findErrorTarget(target);
+	            if (!target.flexFormsSavedValidity.valid && self._isElementInvalidElement(errorTarget)) {
+	                self.tooltips.createTooltip(errorTarget, self._formatErrorTooltip(target.flexFormsSavedValidationMessage), false);
+	                return true;
+	            } else {
+	                if (remove) {
+	                    self.tooltips.removeTooltip();
+	                }
+	            }
+	            return false;
+	        }
+	
+	        /**
+	         * Checks if element is marked as invalid
+	         * @param {HTMLElement} el
+	         * @returns {boolean}
+	         * @private
+	         */
+	    }, {
+	        key: '_isElementInvalidElement',
+	        value: function _isElementInvalidElement(el) {
+	            return el.hasAttribute(DATA_ELEMENT_INVALID);
+	        }
+	
+	        /**
+	         * Handles invalid event of a form
+	         * @param {Event} e
+	         * @returns {Promise|boolean}
+	         * @private
+	         */
+	    }, {
+	        key: '_checkIsInvalid',
+	        value: function _checkIsInvalid(e) {
+	            e.preventDefault();
+	            var invalidFields = this.getForm().querySelectorAll(":invalid");
+	            return this._handleValidation(invalidFields, true, false);
+	        }
+	
+	        /**
+	         * Will query dependent fields (by selector) that should be validated with given field
+	         * @param field
+	         * @returns {NodeList|[]}
+	         * @private
+	         */
+	    }, {
+	        key: '_getDependentFields',
+	        value: function _getDependentFields(field) {
+	            var fieldSelector = field.getAttribute(ATTR_DEPENDS),
+	                base = [field];
+	            if (fieldSelector) {
+	                base.push.apply(base, Array.prototype.slice.apply(this.getForm().querySelectorAll(fieldSelector)));
+	            }
+	            return base;
+	        }
+	
+	        /**
+	         * @private
+	         * @param {HTMLElement} [target]
+	         */
+	    }, {
+	        key: '_handleTooltipInline',
+	        value: function _handleTooltipInline(target) {
+	            if (this.tooltips) {
+	                this.tooltips.removeTooltip(target);
+	            }
+	        }
+	
+	        /**
+	         * Initializes validation for a given form, registers event handlers
+	         */
+	    }, {
+	        key: 'initFormValidation',
+	        value: function initFormValidation() {
+	            var _this2 = this;
+	
+	            // Suppress the default bubbles
+	            var form = this.getForm(),
+	                self = this,
+	                invalidEvent = 'invalid';
+	
+	            /**
+	             * Validates if is valid realtime element
+	             * @param {HTMLElement} target
+	             * @returns {boolean}
+	             * @private
+	             */
+	            function _checkIsValidRealtimeElement(target) {
+	                return !target.hasAttribute(ATTR_DISABLE_REALTIME) && !target.hasAttribute(ATTR_DISABLE_INLINE);
+	            }
+	
+	            form.addEventListener(invalidEvent, function (e) {
+	                e.preventDefault();
+	            }, true);
+	
+	            _utilUtil2['default'].addEventOnce(invalidEvent, form, function handleInvalid(e) {
+	                self._formLoading();
+	                var result = self._checkIsInvalid(e);
+	                if (result) {
+	                    self.currentValidationFuture = new _Promise(function (resolve) {
+	                        result.then(function (r) {
+	                            setTimeout(function () {
+	                                _utilUtil2['default'].addEventOnce(invalidEvent, form, handleInvalid, true);
+	                            }, 0);
+	                            resolve(r);
+	                            self._formStopLoading();
+	                            if (!r.foundAnyError) {
+	                                self._formLoading();
+	                                self._handleSubmit(e);
+	                            }
+	                        });
+	                    });
+	                }
+	            }, true);
+	
+	            this.addEventListener(form, 'reset', function () {
+	                _this2.removeErrors();
+	            });
+	
+	            // Timeout for keys:
+	            var TIMEOUT_KEYDOWN,
+	                KEYDOWN_RUNNING = false;
+	
+	            // resets keydown events
+	            function clearKeyDownTimeout() {
+	                KEYDOWN_RUNNING = false;
+	                clearTimeout(TIMEOUT_KEYDOWN);
+	            }
+	
+	            // setup custom realtime event if given
+	            if (self.options.realtime) {
+	                this.addEventListener(form, CONST_REALTIME_EVENT, function (e) {
+	                    if (self._formIsLoading()) {
+	                        return;
+	                    }
+	                    var target = e.target;
+	                    clearTimeout(TIMEOUT_KEYDOWN);
+	                    if (KEYDOWN_RUNNING) {
+	                        return;
+	                    }
+	                    TIMEOUT_KEYDOWN = setTimeout(function () {
+	                        var isStillTarget = document.activeElement === e.target;
+	                        if (!_checkIsValidRealtimeElement(target)) {
+	                            return;
+	                        }
+	                        if (isStillTarget) {
+	                            self._handleTooltipInline();
+	                        }
+	                        KEYDOWN_RUNNING = true;
+	                        var dependentFields = self._getDependentFields(target);
+	                        self._customValidationsForElements(dependentFields).then(function () {
+	                            self.prepareErrors(dependentFields, false);
+	                            if (isStillTarget) {
+	                                self.showAndOrCreateTooltip(e.target);
+	                            }
+	                            // future must be resolved before another event can be started
+	                            KEYDOWN_RUNNING = false;
+	                        });
+	                    }, self.options.realtimeTimeout);
+	                }, true);
+	            }
+	
+	            /**
+	             * Validates if target is a valid input field to check blur and focus events
+	             *
+	             * @param {HTMLElement} target
+	             * @returns {boolean}
+	             * @private
+	             */
+	            function _checkIsValidBlurFocusElement(target) {
+	                var attr = target.getAttribute("type");
+	                return attr !== "radio" && attr !== "checkbox" && attr !== "submit";
+	            }
+	
+	            /**
+	             * Validates if is valid inline-check element
+	             * @param {HTMLElement} target
+	             * @returns {boolean}
+	             * @private
+	             */
+	            function _checkIsValidInlineCheckElement(target) {
+	                return !target.hasAttribute(ATTR_DISABLE_INLINE);
+	            }
+	
+	            this.addEventListener(form, 'blur', function (e) {
+	                // do not hide tooltip after change event
+	                if (!e.target.flexcssKeepTooltips) {
+	                    self._handleTooltipInline(e.target);
+	                }
+	                delete e.target.flexcssKeepTooltips;
+	            }, true);
+	
+	            // handle focus on input elements
+	            // will show an error if field is invalid
+	            this.addEventListener(form, "focus", function (e) {
+	                if (self._formIsLoading()) {
+	                    return;
+	                }
+	                // do not track errors for checkbox and radios on focus:
+	                if (!_checkIsValidBlurFocusElement(e.target)) {
+	                    return;
+	                }
+	                // we need to delay this a little, because Firefox and Safari do not show a tooltip after it
+	                // just have been hidden (on blur). Maybe fix this with a queue later
+	                setTimeout(function () {
+	                    self.showAndOrCreateTooltip(e.target);
+	                }, FOCUS_TOOLTIP_DELAY);
+	            }, true);
+	
+	            if (self.options.inlineValidation) {
+	                // Handle change for checkbox, radios and selects
+	                this.addEventListener(form, "change", function (e) {
+	                    var target = e.target;
+	                    if (self._formIsLoading() || !_checkIsValidInlineCheckElement(target)) {
+	                        return;
+	                    }
+	                    clearKeyDownTimeout();
+	                    var name = target.getAttribute('name');
+	                    var inputs = name ? form.querySelectorAll('[name="' + name + '"]') : [target];
+	                    // we only support dependent fields for a single widgets right now
+	                    if (inputs.length === 1) {
+	                        inputs = self._getDependentFields(target);
+	                    }
+	                    self._customValidationsForElements(inputs).then(function () {
+	                        self.prepareErrors(inputs, false);
+	                        target.flexcssKeepTooltips = self.showAndOrCreateTooltip(target, true);
+	                        if (target.flexcssKeepTooltips) {
+	                            self._handleTooltipHideClickAfterChange();
+	                        }
+	                    });
+	                });
+	            }
+	
+	            // prevent default if form is invalid
+	            this.addEventListener(form, "submit", function listener(e) {
+	                self._submitListener(e, listener);
+	            });
+	
+	            _utilEvent2['default'].dispatchAndFire(form, EVENT_FORM_READY);
+	        }
+	
+	        /* Loading states, unfortunately we can't check if a promise is pending :/*/
+	        /* TODO: Maybe wrap promise to extend this functionality */
+	
+	    }, {
+	        key: '_formLoading',
+	        value: function _formLoading() {
+	            this.getForm().classList.add(LOADING_CLASS);
+	        }
+	    }, {
+	        key: '_formStopLoading',
+	        value: function _formStopLoading() {
+	            this.getForm().classList.remove(LOADING_CLASS);
+	        }
+	    }, {
+	        key: '_formIsLoading',
+	        value: function _formIsLoading() {
+	            return this.getForm().classList.contains(LOADING_CLASS);
+	        }
+	
+	        // this defines the logic after a change event when a tooltip is shown
+	        // because we call this method inside the change event, the click would be immeditally executed with the change
+	        // event when not using setTimeout(). There might be another solution for this...
+	    }, {
+	        key: '_handleTooltipHideClickAfterChange',
+	        value: function _handleTooltipHideClickAfterChange() {
+	            var self = this;
+	            if (this.options.createTooltips) {
+	                setTimeout(function () {
+	                    _utilUtil2['default'].addEventOnce(_utilSettings2['default'].getTabEvent(), global.document.body, function (t) {
+	                        if (!self._isElementInvalidElement(t.target)) {
+	                            self._handleTooltipInline();
+	                        }
+	                    });
+	                }, CLICK_TOOLTIP_DELAY);
+	            }
+	        }
+	    }, {
+	        key: '_focusElement',
+	        value: function _focusElement(el) {
+	            el.focus();
+	            _utilUtil2['default'].scrollToElement(el, this.options.scrollToElementDiff);
+	        }
+	
+	        /**
+	         * Listener that is executed on form submit
+	         * @param e
+	         * @param submitListener
+	         * @returns {boolean}
+	         * @private
+	         */
+	    }, {
+	        key: '_submitListener',
+	        value: function _submitListener(e, submitListener) {
+	
+	            var form = this.getForm(),
+	                self = this,
+	                submitEvent = 'submit';
+	
+	            if (this._formIsLoading()) {
+	                e.preventDefault();
+	                return false;
+	            }
+	            this._formLoading();
+	            form.removeEventListener(submitEvent, submitListener);
+	            this.removeErrors();
+	            e.preventDefault();
+	            // reset:
+	            if (form.checkValidity()) {
+	                form.addEventListener(submitEvent, submitListener);
+	                // It's possible that the form is valid but the custom validations need to be checked again:
+	                self.currentValidationFuture = new _Promise(function (resolve) {
+	                    var validation = self.validateCustomFields();
+	                    validation.then(function (r) {
+	                        // because custom validators may mark multiple fields as invalid, we get all of them in the form
+	                        var fields = self._getInvalidElements(),
+	                            errors = self.prepareErrors(fields, false),
+	                            firstError = errors[0];
+	                        if (firstError) {
+	                            self._focusElement(firstError);
+	                            self.showAndOrCreateTooltip(firstError, true);
+	                        }
+	                        resolve(r);
+	                    });
+	                });
+	                self.currentValidationFuture.then(function (r) {
+	                    if (!r.foundAnyError) {
+	                        // Handle submitting the form to server:
+	                        self._handleSubmit(e);
+	                    } else {
+	                        self._formStopLoading();
+	                    }
+	                });
+	            } else {
+	                self._formStopLoading();
+	                form.addEventListener(submitEvent, submitListener);
+	            }
+	        }
+	
+	        /**
+	         * Handles submitting, optionally allows to stop submitting
+	         * @param e
+	         * @private
+	         */
+	    }, {
+	        key: '_handleSubmit',
+	        value: function _handleSubmit(e) {
+	            this._submitFunction(this.form, e);
+	        }
+	
+	        /**
+	         * Registers a global event Handler
+	         * @param errorFunc
+	         */
+	    }], [{
+	        key: '_shouldNotValidateField',
+	        value: function _shouldNotValidateField(field) {
+	            var target = Form._findErrorTarget(field);
+	            return target instanceof HTMLFieldSetElement || target.hasAttribute(ATTR_VALIDATE_VISIBILITY) && !_utilUtil2['default'].isVisible(target);
+	        }
+	
+	        /**
+	         * Creates an array from a node list with invalid items
+	         * This Method expicitly checks if field should not be validated so it can be used to foucs a field
+	         * @param list
+	         * @returns {Array}
+	         * @private
+	         */
+	    }, {
+	        key: '_createArrayFromInvalidFieldList',
+	        value: function _createArrayFromInvalidFieldList(list) {
+	            var arr = [];
+	            for (var i = 0; i < list.length; ++i) {
+	                var n = list[i];
+	                if (n.validity && !n.validity.valid) {
+	                    if (!Form._shouldNotValidateField(n)) {
+	                        arr.push(n);
+	                    }
+	                }
+	            }
+	            return arr;
+	        }
+	    }, {
+	        key: '_findErrorTarget',
+	        value: function _findErrorTarget(target) {
+	            var el = target.getAttribute(ATTR_ERROR_TARGET_ID) || target,
+	                foundTarget = el instanceof HTMLElement ? el : global.document.getElementById(el);
+	            if (!foundTarget) {
+	                throw 'Given error target did not exsits:' + target;
+	            }
+	            return foundTarget;
+	        }
+	    }, {
+	        key: 'registerErrorMessageHandler',
+	        value: function registerErrorMessageHandler(errorFunc) {
+	            Form.globalErrorMessageHandler = errorFunc;
+	        }
+	
+	        /**
+	         * Initialize forms for a specific selector
+	         * @param {String} selector
+	         * @param {Object} [options]
+	         * @return {array.<Form>}
+	         */
+	    }, {
+	        key: 'init',
+	        value: function init(selector, options) {
+	            var forms = selector instanceof HTMLElement ? selector.querySelectorAll('form') : document.querySelectorAll(selector),
+	                instances = [];
+	            for (var i = 0; i < forms.length; i++) {
+	                instances.push(new Form(forms[i], options));
+	            }
+	            return instances;
+	        }
+	
+	        /**
+	         * Registers a global validator that is usable on all form instances
+	         * @param {String} name
+	         * @param {Function} validator
+	         * @returns {Function}
+	         */
+	    }, {
+	        key: 'registerValidator',
+	        value: function registerValidator(name, validator) {
+	            Form.globalValidators[name] = validator;
+	            return Form;
+	        }
+	
+	        /**
+	         * Registers a global function that is called when a form should validate the response of a server
+	         * @param {Function} func
+	         * @returns {Form}
+	         */
+	    }, {
+	        key: 'registerGlobalRemoteValidationFunction',
+	        value: function registerGlobalRemoteValidationFunction(func) {
+	            Form.globalRemoteValidationFunction = func;
+	            return Form;
+	        }
+	    }]);
+	
+	    return Form;
+	})(_DestroyableWidget3['default']);
+	
+	exports['default'] = Form;
+	Form.globalValidators = [];
+	
+	/**
+	 * Global Remote validation function
+	 */
+	Form.globalRemoteValidationFunction = function () {};
+	
+	/**
+	 * Handles custom error messages extracts custom message by default
+	 */
+	Form.globalErrorMessageHandler = function (field, validity) {
+	    if (!validity.customError) {
+	        var customMsg = field.getAttribute(ATTR_DATA_CUSTOM_MESSAGE);
+	        if (customMsg) {
+	            field.setCustomValidity(customMsg);
+	        }
+	    }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 91 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(92), __esModule: true };
+
+/***/ },
+/* 92 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(74);
+	__webpack_require__(57);
+	__webpack_require__(39);
+	__webpack_require__(93);
+	module.exports = __webpack_require__(16).Promise;
+
+/***/ },
+/* 93 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $          = __webpack_require__(7)
+	  , LIBRARY    = __webpack_require__(45)
+	  , global     = __webpack_require__(15)
+	  , ctx        = __webpack_require__(27)
+	  , classof    = __webpack_require__(62)
+	  , $def       = __webpack_require__(14)
+	  , isObject   = __webpack_require__(25)
+	  , anObject   = __webpack_require__(26)
+	  , aFunction  = __webpack_require__(28)
+	  , strictNew  = __webpack_require__(78)
+	  , forOf      = __webpack_require__(79)
+	  , setProto   = __webpack_require__(24).set
+	  , same       = __webpack_require__(94)
+	  , species    = __webpack_require__(77)
+	  , SPECIES    = __webpack_require__(51)('species')
+	  , RECORD     = __webpack_require__(53)('record')
+	  , asap       = __webpack_require__(95)
+	  , PROMISE    = 'Promise'
+	  , process    = global.process
+	  , isNode     = classof(process) == 'process'
+	  , P          = global[PROMISE]
+	  , Wrapper;
+	
+	var testResolve = function(sub){
+	  var test = new P(function(){});
+	  if(sub)test.constructor = Object;
+	  return P.resolve(test) === test;
+	};
+	
+	var useNative = function(){
+	  var works = false;
+	  function P2(x){
+	    var self = new P(x);
+	    setProto(self, P2.prototype);
+	    return self;
+	  }
+	  try {
+	    works = P && P.resolve && testResolve();
+	    setProto(P2, P);
+	    P2.prototype = $.create(P.prototype, {constructor: {value: P2}});
+	    // actual Firefox has broken subclass support, test that
+	    if(!(P2.resolve(5).then(function(){}) instanceof P2)){
+	      works = false;
+	    }
+	    // actual V8 bug, https://code.google.com/p/v8/issues/detail?id=4162
+	    if(works && __webpack_require__(49)){
+	      var thenableThenGotten = false;
+	      P.resolve($.setDesc({}, 'then', {
+	        get: function(){ thenableThenGotten = true; }
+	      }));
+	      works = thenableThenGotten;
+	    }
+	  } catch(e){ works = false; }
+	  return works;
+	}();
+	
+	// helpers
+	var isPromise = function(it){
+	  return isObject(it) && (useNative ? classof(it) == 'Promise' : RECORD in it);
+	};
+	var sameConstructor = function(a, b){
+	  // library wrapper special case
+	  if(LIBRARY && a === P && b === Wrapper)return true;
+	  return same(a, b);
+	};
+	var getConstructor = function(C){
+	  var S = anObject(C)[SPECIES];
+	  return S != undefined ? S : C;
+	};
+	var isThenable = function(it){
+	  var then;
+	  return isObject(it) && typeof (then = it.then) == 'function' ? then : false;
+	};
+	var notify = function(record, isReject){
+	  if(record.n)return;
+	  record.n = true;
+	  var chain = record.c;
+	  asap(function(){
+	    var value = record.v
+	      , ok    = record.s == 1
+	      , i     = 0;
+	    var run = function(react){
+	      var cb = ok ? react.ok : react.fail
+	        , ret, then;
+	      try {
+	        if(cb){
+	          if(!ok)record.h = true;
+	          ret = cb === true ? value : cb(value);
+	          if(ret === react.P){
+	            react.rej(TypeError('Promise-chain cycle'));
+	          } else if(then = isThenable(ret)){
+	            then.call(ret, react.res, react.rej);
+	          } else react.res(ret);
+	        } else react.rej(value);
+	      } catch(err){
+	        react.rej(err);
+	      }
+	    };
+	    while(chain.length > i)run(chain[i++]); // variable length - can't use forEach
+	    chain.length = 0;
+	    record.n = false;
+	    if(isReject)setTimeout(function(){
+	      asap(function(){
+	        if(isUnhandled(record.p)){
+	          if(isNode){
+	            process.emit('unhandledRejection', value, record.p);
+	          } else if(global.console && console.error){
+	            console.error('Unhandled promise rejection', value);
+	          }
+	        }
+	        record.a = undefined;
+	      });
+	    }, 1);
+	  });
+	};
+	var isUnhandled = function(promise){
+	  var record = promise[RECORD]
+	    , chain  = record.a || record.c
+	    , i      = 0
+	    , react;
+	  if(record.h)return false;
+	  while(chain.length > i){
+	    react = chain[i++];
+	    if(react.fail || !isUnhandled(react.P))return false;
+	  } return true;
+	};
+	var $reject = function(value){
+	  var record = this;
+	  if(record.d)return;
+	  record.d = true;
+	  record = record.r || record; // unwrap
+	  record.v = value;
+	  record.s = 2;
+	  record.a = record.c.slice();
+	  notify(record, true);
+	};
+	var $resolve = function(value){
+	  var record = this
+	    , then;
+	  if(record.d)return;
+	  record.d = true;
+	  record = record.r || record; // unwrap
+	  try {
+	    if(then = isThenable(value)){
+	      asap(function(){
+	        var wrapper = {r: record, d: false}; // wrap
+	        try {
+	          then.call(value, ctx($resolve, wrapper, 1), ctx($reject, wrapper, 1));
+	        } catch(e){
+	          $reject.call(wrapper, e);
+	        }
+	      });
+	    } else {
+	      record.v = value;
+	      record.s = 1;
+	      notify(record, false);
+	    }
+	  } catch(e){
+	    $reject.call({r: record, d: false}, e); // wrap
+	  }
+	};
+	
+	// constructor polyfill
+	if(!useNative){
+	  // 25.4.3.1 Promise(executor)
+	  P = function Promise(executor){
+	    aFunction(executor);
+	    var record = {
+	      p: strictNew(this, P, PROMISE),         // <- promise
+	      c: [],                                  // <- awaiting reactions
+	      a: undefined,                           // <- checked in isUnhandled reactions
+	      s: 0,                                   // <- state
+	      d: false,                               // <- done
+	      v: undefined,                           // <- value
+	      h: false,                               // <- handled rejection
+	      n: false                                // <- notify
+	    };
+	    this[RECORD] = record;
+	    try {
+	      executor(ctx($resolve, record, 1), ctx($reject, record, 1));
+	    } catch(err){
+	      $reject.call(record, err);
+	    }
+	  };
+	  __webpack_require__(83)(P.prototype, {
+	    // 25.4.5.3 Promise.prototype.then(onFulfilled, onRejected)
+	    then: function then(onFulfilled, onRejected){
+	      var S = anObject(anObject(this).constructor)[SPECIES];
+	      var react = {
+	        ok:   typeof onFulfilled == 'function' ? onFulfilled : true,
+	        fail: typeof onRejected == 'function'  ? onRejected  : false
+	      };
+	      var promise = react.P = new (S != undefined ? S : P)(function(res, rej){
+	        react.res = aFunction(res);
+	        react.rej = aFunction(rej);
+	      });
+	      var record = this[RECORD];
+	      record.c.push(react);
+	      if(record.a)record.a.push(react);
+	      if(record.s)notify(record, false);
+	      return promise;
+	    },
+	    // 25.4.5.1 Promise.prototype.catch(onRejected)
+	    'catch': function(onRejected){
+	      return this.then(undefined, onRejected);
+	    }
+	  });
+	}
+	
+	// export
+	$def($def.G + $def.W + $def.F * !useNative, {Promise: P});
+	__webpack_require__(55)(P, PROMISE);
+	species(P);
+	species(Wrapper = __webpack_require__(16)[PROMISE]);
+	
+	// statics
+	$def($def.S + $def.F * !useNative, PROMISE, {
+	  // 25.4.4.5 Promise.reject(r)
+	  reject: function reject(r){
+	    return new this(function(res, rej){ rej(r); });
+	  }
+	});
+	$def($def.S + $def.F * (!useNative || testResolve(true)), PROMISE, {
+	  // 25.4.4.6 Promise.resolve(x)
+	  resolve: function resolve(x){
+	    return isPromise(x) && sameConstructor(x.constructor, this)
+	      ? x : new this(function(res){ res(x); });
+	  }
+	});
+	$def($def.S + $def.F * !(useNative && __webpack_require__(100)(function(iter){
+	  P.all(iter)['catch'](function(){});
+	})), PROMISE, {
+	  // 25.4.4.1 Promise.all(iterable)
+	  all: function all(iterable){
+	    var C      = getConstructor(this)
+	      , values = [];
+	    return new C(function(res, rej){
+	      forOf(iterable, false, values.push, values);
+	      var remaining = values.length
+	        , results   = Array(remaining);
+	      if(remaining)$.each.call(values, function(promise, index){
+	        C.resolve(promise).then(function(value){
+	          results[index] = value;
+	          --remaining || res(results);
+	        }, rej);
+	      });
+	      else res(results);
+	    });
+	  },
+	  // 25.4.4.4 Promise.race(iterable)
+	  race: function race(iterable){
+	    var C = getConstructor(this);
+	    return new C(function(res, rej){
+	      forOf(iterable, false, function(promise){
+	        C.resolve(promise).then(res, rej);
+	      });
+	    });
+	  }
+	});
+
+/***/ },
+/* 94 */
+/***/ function(module, exports) {
+
+	module.exports = Object.is || function is(x, y){
+	  return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
+	};
+
+/***/ },
+/* 95 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var global    = __webpack_require__(15)
+	  , macrotask = __webpack_require__(96).set
+	  , Observer  = global.MutationObserver || global.WebKitMutationObserver
+	  , process   = global.process
+	  , head, last, notify;
+	
+	function flush(){
+	  while(head){
+	    head.fn.call(); // <- currently we use it only for Promise - try / catch not required
+	    head = head.next;
+	  } last = undefined;
+	}
+	
+	// Node.js
+	if(__webpack_require__(11)(process) == 'process'){
+	  notify = function(){
+	    process.nextTick(flush);
+	  };
+	// browsers with MutationObserver
+	} else if(Observer){
+	  var toggle = 1
+	    , node   = document.createTextNode('');
+	  new Observer(flush).observe(node, {characterData: true}); // eslint-disable-line no-new
+	  notify = function(){
+	    node.data = toggle = -toggle;
+	  };
+	// for other environments - macrotask based on:
+	// - setImmediate
+	// - MessageChannel
+	// - window.postMessag
+	// - onreadystatechange
+	// - setTimeout
+	} else {
+	  notify = function(){
+	    // strange IE + webpack dev server bug - use .call(global)
+	    macrotask.call(global, flush);
+	  };
+	}
+	
+	module.exports = function asap(fn){
+	  var task = {fn: fn, next: undefined};
+	  if(last)last.next = task;
+	  if(!head){
+	    head = task;
+	    notify();
+	  } last = task;
+	};
+
+/***/ },
+/* 96 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var ctx                = __webpack_require__(27)
+	  , invoke             = __webpack_require__(97)
+	  , html               = __webpack_require__(98)
+	  , cel                = __webpack_require__(99)
+	  , global             = __webpack_require__(15)
+	  , process            = global.process
+	  , setTask            = global.setImmediate
+	  , clearTask          = global.clearImmediate
+	  , MessageChannel     = global.MessageChannel
+	  , counter            = 0
+	  , queue              = {}
+	  , ONREADYSTATECHANGE = 'onreadystatechange'
+	  , defer, channel, port;
+	var run = function(){
+	  var id = +this;
+	  if(queue.hasOwnProperty(id)){
+	    var fn = queue[id];
+	    delete queue[id];
+	    fn();
+	  }
+	};
+	var listner = function(event){
+	  run.call(event.data);
+	};
+	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
+	if(!setTask || !clearTask){
+	  setTask = function setImmediate(fn){
+	    var args = [], i = 1;
+	    while(arguments.length > i)args.push(arguments[i++]);
+	    queue[++counter] = function(){
+	      invoke(typeof fn == 'function' ? fn : Function(fn), args);
+	    };
+	    defer(counter);
+	    return counter;
+	  };
+	  clearTask = function clearImmediate(id){
+	    delete queue[id];
+	  };
+	  // Node.js 0.8-
+	  if(__webpack_require__(11)(process) == 'process'){
+	    defer = function(id){
+	      process.nextTick(ctx(run, id, 1));
+	    };
+	  // Browsers with MessageChannel, includes WebWorkers
+	  } else if(MessageChannel){
+	    channel = new MessageChannel;
+	    port    = channel.port2;
+	    channel.port1.onmessage = listner;
+	    defer = ctx(port.postMessage, port, 1);
+	  // Browsers with postMessage, skip WebWorkers
+	  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
+	  } else if(global.addEventListener && typeof postMessage == 'function' && !global.importScript){
+	    defer = function(id){
+	      global.postMessage(id + '', '*');
+	    };
+	    global.addEventListener('message', listner, false);
+	  // IE8-
+	  } else if(ONREADYSTATECHANGE in cel('script')){
+	    defer = function(id){
+	      html.appendChild(cel('script'))[ONREADYSTATECHANGE] = function(){
+	        html.removeChild(this);
+	        run.call(id);
+	      };
+	    };
+	  // Rest old browsers
+	  } else {
+	    defer = function(id){
+	      setTimeout(ctx(run, id, 1), 0);
+	    };
+	  }
+	}
+	module.exports = {
+	  set:   setTask,
+	  clear: clearTask
+	};
+
+/***/ },
+/* 97 */
+/***/ function(module, exports) {
+
+	// fast apply, http://jsperf.lnkit.com/fast-apply/5
+	module.exports = function(fn, args, that){
+	  var un = that === undefined;
+	  switch(args.length){
+	    case 0: return un ? fn()
+	                      : fn.call(that);
+	    case 1: return un ? fn(args[0])
+	                      : fn.call(that, args[0]);
+	    case 2: return un ? fn(args[0], args[1])
+	                      : fn.call(that, args[0], args[1]);
+	    case 3: return un ? fn(args[0], args[1], args[2])
+	                      : fn.call(that, args[0], args[1], args[2]);
+	    case 4: return un ? fn(args[0], args[1], args[2], args[3])
+	                      : fn.call(that, args[0], args[1], args[2], args[3]);
+	  } return              fn.apply(that, args);
+	};
+
+/***/ },
+/* 98 */
+/***/ function(module, exports) {
+
+	module.exports = "module.exports = require('./$.global').document && document.documentElement;";
+
+/***/ },
+/* 99 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var isObject = __webpack_require__(25)
+	  , document = __webpack_require__(15).document
+	  // in old IE typeof document.createElement is 'object'
+	  , is = isObject(document) && isObject(document.createElement);
+	module.exports = function(it){
+	  return is ? document.createElement(it) : {};
+	};
+
+/***/ },
+/* 100 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var SYMBOL_ITERATOR = __webpack_require__(51)('iterator')
+	  , SAFE_CLOSING    = false;
+	try {
+	  var riter = [7][SYMBOL_ITERATOR]();
+	  riter['return'] = function(){ SAFE_CLOSING = true; };
+	  Array.from(riter, function(){ throw 2; });
+	} catch(e){ /* empty */ }
+	module.exports = function(exec){
+	  if(!SAFE_CLOSING)return false;
+	  var safe = false;
+	  try {
+	    var arr  = [7]
+	      , iter = arr[SYMBOL_ITERATOR]();
+	    iter.next = function(){ safe = true; };
+	    arr[SYMBOL_ITERATOR] = function(){ return iter; };
+	    exec(arr);
+	  } catch(e){ /* empty */ }
+	  return safe;
+	};
+
+/***/ },
+/* 101 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(102), __esModule: true };
+
+/***/ },
+/* 102 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(57);
+	__webpack_require__(103);
+	module.exports = __webpack_require__(16).Array.from;
+
+/***/ },
+/* 103 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var ctx         = __webpack_require__(27)
+	  , $def        = __webpack_require__(14)
+	  , toObject    = __webpack_require__(70)
+	  , call        = __webpack_require__(80)
+	  , isArrayIter = __webpack_require__(81)
+	  , toLength    = __webpack_require__(82)
+	  , getIterFn   = __webpack_require__(61);
+	$def($def.S + $def.F * !__webpack_require__(100)(function(iter){ Array.from(iter); }), 'Array', {
+	  // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
+	  from: function from(arrayLike/*, mapfn = undefined, thisArg = undefined*/){
+	    var O       = toObject(arrayLike)
+	      , C       = typeof this == 'function' ? this : Array
+	      , mapfn   = arguments[1]
+	      , mapping = mapfn !== undefined
+	      , index   = 0
+	      , iterFn  = getIterFn(O)
+	      , length, result, step, iterator;
+	    if(mapping)mapfn = ctx(mapfn, arguments[2], 2);
+	    // if object isn't iterable or it's array with default iterator - use simple case
+	    if(iterFn != undefined && !(C == Array && isArrayIter(iterFn))){
+	      for(iterator = iterFn.call(O), result = new C; !(step = iterator.next()).done; index++){
+	        result[index] = mapping ? call(iterator, mapfn, [step.value, index], true) : step.value;
+	      }
+	    } else {
+	      for(result = new C(length = toLength(O.length)); length > index; index++){
+	        result[index] = mapping ? mapfn(O[index], index) : O[index];
+	      }
+	    }
+	    result.length = index;
+	    return result;
+	  }
+	});
+
+/***/ },
+/* 104 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(105), __esModule: true };
+
+/***/ },
+/* 105 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(106);
+	module.exports = __webpack_require__(16).Object.keys;
+
+/***/ },
+/* 106 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.2.14 Object.keys(O)
+	var toObject = __webpack_require__(70);
+	
+	__webpack_require__(13)('keys', function($keys){
+	  return function keys(it){
+	    return $keys(toObject(it));
+	  };
+	});
+
+/***/ },
+/* 107 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	var _Object$getOwnPropertyNames = __webpack_require__(108)["default"];
+	
+	var _Object$getOwnPropertyDescriptor = __webpack_require__(5)["default"];
+	
+	var _Object$defineProperty = __webpack_require__(30)["default"];
+	
+	exports["default"] = function (obj, defaults) {
+	  var keys = _Object$getOwnPropertyNames(defaults);
+	
+	  for (var i = 0; i < keys.length; i++) {
+	    var key = keys[i];
+	
+	    var value = _Object$getOwnPropertyDescriptor(defaults, key);
+	
+	    if (value && value.configurable && obj[key] === undefined) {
+	      _Object$defineProperty(obj, key, value);
+	    }
+	  }
+	
+	  return obj;
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 108 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(109), __esModule: true };
+
+/***/ },
+/* 109 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $ = __webpack_require__(7);
+	__webpack_require__(110);
+	module.exports = function getOwnPropertyNames(it){
+	  return $.getNames(it);
+	};
+
+/***/ },
+/* 110 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.2.7 Object.getOwnPropertyNames(O)
+	__webpack_require__(13)('getOwnPropertyNames', function(){
+	  return __webpack_require__(111).get;
+	});
+
+/***/ },
+/* 111 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
+	var toString  = {}.toString
+	  , toIObject = __webpack_require__(9)
+	  , getNames  = __webpack_require__(7).getNames;
+	
+	var windowNames = typeof window == 'object' && Object.getOwnPropertyNames
+	  ? Object.getOwnPropertyNames(window) : [];
+	
+	var getWindowNames = function(it){
+	  try {
+	    return getNames(it);
+	  } catch(e){
+	    return windowNames.slice();
+	  }
+	};
+	
+	module.exports.get = function getOwnPropertyNames(it){
+	  if(windowNames && toString.call(it) == '[object Window]')return getWindowNames(it);
+	  return getNames(toIObject(it));
+	};
+
+/***/ },
+/* 112 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	exports["default"] = function (obj, defaults) {
+	  var newObj = defaults({}, obj);
+	  delete newObj["default"];
+	  return newObj;
+	};
+	
+	exports.__esModule = true;
+
+/***/ },
+/* 113 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	/*!
+	 * FlexCss.Tooltip
+	 * Licensed under the MIT License (MIT)
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 */
+	
+	'use strict';
+	
+	var _get = __webpack_require__(4)['default'];
+	
+	var _inherits = __webpack_require__(18)['default'];
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _Object$assign = __webpack_require__(66)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(2)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _utilUtil = __webpack_require__(114);
+	
+	var _utilUtil2 = _interopRequireDefault(_utilUtil);
+	
+	var _DestroyableWidget2 = __webpack_require__(115);
+	
+	var _DestroyableWidget3 = _interopRequireDefault(_DestroyableWidget2);
+	
+	/**
+	 * @type {string}
+	 */
+	var CLASS_NAMES_TOOLTIP = 'tooltip-container';
+	/**
+	 * @type {string}
+	 */
+	var CLASS_NAMES_OPEN = 'open';
+	
+	/**
+	 * @type {string}
+	 */
+	var ATTR_DATA_CLASSNAME = 'data-class';
+	
+	/**
+	 * @type {HTMLDocument}
+	 */
+	var doc = global.document;
+	
+	/**
+	 * Simple Tooltip
+	 */
+	
+	var Tooltip = (function (_DestroyableWidget) {
+	    _inherits(Tooltip, _DestroyableWidget);
+	
+	    /**
+	     * Creates a Tooltip
+	     * @param {HTMLElement|String} DelegateContainer
+	     * @param {Object} [options]
+	     */
+	
+	    function Tooltip(DelegateContainer, options) {
+	        _classCallCheck(this, Tooltip);
+	
+	        _get(Object.getPrototypeOf(Tooltip.prototype), 'constructor', this).call(this);
+	        /**
+	         * The Container where possible events are captured
+	         */
+	        this.container = DelegateContainer instanceof HTMLElement ? DelegateContainer : doc.getElementById(DelegateContainer);
+	
+	        if (!this.container) {
+	            throw 'Could not create Tooltip, DelegateContainer not found';
+	        }
+	
+	        /**
+	         * The Container where tooltips are stored for this instance
+	         * @type {HTMLElement}
+	         */
+	        this.tooltipContainer = null;
+	
+	        /**
+	         * Default Options
+	         */
+	        this.options = {
+	            containerClass: '',
+	            selectorAttribute: 'data-tooltip'
+	        };
+	
+	        _Object$assign(this.options, options || {});
+	    }
+	
+	    /**
+	     * Creates and shows a tooltip
+	     * @param {HTMLElement} target where is this tooltip positioned
+	     * @param {String} text text content in tooltip, will be NOT escaped
+	     * @param {Boolean} [removeTitle] removes title element if given
+	     */
+	
+	    _createClass(Tooltip, [{
+	        key: 'createTooltip',
+	        value: function createTooltip(target, text, removeTitle) {
+	            // abort if text is empty
+	            if (!text || text && text.trim() === '') {
+	                return;
+	            }
+	            var tooltipContainer = this.tooltipContainer;
+	
+	            if (!tooltipContainer) {
+	                tooltipContainer = doc.createElement('div');
+	                this.container.appendChild(tooltipContainer);
+	                this.tooltipContainer = tooltipContainer;
+	            }
+	            this._restoreClassNames(tooltipContainer, target);
+	
+	            tooltipContainer.style.left = 'auto';
+	            tooltipContainer.style.top = 'auto';
+	            tooltipContainer.innerHTML = text;
+	            tooltipContainer.flexTooltipCurrentTarget = target;
+	            if (removeTitle) {
+	                target.oldTitle = text;
+	                target.removeAttribute('title');
+	            }
+	
+	            _utilUtil2['default'].setupPositionNearby(target, tooltipContainer, this.container, true, true);
+	
+	            tooltipContainer.classList.add(CLASS_NAMES_OPEN);
+	        }
+	    }, {
+	        key: '_restoreClassNames',
+	        value: function _restoreClassNames(container, target) {
+	            // allow additional classname per tooltip on target element
+	            var classNames = [CLASS_NAMES_TOOLTIP, this.options.containerClass],
+	                maybeTargetClass = target.getAttribute(ATTR_DATA_CLASSNAME);
+	            if (maybeTargetClass) {
+	                classNames.push(maybeTargetClass);
+	            }
+	            container.className = classNames.join(" ");
+	            return this;
+	        }
+	
+	        /**
+	         * @returns {HTMLElement|null}
+	         */
+	    }, {
+	        key: 'getCurrentTarget',
+	        value: function getCurrentTarget() {
+	            return this.tooltipContainer ? this.tooltipContainer.flexTooltipCurrentTarget : null;
+	        }
+	
+	        /**
+	         * Destroys this Widget
+	         * @returns {boolean}
+	         */
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	            _get(Object.getPrototypeOf(Tooltip.prototype), 'destroy', this).call(this);
+	
+	            if (this.tooltipContainer) {
+	                this.tooltipContainer.parentNode.removeChild(this.tooltipContainer);
+	                return true;
+	            }
+	            return false;
+	        }
+	
+	        /**
+	         * Removes a Tooltip on given target
+	         * @param {HTMLElement} [target], if not given will remove current open tooltip on this instance
+	         */
+	    }, {
+	        key: 'removeTooltip',
+	        value: function removeTooltip(target) {
+	            if (!target && this.tooltipContainer) {
+	                target = this.tooltipContainer.flexTooltipCurrentTarget;
+	            }
+	            if (this.tooltipContainer) {
+	                if (this.tooltipContainer.flexTooltipCurrentTarget !== target) {
+	                    return;
+	                }
+	                this.tooltipContainer.classList.remove(CLASS_NAMES_OPEN);
+	                delete this.tooltipContainer.flexTooltipCurrentTarget;
+	            }
+	            if (target && target.oldTitle) {
+	                target.setAttribute('title', target.oldTitle);
+	            }
+	        }
+	
+	        /**
+	         * Initilizes mouse events on container element
+	         */
+	    }, {
+	        key: 'registerEvents',
+	        value: function registerEvents() {
+	            var self = this;
+	            this.addEventListener(this.container, 'mouseover', function (e) {
+	                if (e.target.hasAttribute(self.options.selectorAttribute)) {
+	                    self.createTooltip(e.target, e.target.getAttribute('title'), true);
+	                }
+	            });
+	
+	            this.addEventListener(this.container, 'mouseout', function (e) {
+	                if (e.target.hasAttribute(self.options.selectorAttribute)) {
+	                    self.removeTooltip(e.target);
+	                }
+	            });
+	            return this;
+	        }
+	    }]);
+	
+	    return Tooltip;
+	})(_DestroyableWidget3['default']);
+	
+	exports['default'] = Tooltip;
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 114 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	'use strict';
+	
+	var _createClass = __webpack_require__(29)["default"];
+	
+	var _classCallCheck = __webpack_require__(32)["default"];
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var PFX = ["webkit", "moz", "MS", "o", ""];
+	
+	var COL_LEFT_CLASS = 'is-collision-left';
+	
+	var COL_RIGHT_CLASS = 'is-collision-right';
+	
+	var COL_BOTTOM_CLASS = 'is-collision-bottom';
+	
+	/**
+	 * Provides shared DOM-Utility functions
+	 */
+	
+	var Util = (function () {
+	    function Util() {
+	        _classCallCheck(this, Util);
+	    }
+	
+	    _createClass(Util, null, [{
+	        key: "prefixedAnimateEvent",
+	
+	        /**
+	         * Will register the right animation event based on browser
+	         * @param element
+	         * @param type
+	         * @param callback
+	         */
+	        value: function prefixedAnimateEvent(element, type, callback) {
+	            var thisFunction = function thisFunction(e) {
+	                callback.apply(element, [e, thisFunction]);
+	            };
+	
+	            for (var p = 0; p < PFX.length; p++) {
+	                if (!PFX[p]) {
+	                    type = type.toLowerCase();
+	                }
+	                var name = PFX[p] + type;
+	                element.addEventListener(name, thisFunction, true);
+	            }
+	        }
+	
+	        /**
+	         * Get correct transitionend event
+	         * @returns {String}
+	         * @private
+	         */
+	    }, {
+	        key: "whichTransitionEndEvent",
+	        value: function whichTransitionEndEvent() {
+	            var t = undefined;
+	            var el = document.createElement('fake');
+	
+	            var transitions = {
+	                'transition': 'transitionend',
+	                'OTransition': 'oTransitionEnd',
+	                'MozTransition': 'transitionend',
+	                'WebkitTransition': 'webkitTransitionEnd'
+	            };
+	
+	            for (t in transitions) {
+	                if (el.style[t] !== undefined) {
+	                    return transitions[t];
+	                }
+	            }
+	        }
+	
+	        /**
+	         * Check if target is part of parent node
+	         * @param target
+	         * @param parent
+	         * @returns {boolean}
+	         */
+	    }, {
+	        key: "isPartOfNode",
+	        value: function isPartOfNode(target, parent) {
+	            if (!target || !parent) {
+	                return false;
+	            }
+	            var now = target;
+	            while (now !== parent && now !== null) {
+	                if (now === parent) {
+	                    break;
+	                }
+	                now = now.parentNode;
+	            }
+	            return now !== null;
+	        }
+	
+	        /**
+	         * Walks the tree until func returns true for given argument
+	         * @param target
+	         * @param func
+	         * @returns {boolean|HTMLElement}
+	         */
+	    }, {
+	        key: "parentsUntil",
+	        value: function parentsUntil(target, func) {
+	            if (!target) {
+	                return false;
+	            }
+	            var now = target;
+	            while (!func(now) && now !== null) {
+	                now = now.parentNode;
+	            }
+	
+	            return now;
+	        }
+	
+	        /**
+	         * Generates a unique id
+	         * @return {String}
+	         */
+	    }, {
+	        key: "guid",
+	        value: function guid() {
+	            function s4() {
+	                return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	            }
+	
+	            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+	        }
+	
+	        /**
+	         * Detects scrollbar width
+	         * @see http://stackoverflow.com/questions/986937/how-can-i-get-the-browsers-scrollbar-sizes
+	         * @returns {number}
+	         */
+	    }, {
+	        key: "getScrollBarWidth",
+	        value: function getScrollBarWidth() {
+	
+	            var doc = global.document,
+	                inner = doc.createElement('p');
+	            inner.style.width = "100%";
+	            inner.style.height = "200px";
+	
+	            var outer = doc.createElement('div');
+	            outer.style.position = "absolute";
+	            outer.style.top = "0px";
+	            outer.style.left = "0px";
+	            outer.style.visibility = "hidden";
+	            outer.style.width = "200px";
+	            outer.style.height = "150px";
+	            outer.style.overflow = "hidden";
+	            outer.appendChild(inner);
+	
+	            doc.body.appendChild(outer);
+	            var w1 = inner.offsetWidth;
+	            outer.style.overflow = 'scroll';
+	            var w2 = inner.offsetWidth;
+	            if (w1 === w2) {
+	                w2 = outer.clientWidth;
+	            }
+	            doc.body.removeChild(outer);
+	
+	            return w1 - w2;
+	        }
+	
+	        /**
+	         * Run an event once
+	         * @param {String} ev
+	         * @param {HTMLElement|HTMLDocument} target
+	         * @param {Function} func
+	         * @param {boolean} [capture]
+	         */
+	    }, {
+	        key: "addEventOnce",
+	        value: function addEventOnce(ev, target, func, capture) {
+	            var thisFunction = function thisFunction(event) {
+	                func(event, func);
+	                target.removeEventListener(ev, thisFunction, capture);
+	            };
+	            return target.addEventListener(ev, thisFunction, capture);
+	        }
+	
+	        /**
+	         * Checks if an element is visible
+	         * @param {HTMLElement} element
+	         * @returns bool
+	         */
+	    }, {
+	        key: "isVisible",
+	        value: function isVisible(element) {
+	            return element.offsetWidth > 0 && element.offsetHeight > 0;
+	        }
+	
+	        /**
+	         * Creates a camelCaseRepresentation of a dashed string
+	         * @param {String} str
+	         * @returns String
+	         */
+	    }, {
+	        key: "dashToCamelCase",
+	        value: function dashToCamelCase(str) {
+	            return str.replace(/-([a-z])/g, function (g) {
+	                return g[1].toUpperCase();
+	            });
+	        }
+	
+	        /**
+	         * Creates a copy of `input`
+	         * @param {*} input
+	         * @return *
+	         */
+	    }, {
+	        key: "copy",
+	        value: function copy(input) {
+	            return JSON.parse(JSON.stringify(input));
+	        }
+	
+	        /**
+	         * Reads options from element (data attributes) and applies to base
+	         * @param {HTMLElement} element
+	         * @param {Object} base
+	         * @return {Object}
+	         */
+	    }, {
+	        key: "applyOptionsFromElement",
+	        value: function applyOptionsFromElement(element, base) {
+	            if (!element) {
+	                return base;
+	            }
+	            var attrs = element.attributes;
+	            for (var i = 0; i < attrs.length; i++) {
+	                var attr = attrs[i];
+	                if (attr) {
+	                    var s = Util.dashToCamelCase(attr.nodeName.replace('data-', '')),
+	                        val = attr.nodeValue;
+	                    if (base.hasOwnProperty(s)) {
+	                        // skip functions
+	                        if (typeof base[s] === 'function') {
+	                            continue;
+	                        }
+	                        if (typeof base[s] === 'boolean') {
+	                            base[s] = parseInt(val || 1) === 1;
+	                        } else {
+	                            base[s] = val;
+	                        }
+	                    }
+	                }
+	            }
+	            return base;
+	        }
+	
+	        /**
+	         * Will position an element directly at given target
+	         * Is aware of a given collision container to detect edges
+	         * Will put elementToPosition either to left, center or right edge (prefer right)
+	         *  and either to bottom or top (prefers bottom)
+	         *
+	         * You may overwrite preferred positioned with `centerHorizontal` and `positionTop`
+	         *
+	         * @param {HTMLElement} target the target container to align to
+	         * @param {HTMLElement} elementToPosition the element to position
+	         * @param {HTMLElement} collisionContainer the outer container to prevent collisions
+	         * @param {bool} [centerHorizontal] set true to center element, otherwise it's put on the right border by default
+	         * @param {bool} [positionTop] flip top, by default element is positioned to the bottom.
+	         * @returns {HTMLElement}
+	         */
+	    }, {
+	        key: "setupPositionNearby",
+	        value: function setupPositionNearby(target, elementToPosition, collisionContainer, centerHorizontal, positionTop) {
+	
+	            // determine relative offsets
+	            var amountTop = 0,
+	                amountLeft = 0;
+	            Util.parentsUntil(target.parentNode, function (el) {
+	                if (!(el instanceof HTMLElement)) {
+	                    return false;
+	                }
+	                var style = window.getComputedStyle(el);
+	                if (Util.isPartOfNode(elementToPosition, el)) {
+	                    if (style && style.position === 'relative') {
+	                        amountTop += el.offsetTop || 0;
+	                        amountLeft += el.offsetLeft || 0;
+	                    }
+	                    return false;
+	                } else {
+	                    return true;
+	                }
+	            });
+	
+	            var targetPosition = target.getBoundingClientRect(),
+	                elementRect = elementToPosition.getBoundingClientRect(),
+	                colRect = collisionContainer.getBoundingClientRect(),
+	                targetTop = targetPosition.top - amountTop,
+	                targetRight = targetPosition.right,
+	                isCollisionTop = targetTop - elementRect.height <= 0,
+	                isCollisionBottom = window.innerHeight < targetTop + amountTop + targetPosition.height + elementRect.height,
+	                isCollisionLeft = targetRight < elementRect.width,
+	                targetLeft = targetPosition.left,
+	                isCollisionRight = targetLeft + elementRect.width > colRect.width,
+	                classList = elementToPosition.classList;
+	
+	            classList.remove(COL_RIGHT_CLASS);
+	            classList.remove(COL_LEFT_CLASS);
+	            classList.remove(COL_BOTTOM_CLASS);
+	
+	            var calcTop = undefined,
+	                calcLeft = undefined;
+	            if (isCollisionLeft && !isCollisionRight) {
+	                // put element to left if collision with left
+	                calcLeft = targetPosition.left - colRect.left - amountLeft + 'px';
+	                classList.add(COL_LEFT_CLASS);
+	            } else {
+	                // maybe center if no collision with either side
+	                var rightPosition = targetRight - elementRect.width - colRect.left - amountLeft + 'px',
+	                    leftCentered = (targetLeft + targetPosition.width / 2 - elementRect.width / 2 || 0) - colRect.left,
+	                    collisionCentered = leftCentered + elementRect.width > colRect.width;
+	                if (centerHorizontal && !collisionCentered) {
+	                    calcLeft = leftCentered + 'px';
+	                } else {
+	                    classList.add(COL_RIGHT_CLASS);
+	                    calcLeft = rightPosition;
+	                }
+	            }
+	
+	            if (isCollisionBottom || positionTop && !isCollisionTop) {
+	                // Put Element on top if collision
+	                calcTop = targetTop - elementRect.height - colRect.top + 'px';
+	                classList.add(COL_BOTTOM_CLASS);
+	            } else {
+	                calcTop = targetTop + targetPosition.height - colRect.top + 'px';
+	            }
+	
+	            elementToPosition.style.cssText = "top:" + calcTop + ";left:" + calcLeft + ";";
+	
+	            return elementToPosition;
+	        }
+	
+	        /**
+	         * Brings a given element into viewport
+	         * @param {HTMLElement} el
+	         * @param {int|function}[optionalOffset]
+	         */
+	    }, {
+	        key: "scrollToElement",
+	        value: function scrollToElement(el, optionalOffset) {
+	            el.scrollIntoView();
+	            // optionally use a additional scrollDif
+	            if (optionalOffset) {
+	                if (typeof optionalOffset === 'function') {
+	                    optionalOffset = optionalOffset();
+	                }
+	                if (optionalOffset > 0) {
+	                    var scrolledY = window.scrollY || window.pageYOffset;
+	                    if (scrolledY) {
+	                        window.scroll(0, scrolledY - optionalOffset);
+	                    }
+	                }
+	            }
+	        }
+	    }]);
+	
+	    return Util;
+	})();
+	
+	exports["default"] = Util;
+	module.exports = exports["default"];
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 115 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	'use strict';
+	
+	/**
+	 * Provides a Basic Widget
+	 */
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var DestroyableWidget = (function () {
+	    function DestroyableWidget() {
+	        _classCallCheck(this, DestroyableWidget);
+	
+	        this.listeners = [];
+	    }
+	
+	    /**
+	     * Destroys a Widget
+	     */
+	
+	    _createClass(DestroyableWidget, [{
+	        key: 'destroy',
+	        value: function destroy() {
+	            this.listeners.forEach(function (listener) {
+	                listener.element.removeEventListener.apply(listener.element, listener.args);
+	            });
+	            this.listeners = [];
+	        }
+	
+	        /**
+	         * Adds an event and registers it later to remove bindings
+	         * @param {HTMLElement} element
+	         * @param {String} name
+	         * @param {Function} listener
+	         * @param {boolean} [capture]
+	         * @returns {Function}
+	         */
+	    }, {
+	        key: 'addEventListener',
+	        value: function addEventListener(element, name, listener, capture) {
+	            this.listeners.push({
+	                element: element,
+	                args: [name, listener, capture]
+	            });
+	            element.addEventListener(name, listener, capture);
+	            return listener;
+	        }
+	    }]);
+	
+	    return DestroyableWidget;
+	})();
+	
+	exports['default'] = DestroyableWidget;
+	module.exports = exports['default'];
+
+/***/ },
+/* 116 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	/*global CustomEvent*/
+	
+	'use strict';
+	
+	// polyfill for custom events to make thinks work in IE
+	// The needed polyfill is so small that I embedded it here
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _Object$assign = __webpack_require__(66)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	void (function () {
+	    if (!global.CustomEvent || typeof global.CustomEvent !== 'function') {
+	        var CustomEvent;
+	        CustomEvent = function (event, params) {
+	            var evt;
+	            params = params || {
+	                bubbles: false,
+	                cancelable: false,
+	                detail: undefined
+	            };
+	            evt = document.createEvent("CustomEvent");
+	            evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+	            return evt;
+	        };
+	        CustomEvent.prototype = global.Event.prototype;
+	        global.CustomEvent = CustomEvent;
+	    }
+	})();
+	/**
+	 * Simpler Event dispatching
+	 */
+	
+	var EventHandler = (function () {
+	
+	    /**
+	     * @param {HTMLElement} target
+	     * @param {String} name
+	     */
+	
+	    function EventHandler(target, name) {
+	        _classCallCheck(this, EventHandler);
+	
+	        this.target = target;
+	        this.defaultOptions = {
+	            bubbles: true,
+	            cancelable: true
+	        };
+	
+	        this.name = name;
+	    }
+	
+	    /**
+	     * Set more options
+	     * @param {Object} options
+	     * @returns {EventHandler}
+	     */
+	
+	    _createClass(EventHandler, [{
+	        key: 'withOptions',
+	        value: function withOptions(options) {
+	            _Object$assign(this.defaultOptions, options || {});
+	            return this;
+	        }
+	
+	        /**
+	         * Call with the originalEvent
+	         * @param {Event} e
+	         * @returns {EventHandler}
+	         */
+	    }, {
+	        key: 'withOriginal',
+	        value: function withOriginal(e) {
+	            return this.withDetail({
+	                originalEvent: e
+	            });
+	        }
+	
+	        /**
+	         * Extends the detail part of the event
+	         * @param {Object} o
+	         * @returns {EventHandler}
+	         */
+	    }, {
+	        key: 'withDetail',
+	        value: function withDetail(o) {
+	            if (!this.defaultOptions.detail) {
+	                this.defaultOptions.detail = {};
+	            }
+	            _Object$assign(this.defaultOptions.detail, o);
+	            return this;
+	        }
+	
+	        /**
+	         * @returns {Window.CustomEvent}
+	         */
+	    }, {
+	        key: 'fire',
+	        value: function fire() {
+	            var e = new CustomEvent(this.name, this.defaultOptions);
+	            if (this.target) {
+	                this.target.dispatchEvent(e);
+	            }
+	            return e;
+	        }
+	    }]);
+	
+	    return EventHandler;
+	})();
+	
+	var Event = (function () {
+	    function Event() {
+	        _classCallCheck(this, Event);
+	    }
+	
+	    _createClass(Event, null, [{
+	        key: 'dispatch',
+	
+	        /**
+	         * Prepares to dispatch a custom event (without firing)
+	         * @param {HTMLElement} target
+	         * @param {String} name
+	         * @returns {EventHandler}
+	         */
+	        value: function dispatch(target, name) {
+	            return new EventHandler(target, name);
+	        }
+	
+	        /**
+	         * Dispatches a custom event and fires it directly
+	         * @param {HTMLElement} target
+	         * @param {String} name
+	         * @param {Object} [options]
+	         * @returns {Window.CustomEvent}
+	         */
+	    }, {
+	        key: 'dispatchAndFire',
+	        value: function dispatchAndFire(target, name, options) {
+	            return new EventHandler(target, name).withOptions(options).fire();
+	        }
+	    }]);
+	
+	    return Event;
+	})();
+	
+	exports['default'] = Event;
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 117 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	'use strict';
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _Object$assign = __webpack_require__(66)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(2)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _utilUtil = __webpack_require__(114);
+	
+	var _utilUtil2 = _interopRequireDefault(_utilUtil);
+	
+	var DOM_COMPLETE = 'complete';
+	
+	// we attach global settings to global once because settings might be shared a lot of times trough the application
+	// Maybe find a better way to handle that scenario
+	if (!global.FLEXCSS_GLOBAL_SETTINGS) {
+	    (function () {
+	
+	        global.FLEXCSS_GLOBAL_SETTINGS = {
+	            // defined breakpoint for small devices < n
+	            smallBreakpoint: 768,
+	            // nodes that should be updated when no scrollbar is expected
+	            scrollbarUpdateNodes: global.document.body !== null ? [global.document.body] : [],
+	            // additional Delay until darkener is fully hidden
+	            darkenerFadeDelay: 100,
+	            // class that is added if canvas has been toggled
+	            canvasToggledClass: 'toggled-canvas'
+	        };
+	
+	        global.FLEXCSS_CONST_IS_IOS = null;
+	
+	        global.FLEXCSS_CONST_IS_TOUCH = null;
+	
+	        global.FLEXCSS_CONST_IS_IE = null;
+	
+	        global.FLEXCSS_CONST_TAB_EVENT = 'click';
+	
+	        var init = function init() {
+	            // Measure scrollbar width
+	            global.FLEXCSS_CONST_SCROLLBAR_WIDTH = _utilUtil2['default'].getScrollBarWidth();
+	            // detect right transition end event
+	            global.FLEXCSS_CONST_TRANSITION_EVENT = _utilUtil2['default'].whichTransitionEndEvent();
+	        };
+	
+	        if (global.document.readyState === DOM_COMPLETE) {
+	            init();
+	        } else {
+	            // it's possible that global.document.body is not available if the document is not
+	            // loaded completely
+	            document.addEventListener('DOMContentLoaded', function () {
+	                init();
+	            });
+	        }
+	    })();
+	}
+	
+	/**
+	 * Utility class that setups global settings
+	 */
+	
+	var Settings = (function () {
+	    function Settings() {
+	        _classCallCheck(this, Settings);
+	    }
+	
+	    _createClass(Settings, null, [{
+	        key: 'setup',
+	
+	        /**
+	         * Setup global settings, overwrite default values
+	         * @param {Object} settings
+	         */
+	        value: function setup(settings) {
+	            _Object$assign(global.FLEXCSS_GLOBAL_SETTINGS, settings);
+	        }
+	
+	        /**
+	         * Access to global settings
+	         * @returns {Object}
+	         */
+	    }, {
+	        key: 'get',
+	        value: function get() {
+	            return global.FLEXCSS_GLOBAL_SETTINGS;
+	        }
+	
+	        /**
+	         * Detects a IOS Device, caches subsequent calls
+	         * @returns {boolean}
+	         */
+	    }, {
+	        key: 'isIosDevice',
+	        value: function isIosDevice() {
+	            if (!global.FLEXCSS_CONST_IS_IOS) {
+	                global.FLEXCSS_CONST_IS_IOS = global.navigator.userAgent.match(/(iPad|iPhone|iPod)/i);
+	            }
+	
+	            return global.FLEXCSS_CONST_IS_IOS;
+	        }
+	
+	        /**
+	         * Detects a touch device, caches subsequent calls
+	         * @returns {boolean}
+	         */
+	    }, {
+	        key: 'isTouchDevice',
+	        value: function isTouchDevice() {
+	            if (!global.FLEXCSS_CONST_IS_TOUCH) {
+	                global.FLEXCSS_CONST_IS_TOUCH = 'ontouchstart' in window || !!global.navigator.msMaxTouchPoints;
+	            }
+	            return global.FLEXCSS_CONST_IS_TOUCH;
+	        }
+	
+	        /**
+	         * Checks if current browser is Internet Explorer
+	         * @returns {boolean|*}
+	         */
+	    }, {
+	        key: 'isIE',
+	        value: function isIE() {
+	            if (!global.FLEXCSS_CONST_IS_IE) {
+	                global.FLEXCSS_CONST_IS_IE = "ActiveXObject" in window;
+	            }
+	            return global.FLEXCSS_CONST_IS_IE;
+	        }
+	
+	        /**
+	         * @returns {String}
+	         */
+	    }, {
+	        key: 'getTransitionEvent',
+	        value: function getTransitionEvent() {
+	            return global.FLEXCSS_CONST_TRANSITION_EVENT;
+	        }
+	
+	        /**
+	         * @returns {int}
+	         */
+	    }, {
+	        key: 'getScrollbarWidth',
+	        value: function getScrollbarWidth() {
+	            return global.FLEXCSS_CONST_SCROLLBAR_WIDTH;
+	        }
+	
+	        /**
+	         * @returns {String}
+	         */
+	    }, {
+	        key: 'getTabEvent',
+	        value: function getTabEvent() {
+	            return global.FLEXCSS_CONST_TAB_EVENT;
+	        }
+	    }]);
+	
+	    return Settings;
+	})();
+	
+	exports['default'] = Settings;
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 118 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// the whatwg-fetch polyfill installs the fetch() function
+	// on the global object (window or self)
+	//
+	// Return that as the export for use in Webpack, Browserify etc.
+	'use strict';
+	
+	__webpack_require__(119);
+	module.exports = self.fetch.bind(self);
+
+/***/ },
+/* 119 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var _Object$getOwnPropertyNames = __webpack_require__(108)['default'];
+	
+	var _Promise = __webpack_require__(91)['default'];
+	
+	(function () {
+	  'use strict';
+	
+	  if (self.fetch) {
+	    return;
+	  }
+	
+	  function normalizeName(name) {
+	    if (typeof name !== 'string') {
+	      name = String(name);
+	    }
+	    if (/[^a-z0-9\-#$%&'*+.\^_`|~]/i.test(name)) {
+	      throw new TypeError('Invalid character in header field name');
+	    }
+	    return name.toLowerCase();
+	  }
+	
+	  function normalizeValue(value) {
+	    if (typeof value !== 'string') {
+	      value = String(value);
+	    }
+	    return value;
+	  }
+	
+	  function Headers(headers) {
+	    this.map = {};
+	
+	    if (headers instanceof Headers) {
+	      headers.forEach(function (value, name) {
+	        this.append(name, value);
+	      }, this);
+	    } else if (headers) {
+	      _Object$getOwnPropertyNames(headers).forEach(function (name) {
+	        this.append(name, headers[name]);
+	      }, this);
+	    }
+	  }
+	
+	  Headers.prototype.append = function (name, value) {
+	    name = normalizeName(name);
+	    value = normalizeValue(value);
+	    var list = this.map[name];
+	    if (!list) {
+	      list = [];
+	      this.map[name] = list;
+	    }
+	    list.push(value);
+	  };
+	
+	  Headers.prototype['delete'] = function (name) {
+	    delete this.map[normalizeName(name)];
+	  };
+	
+	  Headers.prototype.get = function (name) {
+	    var values = this.map[normalizeName(name)];
+	    return values ? values[0] : null;
+	  };
+	
+	  Headers.prototype.getAll = function (name) {
+	    return this.map[normalizeName(name)] || [];
+	  };
+	
+	  Headers.prototype.has = function (name) {
+	    return this.map.hasOwnProperty(normalizeName(name));
+	  };
+	
+	  Headers.prototype.set = function (name, value) {
+	    this.map[normalizeName(name)] = [normalizeValue(value)];
+	  };
+	
+	  Headers.prototype.forEach = function (callback, thisArg) {
+	    _Object$getOwnPropertyNames(this.map).forEach(function (name) {
+	      this.map[name].forEach(function (value) {
+	        callback.call(thisArg, value, name, this);
+	      }, this);
+	    }, this);
+	  };
+	
+	  function consumed(body) {
+	    if (body.bodyUsed) {
+	      return _Promise.reject(new TypeError('Already read'));
+	    }
+	    body.bodyUsed = true;
+	  }
+	
+	  function fileReaderReady(reader) {
+	    return new _Promise(function (resolve, reject) {
+	      reader.onload = function () {
+	        resolve(reader.result);
+	      };
+	      reader.onerror = function () {
+	        reject(reader.error);
+	      };
+	    });
+	  }
+	
+	  function readBlobAsArrayBuffer(blob) {
+	    var reader = new FileReader();
+	    reader.readAsArrayBuffer(blob);
+	    return fileReaderReady(reader);
+	  }
+	
+	  function readBlobAsText(blob) {
+	    var reader = new FileReader();
+	    reader.readAsText(blob);
+	    return fileReaderReady(reader);
+	  }
+	
+	  var support = {
+	    blob: 'FileReader' in self && 'Blob' in self && (function () {
+	      try {
+	        new Blob();
+	        return true;
+	      } catch (e) {
+	        return false;
+	      }
+	    })(),
+	    formData: 'FormData' in self
+	  };
+	
+	  function Body() {
+	    this.bodyUsed = false;
+	
+	    this._initBody = function (body) {
+	      this._bodyInit = body;
+	      if (typeof body === 'string') {
+	        this._bodyText = body;
+	      } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+	        this._bodyBlob = body;
+	      } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+	        this._bodyFormData = body;
+	      } else if (!body) {
+	        this._bodyText = '';
+	      } else {
+	        throw new Error('unsupported BodyInit type');
+	      }
+	    };
+	
+	    if (support.blob) {
+	      this.blob = function () {
+	        var rejected = consumed(this);
+	        if (rejected) {
+	          return rejected;
+	        }
+	
+	        if (this._bodyBlob) {
+	          return _Promise.resolve(this._bodyBlob);
+	        } else if (this._bodyFormData) {
+	          throw new Error('could not read FormData body as blob');
+	        } else {
+	          return _Promise.resolve(new Blob([this._bodyText]));
+	        }
+	      };
+	
+	      this.arrayBuffer = function () {
+	        return this.blob().then(readBlobAsArrayBuffer);
+	      };
+	
+	      this.text = function () {
+	        var rejected = consumed(this);
+	        if (rejected) {
+	          return rejected;
+	        }
+	
+	        if (this._bodyBlob) {
+	          return readBlobAsText(this._bodyBlob);
+	        } else if (this._bodyFormData) {
+	          throw new Error('could not read FormData body as text');
+	        } else {
+	          return _Promise.resolve(this._bodyText);
+	        }
+	      };
+	    } else {
+	      this.text = function () {
+	        var rejected = consumed(this);
+	        return rejected ? rejected : _Promise.resolve(this._bodyText);
+	      };
+	    }
+	
+	    if (support.formData) {
+	      this.formData = function () {
+	        return this.text().then(decode);
+	      };
+	    }
+	
+	    this.json = function () {
+	      return this.text().then(JSON.parse);
+	    };
+	
+	    return this;
+	  }
+	
+	  // HTTP methods whose capitalization should be normalized
+	  var methods = ['DELETE', 'GET', 'HEAD', 'OPTIONS', 'POST', 'PUT'];
+	
+	  function normalizeMethod(method) {
+	    var upcased = method.toUpperCase();
+	    return methods.indexOf(upcased) > -1 ? upcased : method;
+	  }
+	
+	  function Request(input, options) {
+	    options = options || {};
+	    var body = options.body;
+	    if (Request.prototype.isPrototypeOf(input)) {
+	      if (input.bodyUsed) {
+	        throw new TypeError('Already read');
+	      }
+	      this.url = input.url;
+	      this.credentials = input.credentials;
+	      if (!options.headers) {
+	        this.headers = new Headers(input.headers);
+	      }
+	      this.method = input.method;
+	      this.mode = input.mode;
+	      if (!body) {
+	        body = input._bodyInit;
+	        input.bodyUsed = true;
+	      }
+	    } else {
+	      this.url = input;
+	    }
+	
+	    this.credentials = options.credentials || this.credentials || 'omit';
+	    if (options.headers || !this.headers) {
+	      this.headers = new Headers(options.headers);
+	    }
+	    this.method = normalizeMethod(options.method || this.method || 'GET');
+	    this.mode = options.mode || this.mode || null;
+	    this.referrer = null;
+	
+	    if ((this.method === 'GET' || this.method === 'HEAD') && body) {
+	      throw new TypeError('Body not allowed for GET or HEAD requests');
+	    }
+	    this._initBody(body);
+	  }
+	
+	  Request.prototype.clone = function () {
+	    return new Request(this);
+	  };
+	
+	  function decode(body) {
+	    var form = new FormData();
+	    body.trim().split('&').forEach(function (bytes) {
+	      if (bytes) {
+	        var split = bytes.split('=');
+	        var name = split.shift().replace(/\+/g, ' ');
+	        var value = split.join('=').replace(/\+/g, ' ');
+	        form.append(decodeURIComponent(name), decodeURIComponent(value));
+	      }
+	    });
+	    return form;
+	  }
+	
+	  function headers(xhr) {
+	    var head = new Headers();
+	    var pairs = xhr.getAllResponseHeaders().trim().split('\n');
+	    pairs.forEach(function (header) {
+	      var split = header.trim().split(':');
+	      var key = split.shift().trim();
+	      var value = split.join(':').trim();
+	      head.append(key, value);
+	    });
+	    return head;
+	  }
+	
+	  Body.call(Request.prototype);
+	
+	  function Response(bodyInit, options) {
+	    if (!options) {
+	      options = {};
+	    }
+	
+	    this._initBody(bodyInit);
+	    this.type = 'default';
+	    this.status = options.status;
+	    this.ok = this.status >= 200 && this.status < 300;
+	    this.statusText = options.statusText;
+	    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers);
+	    this.url = options.url || '';
+	  }
+	
+	  Body.call(Response.prototype);
+	
+	  Response.prototype.clone = function () {
+	    return new Response(this._bodyInit, {
+	      status: this.status,
+	      statusText: this.statusText,
+	      headers: new Headers(this.headers),
+	      url: this.url
+	    });
+	  };
+	
+	  Response.error = function () {
+	    var response = new Response(null, { status: 0, statusText: '' });
+	    response.type = 'error';
+	    return response;
+	  };
+	
+	  var redirectStatuses = [301, 302, 303, 307, 308];
+	
+	  Response.redirect = function (url, status) {
+	    if (redirectStatuses.indexOf(status) === -1) {
+	      throw new RangeError('Invalid status code');
+	    }
+	
+	    return new Response(null, { status: status, headers: { location: url } });
+	  };
+	
+	  self.Headers = Headers;
+	  self.Request = Request;
+	  self.Response = Response;
+	
+	  self.fetch = function (input, init) {
+	    return new _Promise(function (resolve, reject) {
+	      var request;
+	      if (Request.prototype.isPrototypeOf(input) && !init) {
+	        request = input;
+	      } else {
+	        request = new Request(input, init);
+	      }
+	
+	      var xhr = new XMLHttpRequest();
+	
+	      function responseURL() {
+	        if ('responseURL' in xhr) {
+	          return xhr.responseURL;
+	        }
+	
+	        // Avoid security warnings on getResponseHeader when not allowed by CORS
+	        if (/^X-Request-URL:/m.test(xhr.getAllResponseHeaders())) {
+	          return xhr.getResponseHeader('X-Request-URL');
+	        }
+	
+	        return;
+	      }
+	
+	      xhr.onload = function () {
+	        var status = xhr.status === 1223 ? 204 : xhr.status;
+	        if (status < 100 || status > 599) {
+	          reject(new TypeError('Network request failed'));
+	          return;
+	        }
+	        var options = {
+	          status: status,
+	          statusText: xhr.statusText,
+	          headers: headers(xhr),
+	          url: responseURL()
+	        };
+	        var body = 'response' in xhr ? xhr.response : xhr.responseText;
+	        resolve(new Response(body, options));
+	      };
+	
+	      xhr.onerror = function () {
+	        reject(new TypeError('Network request failed'));
+	      };
+	
+	      xhr.open(request.method, request.url, true);
+	
+	      if (request.credentials === 'include') {
+	        xhr.withCredentials = true;
+	      }
+	
+	      if ('responseType' in xhr && support.blob) {
+	        xhr.responseType = 'blob';
+	      }
+	
+	      request.headers.forEach(function (value, name) {
+	        xhr.setRequestHeader(name, value);
+	      });
+	
+	      xhr.send(typeof request._bodyInit === 'undefined' ? null : request._bodyInit);
+	    });
+	  };
+	  self.fetch.polyfill = true;
+	})();
+
+/***/ },
+/* 120 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	/*!
+	 * FlexCss.Modal
+	 * Licensed under the MIT License (MIT)
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 */
+	
+	'use strict';
+	
+	/*global KeyboardEvent*/
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _Object$assign = __webpack_require__(66)['default'];
+	
+	var _Promise = __webpack_require__(91)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(2)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _utilSettings = __webpack_require__(117);
+	
+	var _utilSettings2 = _interopRequireDefault(_utilSettings);
+	
+	var _utilEvent = __webpack_require__(116);
+	
+	var _utilEvent2 = _interopRequireDefault(_utilEvent);
+	
+	var _utilUtil = __webpack_require__(114);
+	
+	var _utilUtil2 = _interopRequireDefault(_utilUtil);
+	
+	var _Widget = __webpack_require__(121);
+	
+	var _Widget2 = _interopRequireDefault(_Widget);
+	
+	var HTML_ELEMENT = global.document.documentElement;
+	var KEY_ESC = 27;
+	/* Attribute Names */
+	var ATTR_CREATE_NEW = 'data-new-instance';
+	var ATTR_CLOSE = 'data-close-modal';
+	var ATTR_NAME = 'data-modal';
+	
+	/* Class names */
+	var CLS_CONTAINER_CURRENT = 'front';
+	var CLS_OPEN = 'open';
+	var CLS_CURRENT = 'current';
+	var CLS_PART_OF_STACK = 'part-of-stack';
+	var CLS_MODAL_OPEN = 'modal-open';
+	var CLS_MODAL_CONTAINER = 'modal-container';
+	var CLS_ANIM_END = 'modal-anim-end';
+	var CLS_LOADER_CONTAINER = 'loader-container';
+	var CLS_LOADER = 'loader';
+	
+	/* Events */
+	
+	/**
+	 * Event triggered when modal is closed
+	 * @type {string}
+	 */
+	var EVENT_MODAL_CLOSED = 'flexcss.modal.closed';
+	exports.EVENT_MODAL_CLOSED = EVENT_MODAL_CLOSED;
+	/**
+	 * Event triggered before a modal is closed, cancelable
+	 * @type {string}
+	 */
+	var EVENT_MODAL_BEFORE_CLOSED = 'flexcss.modal.beforeClose';
+	exports.EVENT_MODAL_BEFORE_CLOSED = EVENT_MODAL_BEFORE_CLOSED;
+	/**
+	 * Event triggered when a modal is opened
+	 * @type {string}
+	 */
+	var EVENT_MODAL_OPENED = 'flexcss.modal.opened';
+	
+	exports.EVENT_MODAL_OPENED = EVENT_MODAL_OPENED;
+	/**
+	 * Event triggered when modal is initilized, called on target
+	 * @type {string}
+	 */
+	var EVENT_MODAL_INIT = 'flexcss.modal.init';
+	
+	exports.EVENT_MODAL_INIT = EVENT_MODAL_INIT;
+	/**
+	 * Triggered when the content of an async modal on a target is loaded, called on target
+	 * @type {string}
+	 */
+	var EVENT_MODAL_ASYNC_TARGET_LOADED = 'flexcss.modal.asyncTargetLoaded';
+	
+	exports.EVENT_MODAL_ASYNC_TARGET_LOADED = EVENT_MODAL_ASYNC_TARGET_LOADED;
+	/**
+	 * A Modal Implementation
+	 */
+	
+	var Modal = (function () {
+	    function Modal(DelegateContainer, options) {
+	        _classCallCheck(this, Modal);
+	
+	        var doc = global.document,
+	            container = DelegateContainer instanceof HTMLElement ? DelegateContainer : doc.getElementById(DelegateContainer);
+	
+	        // Instance vars:
+	        if (!container) {
+	            throw 'Could not found container element by given ID/Element: ' + DelegateContainer;
+	        }
+	
+	        this.currentOpen = null;
+	
+	        this.loading = false;
+	
+	        this.container = container;
+	
+	        /**
+	         * Default Options
+	         */
+	        this.options = {
+	            classNames: 'modal',
+	            closeOnEscape: true,
+	            closeOnBackgroundClick: true,
+	            destroyOnFinish: false,
+	            fixedContainer: true,
+	            containerClassNames: ''
+	        };
+	
+	        _Object$assign(this.options, options);
+	
+	        // Container where events are delegated
+	        this.eventContainer = null;
+	        this.eventFunction = null;
+	
+	        this.dataMainPageContainer = global.document.body;
+	
+	        this.currentScrollTop = 0;
+	
+	        this.modalContainer = null;
+	
+	        // Destroy full modal instance when no dialogs are bind to?
+	        // Otherwise container is recycled
+	        this.destroyOnFinish = this.options.destroyOnFinish;
+	    }
+	
+	    // Static variable that keeps track of all open modals
+	
+	    /**
+	     * Removes this modal from global stack
+	     * Will handle fixing main html element too
+	     * @private
+	     * @param n
+	     */
+	
+	    _createClass(Modal, [{
+	        key: '_removeModalFromStack',
+	        value: function _removeModalFromStack(n) {
+	            var t = Modal._modalInstances.indexOf(n),
+	                self = this;
+	            if (t > -1) {
+	                Modal._modalInstances.splice(t, 1);
+	                if (Modal._modalInstances.length === 0) {
+	                    // restore scrollPosition:
+	                    if (self.dataMainPageContainer) {
+	                        setTimeout(function () {
+	                            if (self.options.fixedContainer) {
+	                                self.dataMainPageContainer.style.position = "static";
+	                                self.dataMainPageContainer.style.top = "0px";
+	                                // reset scrollTop
+	                                document.documentElement.scrollTop = self.currentScrollTop;
+	                                document.body.scrollTop = self.currentScrollTop;
+	                            }
+	                            _utilSettings2['default'].get().scrollbarUpdateNodes.forEach(function (node) {
+	                                node.style.paddingRight = '';
+	                            });
+	                            HTML_ELEMENT.classList.remove(CLS_MODAL_OPEN);
+	                        }, 0);
+	                    }
+	                }
+	            }
+	        }
+	
+	        /**
+	         * Modal container that contains all `stacked` modals for this instance
+	         * @returns {HTMLElement}
+	         */
+	    }, {
+	        key: 'getModalContainer',
+	        value: function getModalContainer() {
+	            return this.modalContainer;
+	        }
+	
+	        /**
+	         * Closes the current open modal of this stack
+	         * @params [e], optional event
+	         * @returns {*}
+	         */
+	    }, {
+	        key: 'close',
+	        value: function close(e) {
+	            var self = this;
+	
+	            var options = self.currentOpen ? _utilUtil2['default'].applyOptionsFromElement(self.currentOpen, _utilUtil2['default'].copy(self.options)) : self.options;
+	
+	            // close only on keyboard if instance should
+	            if (!options.closeOnEscape && e instanceof KeyboardEvent) {
+	                return false;
+	            }
+	
+	            // close only on background if instance should
+	            if (!options.closeOnBackgroundClick && e && e.type === _utilSettings2['default'].getTabEvent() && !e.target.hasAttribute(ATTR_CLOSE)) {
+	                return false;
+	            }
+	
+	            // if an instance is currently loading, prevent from closing
+	            if (self.loading) {
+	                return false;
+	            }
+	
+	            if (e) {
+	                e.preventDefault();
+	            }
+	
+	            if (self.currentOpen) {
+	                // dispatch beforeClose event, if prevented prevent modal from closing
+	                var ev = _utilEvent2['default'].dispatchAndFire(self.currentOpen, EVENT_MODAL_BEFORE_CLOSED);
+	                if (ev.defaultPrevented) {
+	                    return false;
+	                }
+	
+	                this._finishState(self.currentOpen);
+	                // if there is an previous modal
+	                if (self.currentOpen.prevModal) {
+	                    // switch to the next modal
+	                    return self.switchModals(self.currentOpen.prevModal, self.currentOpen.prevModal.prevModal || null);
+	                }
+	
+	                // finally trigger closed event
+	                _utilEvent2['default'].dispatch(self.currentOpen, EVENT_MODAL_CLOSED).withOriginal(e).fire();
+	            }
+	            self._removeModalFromStack(self.currentOpen);
+	
+	            // Full stack closed:
+	            self.currentOpen = null;
+	            if (self.modalContainer) {
+	                // setup next open
+	                var lastContainer = Modal._modalInstances[Modal._modalInstances.length - 1],
+	                    classList = self.modalContainer.classList;
+	                classList.remove(CLS_CONTAINER_CURRENT);
+	                classList.remove(CLS_OPEN);
+	                // Remove all current classes from child-nodes
+	                for (var i = 0; i < self.modalContainer.childNodes.length; i++) {
+	                    var node = self.modalContainer.childNodes[i],
+	                        cl = node.classList;
+	                    // remove applied styles
+	                    self._finishState(node);
+	                    cl.remove(CLS_CURRENT);
+	                    cl.remove(CLS_PART_OF_STACK);
+	                }
+	                if (lastContainer) {
+	                    lastContainer.parentNode.classList.add(CLS_CONTAINER_CURRENT);
+	                }
+	            }
+	
+	            if (self.destroyOnFinish) {
+	                self.destroy();
+	            }
+	            return self;
+	        }
+	
+	        /**
+	         * Resets a target when newly initilizes
+	         * @param target
+	         * @private
+	         */
+	    }, {
+	        key: '_finishState',
+	        value: function _finishState(target) {
+	            target.classList.remove(CLS_ANIM_END);
+	        }
+	
+	        /**
+	         * Handler called when a Modal has finished an animation
+	         * @param e
+	         * @param self
+	         * @private
+	         */
+	    }, {
+	        key: '_finishAnim',
+	        value: function _finishAnim(e, self) {
+	            e.target.classList.add(CLS_ANIM_END);
+	            e.target.removeEventListener(e.type, self, true);
+	        }
+	
+	        /**
+	         * Brings the given modal to front
+	         * @param co
+	         * @param last
+	         */
+	    }, {
+	        key: 'switchModals',
+	        value: function switchModals(co, last) {
+	            co.prevModal = last;
+	            Modal._modalInstances.push(co);
+	
+	            if (last) {
+	                this._finishState(last);
+	                _utilUtil2['default'].prefixedAnimateEvent(last, 'AnimationEnd', this._finishAnim);
+	                last.classList.add(CLS_PART_OF_STACK);
+	            }
+	            // set new currentOpen
+	            this.currentOpen = co;
+	
+	            // bring current container to the front
+	            var instances = Modal._modalInstances;
+	
+	            for (var m = 0; m < instances.length; m++) {
+	                instances[m].parentNode.classList.remove(CLS_CONTAINER_CURRENT);
+	            }
+	            this.modalContainer.classList.add(CLS_CONTAINER_CURRENT);
+	            // remove animations if animations has been completed, fixes various bugs:
+	            // - fixes nested scrolling element issue in iOS Browsers / Mobile-Safari
+	            _utilUtil2['default'].prefixedAnimateEvent(co, 'AnimationEnd', this._finishAnim);
+	
+	            for (var i = 0; i < this.modalContainer.childNodes.length; i++) {
+	                var n = this.modalContainer.childNodes[i],
+	                    isCurrent = n.classList.contains(CLS_CURRENT);
+	                if (n === co) {
+	                    co.classList.add(CLS_CURRENT);
+	                    co.classList.remove(CLS_PART_OF_STACK);
+	                    this._finishState(co);
+	                } else {
+	                    n.classList.remove(CLS_CURRENT);
+	                    if (isCurrent) {
+	                        this._removeModalFromStack(n);
+	                        _utilEvent2['default'].dispatchAndFire(n, EVENT_MODAL_CLOSED);
+	                    }
+	                }
+	            }
+	        }
+	    }, {
+	        key: 'handleScrollbar',
+	        value: function handleScrollbar() {
+	            var self = this;
+	            if (Modal._modalInstances.length === 0) {
+	                // save current scrollTop:
+	                var scrollTop = undefined,
+	                    c = undefined;
+	                if (self.options.fixedContainer) {
+	                    scrollTop = global.pageYOffset;
+	                    c = self.dataMainPageContainer;
+	                    self.currentScrollTop = scrollTop;
+	                }
+	                // this causes reflow/paint and should be optimized
+	                // At lest we write in a batch later
+	                _utilSettings2['default'].get().scrollbarUpdateNodes.map(function (n) {
+	                    return {
+	                        n: n, padding: parseInt(global.getComputedStyle(n).paddingRight) + _utilSettings2['default'].getScrollbarWidth() + 'px'
+	                    };
+	                }).forEach(function (d) {
+	                    d.n.style.paddingRight = d.padding;
+	                });
+	                if (self.options.fixedContainer) {
+	                    if (c) {
+	                        c.style.cssText += 'top:' + (scrollTop * -1 + 'px') + ';position:fixed';
+	                    }
+	                }
+	                HTML_ELEMENT.classList.add(CLS_MODAL_OPEN);
+	            }
+	        }
+	
+	        /**
+	         * Creates a Modal and opens it (later)
+	         * @param e
+	         * @returns {Promise|boolean}
+	         */
+	    }, {
+	        key: 'createWidget',
+	        value: function createWidget(e) {
+	            var self = this;
+	            if (this.loading) {
+	                return false;
+	            }
+	
+	            // check if another modal has registered events on this dom path:
+	            if (e && e.target) {
+	                var foundInstance = _utilUtil2['default'].parentsUntil(e.target, function (node) {
+	                    return node && node.flexModalInstance;
+	                });
+	
+	                // if another instance has been found, abort
+	                if (foundInstance !== this.container) {
+	                    return false;
+	                }
+	            }
+	            var targetContent,
+	                future,
+	                widget,
+	                target,
+	                hasTarget = true,
+	                isHtmlElement = e instanceof HTMLElement,
+	                isWidget = _Widget2['default'].isWidget(e);
+	            if (isHtmlElement || isWidget) {
+	                if (isHtmlElement) {
+	                    targetContent = e;
+	                } else {
+	                    widget = e;
+	                    targetContent = widget.element;
+	                }
+	            } else {
+	                target = e.target;
+	                if (!target) {
+	                    throw 'Could not find target, did you pass an event, a HTMLElement or an Widget?';
+	                }
+	                hasTarget = target.hasAttribute(ATTR_NAME);
+	                targetContent = target.getAttribute(ATTR_NAME);
+	                widget = _Widget2['default'].findWidget(target);
+	                if (target.hasAttribute(ATTR_CREATE_NEW) && !e.newInstance) {
+	                    var newInstance = new Modal(this.container).setDestroyOnFinish(true);
+	                    e.newInstance = true;
+	                    newInstance.fromEvent(e).then(function () {
+	                        newInstance.registerEvents(newInstance.getModalContainer());
+	                    });
+	                    return false;
+	                }
+	                if (hasTarget) {
+	                    e.stopImmediatePropagation();
+	                    e.preventDefault();
+	                }
+	            }
+	
+	            if (!hasTarget) {
+	                return false;
+	            }
+	
+	            var modalContainerClasses = this.modalContainer ? this.modalContainer.classList : [];
+	
+	            // lazy create modal container
+	            if (!this.modalContainer) {
+	                this.modalContainer = global.document.createElement('div');
+	                this.modalContainer.className = CLS_MODAL_CONTAINER + ' ' + this.options.containerClassNames + ' ' + CLS_OPEN;
+	                var closeModalFunction = function closeModalFunction(ce) {
+	                    if (self.loading) {
+	                        return false;
+	                    }
+	                    if (_utilUtil2['default'].isPartOfNode(ce.target, self.currentOpen)) {
+	                        if (!ce.target.hasAttribute(ATTR_CLOSE)) {
+	                            return false;
+	                        }
+	                    }
+	                    self.close(ce);
+	                };
+	
+	                this.modalContainer.addEventListener(_utilSettings2['default'].getTabEvent(), closeModalFunction, false);
+	
+	                modalContainerClasses = this.modalContainer.classList;
+	                this.container.appendChild(this.modalContainer);
+	            } else {
+	                modalContainerClasses.add(CLS_OPEN);
+	            }
+	
+	            var loader = undefined,
+	                doc = global.document,
+	                toggleLoader = function toggleLoader(show) {
+	                if (show) {
+	                    loader = doc.createElement('div');
+	                    loader.className = CLS_LOADER_CONTAINER;
+	                    var loaderLoader = doc.createElement('div');
+	                    loaderLoader.className = CLS_LOADER;
+	                    loader.appendChild(loaderLoader);
+	                    self.modalContainer.appendChild(loader);
+	                } else {
+	                    loader.parentNode.removeChild(loader);
+	                }
+	            };
+	
+	            this.handleScrollbar();
+	
+	            modalContainerClasses.add(CLS_CONTAINER_CURRENT);
+	            modalContainerClasses.add('loading');
+	            this.loading = true;
+	            toggleLoader(true);
+	            var async = widget ? widget.getAsync() : null;
+	            if (_Widget2['default'].isWidget(widget) && async) {
+	                future = async.then(function (r) {
+	                    var result;
+	                    if (r instanceof HTMLElement || r instanceof DocumentFragment) {
+	                        result = r;
+	                    } else {
+	                        // Create container Element:
+	                        var element = doc.createElement('div');
+	                        element.className = self.options.classNames;
+	                        element.innerHTML = r;
+	                        element.id = _utilUtil2['default'].guid();
+	                        result = element;
+	                    }
+	                    widget.finalContent = result;
+	                    _utilEvent2['default'].dispatchAndFire(target, EVENT_MODAL_ASYNC_TARGET_LOADED);
+	                    return result;
+	                });
+	            } else {
+	                var el = targetContent instanceof HTMLElement || targetContent instanceof DocumentFragment ? targetContent : doc.getElementById(targetContent);
+	                if (el) {
+	                    future = new _Promise(function (resolve) {
+	                        resolve(el);
+	                    });
+	                } else {
+	                    throw 'Could not found given modal element (content) with ID: ' + targetContent;
+	                }
+	            }
+	
+	            _utilEvent2['default'].dispatchAndFire(target, EVENT_MODAL_INIT);
+	
+	            return future.then(function (thisEl) {
+	                thisEl.hfWidgetInstance = self;
+	                self.modalContainer.appendChild(thisEl);
+	                modalContainerClasses.remove('loading');
+	                self.loading = false;
+	                toggleLoader(false);
+	
+	                self.open(thisEl, true, e);
+	
+	                return thisEl;
+	            });
+	        }
+	
+	        /**
+	         * Open's an already rendered modal
+	         * @param {HTMLElement} modal
+	         * @param {Boolean} [internal], set to true to prevent container management
+	         * @param {Boolean} [maybeEvent], optional event-object that triggered open
+	         */
+	    }, {
+	        key: 'open',
+	        value: function open(modal, internal, maybeEvent) {
+	
+	            if (!internal) {
+	                this.modalContainer.classList.add('open');
+	                this.handleScrollbar();
+	            }
+	            this.switchModals(modal, this.currentOpen);
+	
+	            _utilEvent2['default'].dispatch(modal, EVENT_MODAL_OPENED).withOriginal(maybeEvent).fire();
+	        }
+	    }, {
+	        key: 'registerEvents',
+	        value: function registerEvents(delegate) {
+	            var delegateContainer = delegate || this.container,
+	                self = this;
+	
+	            // register modal instance so we can detect multiple registrars
+	            delegateContainer.flexModalInstance = self;
+	            self.eventFunction = function () {
+	                self.createWidget.apply(self, arguments);
+	            };
+	            delegateContainer.addEventListener(_utilSettings2['default'].getTabEvent(), self.eventFunction, false);
+	
+	            self.eventContainer = delegateContainer;
+	            return self;
+	        }
+	
+	        /**
+	         * Creates a new Dialog Instance either directly from HTML Element or a Widget instance
+	         * @param {HTMLElement|Widget} widget instance or html element
+	         * @returns {Promise}
+	         */
+	    }, {
+	        key: 'fromWidget',
+	        value: function fromWidget(widget) {
+	            return this.createWidget(widget);
+	        }
+	
+	        /**
+	         * Creates a Widget from event
+	         * @param e
+	         * @returns {Promise}
+	         */
+	    }, {
+	        key: 'fromEvent',
+	        value: function fromEvent(e) {
+	            return this.createWidget(e);
+	        }
+	    }, {
+	        key: 'setDestroyOnFinish',
+	        value: function setDestroyOnFinish(v) {
+	            this.destroyOnFinish = v;
+	            return this;
+	        }
+	
+	        /**
+	         * Destroy this widget instance, cleans empty DOM nodes
+	         * Will use fast MutationObserver if available, otherwise falls back to DOMNodeRemoved event
+	         */
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	            var self = this,
+	                modalContainer = this.modalContainer;
+	            var isEmptyContainer = modalContainer.childNodes.length === 0;
+	            // Remove event listener on destroy, do not remove DOM node
+	            if (self.eventContainer) {
+	                self.eventContainer.removeEventListener(_utilSettings2['default'].getTabEvent(), self.eventFunction, true);
+	            }
+	
+	            if (isEmptyContainer) {
+	                if (modalContainer.parentNode) {
+	                    modalContainer.parentNode.removeChild(modalContainer);
+	                }
+	            }
+	            if (global.MutationObserver) {
+	                var observer = new MutationObserver(function (mutations) {
+	                    mutations.forEach(function () {
+	                        if (isEmptyContainer) {
+	                            modalContainer.parentNode.removeChild(modalContainer);
+	                            observer.disconnect();
+	                        }
+	                    });
+	                });
+	                observer.observe(modalContainer, { childList: true });
+	            } else {
+	                modalContainer.addEventListener('DOMNodeRemoved', function (e) {
+	                    if (e.target !== modalContainer && modalContainer.childNodes.length - 1 === 0) {
+	                        modalContainer.parentNode.removeChild(modalContainer);
+	                    }
+	                });
+	            }
+	        }
+	    }]);
+	
+	    return Modal;
+	})();
+	
+	exports['default'] = Modal;
+	Modal._modalInstances = [];
+	
+	// Global keydown listener for modal
+	global.addEventListener('keydown', function (e) {
+	    if (e.keyCode === KEY_ESC) {
+	        var lastModal = Modal._modalInstances[Modal._modalInstances.length - 1];
+	        if (lastModal) {
+	            _Widget2['default'].findWidget(lastModal).close(e);
+	        }
+	    }
+	});
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 121 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	/*!
+	 * FlexCss.Widget
+	 * Licensed under the MIT License (MIT)
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 */
+	
+	'use strict';
+	
+	/**
+	 * A Widget provides async content on a specific target (e.g. a modal link)
+	 */
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _Promise = __webpack_require__(91)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	
+	var Widget = (function () {
+	
+	  /**
+	   * Creates a new Widget
+	   * @param [element], optional define the content of widget
+	   */
+	
+	  function Widget(element) {
+	    var _this = this;
+	
+	    _classCallCheck(this, Widget);
+	
+	    /**
+	     *
+	     * @type {Promise}
+	     */
+	    this.asyncContent = null;
+	
+	    /**
+	     * @type {boolean}
+	     */
+	    this._isWidget = true;
+	
+	    if (element) {
+	      /**
+	       * @type {HTMLElement}
+	       */
+	      this.element = element instanceof HTMLElement ? element : global.document.getElementById(element);
+	      if (this.element) {
+	        this.element.hfWidgetInstance = this;
+	        this.setAsync((function () {
+	          return new _Promise((function (s) {
+	            s(_this.element);
+	          }).bind(_this));
+	        }).bind(this));
+	      } else {
+	        throw 'Could not found element with ID: ' + element;
+	      }
+	    }
+	    /**
+	     * The final resulted content that a widget did create (e.g. a modal container)
+	     * @type {HTMLElement}
+	     */
+	    this.finalContent = null;
+	  }
+	
+	  /**
+	   *
+	   * @returns {Promise}
+	   */
+	
+	  _createClass(Widget, [{
+	    key: 'getAsync',
+	    value: function getAsync() {
+	      return this.asyncContent();
+	    }
+	
+	    /**
+	     * @param {Function.<Promise>} async
+	     * @returns {Widget}
+	     */
+	  }, {
+	    key: 'setAsync',
+	    value: function setAsync(async) {
+	      this.asyncContent = async;
+	      return this;
+	    }
+	
+	    /**
+	     * @returns {HTMLElement}
+	     */
+	  }, {
+	    key: 'getFinalContent',
+	    value: function getFinalContent() {
+	      return this.finalContent;
+	    }
+	
+	    /**
+	     * @param {HTMLElement} element
+	     * @returns {Widget}
+	     */
+	  }, {
+	    key: 'setElement',
+	    value: function setElement(element) {
+	      this.element = element;
+	      return this;
+	    }
+	
+	    /**
+	     * Destroys the generated content of this widget
+	     * @returns {boolean}
+	     */
+	  }, {
+	    key: 'destroy',
+	    value: function destroy() {
+	
+	      if (this.finalContent && this.finalContent.parentNode) {
+	        this.finalContent.parentNode.removeChild(this.finalContent);
+	        return true;
+	      }
+	
+	      delete this.element;
+	      delete this.asyncContent;
+	      delete this.finalContent;
+	
+	      return false;
+	    }
+	
+	    /**
+	     * Will find a widget on an Element
+	     * @param {HTMLElement} element
+	     * @returns {Widget|undefined}
+	     */
+	  }], [{
+	    key: 'findWidget',
+	    value: function findWidget(element) {
+	      return element ? element.hfWidgetInstance : undefined;
+	    }
+	
+	    /**
+	     * Checks if a given object is an instance
+	     * @param {Object} self
+	     * @returns {boolean}
+	     */
+	  }, {
+	    key: 'isWidget',
+	    value: function isWidget(self) {
+	      return self instanceof Widget || typeof self === 'object' && self.hasOwnProperty('_isWidget');
+	    }
+	  }]);
+	
+	  return Widget;
+	})();
+	
+	exports['default'] = Widget;
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 122 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	/*!
+	 * FlexCss.Toggleable
+	 * Licensed under the MIT License (MIT)
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 */
+	
+	'use strict';
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _Promise = __webpack_require__(91)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(2)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _utilSettings = __webpack_require__(117);
+	
+	var _utilSettings2 = _interopRequireDefault(_utilSettings);
+	
+	var _Widget = __webpack_require__(121);
+	
+	var _Widget2 = _interopRequireDefault(_Widget);
+	
+	var _utilUtil = __webpack_require__(114);
+	
+	var _utilUtil2 = _interopRequireDefault(_utilUtil);
+	
+	var _utilEvent = __webpack_require__(116);
+	
+	var _utilEvent2 = _interopRequireDefault(_utilEvent);
+	
+	/**
+	 * Event that is fired when a tab is closed
+	 * @type {string}
+	 */
+	
+	var EVENT_TAB_CLOSED = 'flexcss.tab.closed';
+	
+	exports.EVENT_TAB_CLOSED = EVENT_TAB_CLOSED;
+	/**
+	 * Event that is fired when a tab has been opened
+	 * @type {string}
+	 */
+	var EVENT_TAB_OPENED = 'flexcss.tab.opened';
+	exports.EVENT_TAB_OPENED = EVENT_TAB_OPENED;
+	/**
+	 * @type {string}
+	 */
+	var ATTR_NAME = 'data-toggle';
+	/**
+	 * @type {string}
+	 */
+	var ACTIVE_CLASS = 'active';
+	/**
+	 * @type {string}
+	 */
+	var LOADING_CLASS = 'loading';
+	
+	/**
+	 * @type {string}
+	 */
+	var ATTR_TOGGLE_LIST = 'data-toggle-list';
+	
+	/**
+	 * Creates a toggleable element, either for tabs or a single toggle
+	 */
+	
+	var Toggleable = (function () {
+	    function Toggleable(ContainerId) {
+	        _classCallCheck(this, Toggleable);
+	
+	        var doc = global.document;
+	
+	        this.container = ContainerId instanceof HTMLElement ? ContainerId : doc.getElementById(ContainerId);
+	
+	        this.loading = false;
+	
+	        if (!this.container) {
+	            throw 'Toggleable container with id "' + ContainerId + '" not found';
+	        }
+	    }
+	
+	    /**
+	     * Listener
+	     * @param {Event} e
+	     * @private
+	     */
+	
+	    _createClass(Toggleable, [{
+	        key: '_listener',
+	        value: function _listener(e) {
+	            var target = e.target,
+	                parent = target.parentNode,
+	                doc = global.document;
+	
+	            // support target child element to clicked
+	            if (!target.hasAttribute(ATTR_NAME)) {
+	                if (parent && parent.hasAttribute(ATTR_NAME)) {
+	                    target = parent;
+	                } else {
+	                    return;
+	                }
+	            }
+	
+	            if (!target.hasAttribute(ATTR_NAME)) {
+	                return;
+	            }
+	
+	            var refId = target.getAttribute(ATTR_NAME),
+	                ref = doc.getElementById(refId);
+	
+	            e.preventDefault();
+	
+	            if (this.loading) {
+	                return;
+	            }
+	
+	            this.toggleTarget(ref, target);
+	        }
+	
+	        /**
+	         * Registers Events for this instance
+	         * @returns {Toggleable}
+	         */
+	    }, {
+	        key: 'registerEvents',
+	        value: function registerEvents() {
+	            this.container.addEventListener(_utilSettings2['default'].getTabEvent(), this._listener.bind(this));
+	            return this;
+	        }
+	
+	        /**
+	         * Toggles given `ref`
+	         * @param {HTMLElement} ref
+	         * @param {HTMLElement} [target] optional target node
+	         */
+	    }, {
+	        key: 'toggleTarget',
+	        value: function toggleTarget(ref, target) {
+	            var _this = this;
+	
+	            if (!target && !ref) {
+	                return;
+	            }
+	            if (!target) {
+	                target = document.querySelector('[' + ATTR_NAME + '="' + ref.id + '"]');
+	            }
+	
+	            var maybeToggleNode,
+	                future,
+	                elClassList = target.classList,
+	                parentClassList,
+	                parent = target.parentNode,
+	                doc = global.document;
+	
+	            future = new _Promise(function (resolve, failure) {
+	                if (ref) {
+	                    resolve(ref);
+	                } else {
+	                    var widget = _Widget2['default'].findWidget(target),
+	                        async = widget ? widget.getAsync() : null;
+	                    if (_Widget2['default'].isWidget(widget) && async) {
+	                        future = async.then(function (r) {
+	                            if (r instanceof HTMLElement) {
+	                                var id = _utilUtil2['default'].guid();
+	                                r.id = id;
+	                                target.setAttribute(ATTR_NAME, id);
+	                                resolve(r);
+	                            } else {
+	                                throw 'Dynamically creating toggle-content is not supported right now. ' + 'Return an HTMLElement instance';
+	                            }
+	                        });
+	                    } else {
+	                        failure('Target not given');
+	                    }
+	                }
+	            });
+	
+	            if (parent) {
+	                maybeToggleNode = _utilUtil2['default'].parentsUntil(target, function (node) {
+	                    return node && node.hasAttribute && node.hasAttribute(ATTR_TOGGLE_LIST);
+	                });
+	
+	                parentClassList = parent.classList;
+	                // Abort if element is already active and if is part of a toggle list
+	                if (maybeToggleNode) {
+	                    if (!parentClassList.contains(ACTIVE_CLASS)) {
+	                        parentClassList.toggle(ACTIVE_CLASS);
+	                        parentClassList.add(LOADING_CLASS);
+	                    } else {
+	                        return;
+	                    }
+	                }
+	
+	                if (maybeToggleNode) {
+	                    for (var i = 0; i < maybeToggleNode.children.length; i++) {
+	                        var n = maybeToggleNode.children[i],
+	                            targetRef = n.children[0];
+	                        if (n !== parent) {
+	                            n.classList.remove(ACTIVE_CLASS);
+	                            if (targetRef) {
+	                                var attr = targetRef.getAttribute(ATTR_NAME),
+	                                    el = attr ? doc.getElementById(attr) : null;
+	                                if (el) {
+	                                    _utilEvent2['default'].dispatchAndFire(el, EVENT_TAB_CLOSED);
+	                                    el.classList.remove(ACTIVE_CLASS);
+	                                    targetRef.classList.remove(ACTIVE_CLASS);
+	                                }
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	            if (elClassList) {
+	                elClassList.toggle(ACTIVE_CLASS);
+	                elClassList.add(LOADING_CLASS);
+	            }
+	            this.loading = true;
+	            future.then((function (r) {
+	                _utilEvent2['default'].dispatchAndFire(r, EVENT_TAB_OPENED);
+	                Toggleable._handleLoaded(target);
+	                r.classList.toggle(ACTIVE_CLASS);
+	                this.loading = false;
+	            }).bind(this))['catch'](function (reason) {
+	                _this.loading = false;
+	                Toggleable._handleLoaded(target);
+	                console.warn(reason);
+	            });
+	        }
+	
+	        /**
+	         * @param el
+	         * @private
+	         */
+	    }], [{
+	        key: '_handleLoaded',
+	        value: function _handleLoaded(el) {
+	            var parentClassList = el.parentNode.classList;
+	            el.classList.remove(LOADING_CLASS);
+	            if (parentClassList) {
+	                parentClassList.remove(LOADING_CLASS);
+	            }
+	        }
+	    }]);
+	
+	    return Toggleable;
+	})();
+	
+	exports['default'] = Toggleable;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 123 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	/*!
+	 * FlexCss.OffCanvas
+	 * Licensed under the MIT License (MIT)
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 */
+	
+	'use strict';
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(2)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _utilSettings = __webpack_require__(117);
+	
+	var _utilSettings2 = _interopRequireDefault(_utilSettings);
+	
+	var _utilUtil = __webpack_require__(114);
+	
+	var _utilUtil2 = _interopRequireDefault(_utilUtil);
+	
+	/**
+	 * @type {string}
+	 */
+	var ATTR_CLOSE_SIDEBAR = 'data-close-offcanvas';
+	
+	/**
+	 * @type {string}
+	 */
+	var ATTR_TARGET = 'data-offcanvas';
+	/**
+	 * @type {string}
+	 */
+	var TOGGLE_CLASS = 'toggled-canvas';
+	/**
+	 * @type {string}
+	 */
+	var INIT_CLASS = 'init';
+	/**
+	 * @type {string}
+	 */
+	var OPEN_CLASS = 'open';
+	/**
+	 * @type {number}
+	 */
+	var HIDE_FACTOR = 3;
+	
+	/**
+	 * A OffCanvas Implementation
+	 */
+	
+	var OffCanvas = (function () {
+	
+	    /**
+	     * Creates an off-canvas navigation
+	     * @param {HTMLElement|String} NavigationId
+	     * @param {HTMLElement|String} Darkener
+	     * @param {int} factor positive will expect right sidebar, positive left
+	     * @param {bool} [disableTouch] if true all touch events are disabled
+	     * @constructor
+	     */
+	
+	    function OffCanvas(NavigationId, Darkener, factor, disableTouch) {
+	        _classCallCheck(this, OffCanvas);
+	
+	        var doc = global.document,
+	            touched = 0,
+	            navigationContainer = NavigationId instanceof HTMLElement ? NavigationId : doc.getElementById(NavigationId),
+	            darkener = Darkener instanceof HTMLElement ? Darkener : doc.getElementById(Darkener),
+	            DARKENER_CLASS_TOGGLE = 'toggle-' + darkener.id || 'darkener',
+	            DARKENER_CLASS_INSTANT_TOGGLE = DARKENER_CLASS_TOGGLE + '-open',
+	            resetStyles = function resetStyles(s) {
+	            s.transform = '';
+	            s.transition = '';
+	            s.webkitTransform = '';
+	            s.webkitTransition = '';
+	        },
+	            shouldNotTouch = function shouldNotTouch() {
+	            return window.innerWidth >= _utilSettings2['default'].get().smallBreakpoint;
+	        };
+	
+	        if (!darkener || !navigationContainer) {
+	            throw 'Could not find needed elements (Darkener and/or NavigationId)';
+	        }
+	
+	        this.darkener = darkener;
+	        this.darkenerClassToggle = DARKENER_CLASS_TOGGLE;
+	        this.darkenerClassToggleInstant = DARKENER_CLASS_INSTANT_TOGGLE;
+	
+	        this.navigationContainer = navigationContainer;
+	        this.navigationContainerId = navigationContainer.id;
+	
+	        // create id if id does not exist
+	        if (!this.navigationContainerId) {
+	            this.navigationContainerId = _utilUtil2['default'].guid();
+	            navigationContainer.id = this.navigationContainerId;
+	        }
+	
+	        if (!disableTouch) {
+	            navigationContainer.addEventListener('touchstart', function (e) {
+	                requestAnimationFrame(function () {
+	                    if (shouldNotTouch()) {
+	                        return;
+	                    }
+	                    touched = e.touches[0].clientX;
+	                    var target = navigationContainer,
+	                        style = target.style;
+	                    target.mustHide = false;
+	                    style.transition = 'transform 0s ease';
+	                    style.webkitTransition = '-webkit-transform 0s ease';
+	                });
+	            });
+	            navigationContainer.addEventListener('touchmove', function (e) {
+	
+	                if (shouldNotTouch()) {
+	                    return;
+	                }
+	                var x = e.touches[0].clientX,
+	                    target = navigationContainer,
+	                    style = target.style,
+	                    calc = touched - x,
+	                    bounds = target.getBoundingClientRect(),
+	                    compare = factor > 0 ? calc <= 0 : calc >= 0;
+	                if (compare) {
+	                    target.mustHide = factor > 0 ? calc * -1 > bounds.width / HIDE_FACTOR : calc > bounds.width / HIDE_FACTOR;
+	                    style.transform = 'translate3d(' + calc * -1 + 'px,0,0)';
+	                    style.webkitTransform = 'translate3d(' + calc * -1 + 'px,0,0)';
+	                }
+	            });
+	            navigationContainer.addEventListener('touchend', (function () {
+	                requestAnimationFrame((function () {
+	                    if (shouldNotTouch()) {
+	                        return;
+	                    }
+	                    var target = navigationContainer,
+	                        style = target.style;
+	                    if (target.mustHide) {
+	                        var width = target.getBoundingClientRect().width * factor;
+	                        style.transition = 'transform .2s ease';
+	                        style.webkitTransition = '-webkit-transform .2s ease';
+	
+	                        style.transform = 'translate3d(' + width + 'px,0,0)';
+	                        style.webkitTransform = 'translate3d(' + width + 'px,0,0)';
+	                        this._remove(function () {
+	                            resetStyles(style);
+	                        });
+	                        this._removeInstant();
+	                    } else {
+	                        resetStyles(style);
+	                    }
+	                }).bind(this));
+	            }).bind(this));
+	        }
+	    }
+	
+	    /**
+	     * @private
+	     */
+	
+	    _createClass(OffCanvas, [{
+	        key: '_remove',
+	        value: function _remove(callback) {
+	            _utilUtil2['default'].addEventOnce(_utilSettings2['default'].getTransitionEvent(), this.navigationContainer, (function () {
+	                // add timeout because transition event fires a little to early
+	                setTimeout((function () {
+	                    requestAnimationFrame((function () {
+	                        var body = global.document.body;
+	                        OffCanvas.currentOpen = null;
+	                        body.classList.remove(TOGGLE_CLASS);
+	                        body.classList.remove(this.darkenerClassToggle);
+	                        if (callback) {
+	                            callback();
+	                        }
+	                    }).bind(this));
+	                }).bind(this), _utilSettings2['default'].get().darkenerFadeDelay);
+	            }).bind(this));
+	        }
+	
+	        /**
+	         * @private
+	         */
+	    }, {
+	        key: '_removeInstant',
+	        value: function _removeInstant() {
+	            this.navigationContainer.classList.remove(OPEN_CLASS);
+	            global.document.body.classList.remove(this.darkenerClassToggleInstant);
+	            this.darkener.classList.remove(INIT_CLASS);
+	        }
+	
+	        /**
+	         * Toggles a an off-canvas element
+	         * @param e
+	         * @private
+	         */
+	    }, {
+	        key: '_toggle',
+	        value: function _toggle(e) {
+	            e.preventDefault();
+	            var bodyClass = global.document.body.classList,
+	                darkenerClass = this.darkener.classList,
+	                DARKENER_CLASS_TOGGLE = this.darkenerClassToggle,
+	                DARKENER_CLASS_INSTANT_TOGGLE = this.darkenerClassToggleInstant,
+	                navigationControllerClassList = this.navigationContainer.classList;
+	            if (this.navigationContainer.classList.contains(OPEN_CLASS)) {
+	                this._remove();
+	                this._removeInstant(navigationControllerClassList);
+	            } else if (!OffCanvas.currentOpen) {
+	                OffCanvas.currentOpen = this;
+	                bodyClass.add(DARKENER_CLASS_INSTANT_TOGGLE);
+	                bodyClass.add(TOGGLE_CLASS);
+	                bodyClass.add(DARKENER_CLASS_TOGGLE);
+	                darkenerClass.add(INIT_CLASS);
+	                navigationControllerClassList.add(OPEN_CLASS);
+	            }
+	        }
+	
+	        /**
+	         * Register events
+	         * @param [delegate]
+	         */
+	    }, {
+	        key: 'registerEvents',
+	        value: function registerEvents(delegate) {
+	            delegate = delegate || global.document;
+	            delegate.addEventListener(_utilSettings2['default'].getTabEvent(), (function (e) {
+	                if (OffCanvas.currentOpen && OffCanvas.currentOpen !== this) {
+	                    return;
+	                }
+	                var id = this.navigationContainerId,
+	                    validTarget = e.target.getAttribute(ATTR_TARGET) === id;
+	                if (!_utilUtil2['default'].isPartOfNode(e.target, this.navigationContainer)) {
+	                    if (validTarget || OffCanvas.currentOpen === this && e.target === this.darkener) {
+	                        this._toggle(e);
+	                    }
+	                } else {
+	                    if (e.target.hasAttribute(ATTR_CLOSE_SIDEBAR)) {
+	                        this._toggle(e);
+	                    }
+	                }
+	            }).bind(this));
+	        }
+	    }]);
+	
+	    return OffCanvas;
+	})();
+	
+	exports['default'] = OffCanvas;
+	
+	OffCanvas.currentOpen = null;
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 124 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	/*!
+	 * FlexCss.Dropdown
+	 * Licensed under the MIT License (MIT)
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 */
+	
+	'use strict';
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _Promise = __webpack_require__(91)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(2)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _utilUtil = __webpack_require__(114);
+	
+	var _utilUtil2 = _interopRequireDefault(_utilUtil);
+	
+	var _utilSettings = __webpack_require__(117);
+	
+	var _utilSettings2 = _interopRequireDefault(_utilSettings);
+	
+	var _utilEvent = __webpack_require__(116);
+	
+	var _utilEvent2 = _interopRequireDefault(_utilEvent);
+	
+	var _Widget = __webpack_require__(121);
+	
+	var _Widget2 = _interopRequireDefault(_Widget);
+	
+	/**
+	 * @type {string}
+	 */
+	var ATTR_CC = 'data-collision-container';
+	/**
+	 * @type {string}
+	 */
+	var ATTR_DARKENER = 'data-darkener-container';
+	/**
+	 * @type {string}
+	 */
+	var DARKENER_INIT = 'init';
+	/**
+	 * @type {string}
+	 */
+	var ATTR_DATA_TARGET = 'data-target';
+	/**
+	 * @type {string}
+	 */
+	var ATTR_CLOSE_DROPDOWN = 'data-close-dropdown';
+	/**
+	 * @type {string}
+	 */
+	var ATTR_NAME = 'data-dropdown';
+	/**
+	 * @type {string}
+	 */
+	var STATE_LOADING = 'loading';
+	
+	var CLS_DARKENER_DROPDOWN = 'darkener-dropdown';
+	/**
+	 * @type {string}
+	 */
+	var CLS_OPEN = 'open';
+	
+	/**
+	 * @type {string}
+	 */
+	var CLS_DROPDOWN = 'dropdown';
+	
+	/**
+	 * @type {string}
+	 */
+	var EVENT_DROPDOWN_CLOSED = 'flexcss.dropdown.closed';
+	
+	exports.EVENT_DROPDOWN_CLOSED = EVENT_DROPDOWN_CLOSED;
+	/**
+	 * A Dropdown
+	 */
+	
+	var Dropdown = (function () {
+	    function Dropdown(DelegateContainer, Darkener) {
+	        _classCallCheck(this, Dropdown);
+	
+	        var doc = global.document;
+	
+	        /**
+	         * Container Element
+	         * @type {HTMLElement}
+	         */
+	        this.container = DelegateContainer instanceof HTMLElement ? DelegateContainer : doc.getElementById(DelegateContainer);
+	
+	        this.currentOpen = null;
+	        this.currentTarget = null;
+	        /**
+	         * @type {HTMLElement}
+	         */
+	        this.darkener = Darkener instanceof HTMLElement ? Darkener : document.getElementById(Darkener);
+	
+	        this.destroyOnClose = false;
+	
+	        if (!this.darkener || !this.container) {
+	            throw 'required elements not found (darkener and container element)';
+	        }
+	    }
+	
+	    /**
+	     * Method that handles delegation events for dropdowns
+	     * @param e
+	     * @returns {boolean}
+	     * @private
+	     */
+	
+	    _createClass(Dropdown, [{
+	        key: '_delegateFunction',
+	        value: function _delegateFunction(e) {
+	            var currentOpen = this.currentOpen,
+	                targetHas = e.target.hasAttribute(ATTR_NAME),
+	                parentHas = e.target.parentNode ? e.target.parentNode.hasAttribute(ATTR_NAME) : false,
+	                target = targetHas ? e.target : e.target.parentNode,
+	                targetIsCurrent = target === this.currentTarget;
+	
+	            if (currentOpen && !_utilUtil2['default'].isPartOfNode(e.target, currentOpen) || targetIsCurrent) {
+	                this.close();
+	                if (targetIsCurrent) {
+	                    e.preventDefault();
+	                }
+	                return targetIsCurrent ? false : this._delegateFunction(e);
+	            }
+	
+	            if (targetHas || parentHas && !currentOpen) {
+	                e.preventDefault();
+	                e.stopImmediatePropagation();
+	
+	                if (target.isLoading) {
+	                    return false;
+	                }
+	                this.createDropdown(target);
+	            } else {
+	                if (currentOpen) {
+	                    if (e.target.hasAttribute(ATTR_CLOSE_DROPDOWN)) {
+	                        e.preventDefault();
+	                        this.close();
+	                    }
+	                    if (!_utilUtil2['default'].isPartOfNode(e.target, currentOpen)) {
+	                        this.close();
+	                    }
+	                }
+	            }
+	        }
+	
+	        /**
+	         * Register Events for this dropdown container
+	         * @returns {Dropdown}
+	         */
+	    }, {
+	        key: 'registerEvents',
+	        value: function registerEvents() {
+	            this.container.addEventListener(_utilSettings2['default'].getTabEvent(), this._delegateFunction.bind(this), true);
+	            return this;
+	        }
+	
+	        /**
+	         * Destroys this instance, unbinds events
+	         * @returns {Dropdown}
+	         */
+	    }, {
+	        key: 'destroy',
+	        value: function destroy() {
+	            this.container.removeEventListener(_utilSettings2['default'].getTabEvent(), this._delegateFunction.bind(this), true);
+	            return this;
+	        }
+	
+	        /**
+	         * Destroys instance on close of dropdown
+	         * @param v
+	         * @returns {Dropdown}
+	         */
+	    }, {
+	        key: 'setDestroyOnClose',
+	        value: function setDestroyOnClose(v) {
+	            this.destroyOnClose = v;
+	            return this;
+	        }
+	
+	        /**
+	         * Will add the right class to container for specific darkener id
+	         * @param instance
+	         * @param show
+	         */
+	    }, {
+	        key: 'toggleDarkenerToggler',
+	        value: function toggleDarkenerToggler(instance, show) {
+	            var cls = 'toggle-' + (instance.id || CLS_DARKENER_DROPDOWN),
+	                classList = this.container.classList;
+	            if (show) {
+	                classList.add(cls);
+	            } else {
+	                classList.remove(cls);
+	            }
+	        }
+	
+	        /**
+	         * Closes Dropdown on current instance
+	         * @return {Boolean|Promise}
+	         */
+	    }, {
+	        key: 'close',
+	        value: function close() {
+	            var _this = this;
+	
+	            var currentOpen = this.currentOpen;
+	            if (!currentOpen) {
+	                return false;
+	            }
+	            var future,
+	                darkenerInstance = currentOpen.flexDarkenerInstance || this.darkener,
+	                thisCurrentOpen = currentOpen;
+	
+	            future = new _Promise(function (resolve) {
+	                if (window.getComputedStyle(currentOpen).position === 'fixed') {
+	                    _utilUtil2['default'].addEventOnce(_utilSettings2['default'].getTransitionEvent(), currentOpen, (function () {
+	                        setTimeout((function () {
+	                            _utilEvent2['default'].dispatchAndFire(thisCurrentOpen, EVENT_DROPDOWN_CLOSED);
+	                            // if a new dropdown has been opened in the meantime, do not remove darkener
+	                            if (this.currentOpen !== null) {
+	                                return false;
+	                            }
+	                            this.toggleDarkenerToggler(darkenerInstance, false);
+	                            this.container.classList.remove(_utilSettings2['default'].get().canvasToggledClass);
+	                            resolve(true);
+	                        }).bind(this), _utilSettings2['default'].get().darkenerFadeDelay);
+	                    }).bind(_this));
+	                } else {
+	                    resolve(true);
+	                    _utilEvent2['default'].dispatchAndFire(thisCurrentOpen, EVENT_DROPDOWN_CLOSED);
+	                }
+	            });
+	
+	            currentOpen.classList.remove(CLS_OPEN);
+	
+	            if (currentOpen.flexDarkenerInstance) {
+	                currentOpen.flexDarkenerInstance.classList.remove(DARKENER_INIT);
+	            } else {
+	                this.darkener.classList.remove(DARKENER_INIT);
+	            }
+	
+	            this.currentOpen = null;
+	            this.currentTarget = null;
+	
+	            if (this.destroyOnClose) {
+	                this.destroy();
+	            }
+	
+	            return future;
+	        }
+	
+	        /**
+	         * Creates a dropdown on given target and opens it
+	         * @param {HTMLElement} target target where this dropdown is placed
+	         * @param {FlexCss.Widget} [thisWidget] if given will use widget instead of widget instance
+	         * @return {FlexCss.Dropdown}
+	         */
+	    }, {
+	        key: 'createDropdown',
+	        value: function createDropdown(target, thisWidget) {
+	            var doc = global.document;
+	
+	            if (!target) {
+	                throw 'Dropdown target not found';
+	            }
+	
+	            var widget = thisWidget || _Widget2['default'].findWidget(target),
+	                future,
+	                data = target.getAttribute(ATTR_NAME),
+	                dropdownContainerElement = doc.getElementById(data),
+	                async = !dropdownContainerElement && _Widget2['default'].isWidget(widget) ? widget.getAsync() : false;
+	
+	            if (async) {
+	                target.classList.add(STATE_LOADING);
+	                target.isLoading = true;
+	                future = async.then(function (r) {
+	                    if (r instanceof HTMLElement) {
+	                        if (r.id) {
+	                            target.setAttribute(ATTR_NAME, r.id);
+	                        }
+	                        return r;
+	                    } else {
+	                        // Create container Element:
+	                        var element = doc.createElement('div');
+	                        element.className = CLS_DROPDOWN;
+	                        element.innerHTML = r;
+	                        element.id = _utilUtil2['default'].guid();
+	                        // Cache target for later use:
+	                        target.setAttribute(ATTR_NAME, element.id);
+	                        this.container.appendChild(element);
+	                        return element;
+	                    }
+	                }).then(function (r) {
+	                    target.isLoading = false;
+	                    target.classList.remove(STATE_LOADING);
+	                    return r;
+	                });
+	            } else {
+	                if (!dropdownContainerElement) {
+	                    throw 'Could not found Dropdown container with ID "' + data + '"';
+	                }
+	                future = new _Promise(function (r) {
+	                    r(dropdownContainerElement);
+	                });
+	            }
+	
+	            future.then((function (dropdownContent) {
+	                if (this.currentOpen) {
+	                    this.close();
+	                }
+	                // Skip one frame to show animation
+	                target.dropdownContent = dropdownContent;
+	                var isAbsolute = global.getComputedStyle(dropdownContent).position === 'absolute';
+	
+	                if (!target.flexCollisionContainer) {
+	                    var collisionC = target.getAttribute(ATTR_CC);
+	                    target.flexCollisionContainer = collisionC ? doc.getElementById(collisionC) || document.documentElement : document.documentElement;
+	                }
+	
+	                dropdownContent.classList.toggle(CLS_OPEN);
+	                if (dropdownContent.classList.contains(CLS_OPEN)) {
+	                    this.currentOpen = dropdownContent;
+	                    this.currentTarget = target;
+	                }
+	                if (isAbsolute) {
+	                    // Check collision:
+	                    var selfTarget = target.getAttribute(ATTR_DATA_TARGET);
+	                    selfTarget = selfTarget ? doc.getElementById(selfTarget) : target;
+	                    _utilUtil2['default'].setupPositionNearby(selfTarget, dropdownContent, target.flexCollisionContainer);
+	                } else {
+	                    this.container.classList.add(_utilSettings2['default'].get().canvasToggledClass);
+	                    // optionally get custom darkener container for target
+	                    var d = target.getAttribute(ATTR_DARKENER);
+	                    if (d) {
+	                        dropdownContent.flexDarkenerInstance = doc.getElementById(d);
+	                        (dropdownContent.flexDarkenerInstance || this.darkener).classList.toggle(DARKENER_INIT);
+	                    } else {
+	                        this.darkener.classList.toggle(DARKENER_INIT);
+	                    }
+	
+	                    this.toggleDarkenerToggler(dropdownContent.flexDarkenerInstance || this.darkener, true);
+	
+	                    dropdownContent.style.left = '0';
+	                    dropdownContent.style.top = 'auto';
+	                }
+	            }).bind(this));
+	        }
+	    }]);
+	
+	    return Dropdown;
+	})();
+	
+	exports['default'] = Dropdown;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 125 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	/*!
+	 * FlexCss.LightBox
+	 * Licensed under the MIT License (MIT)
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 */
+	
+	'use strict';
+	
+	/* global Image, TouchEvent*/
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _Object$assign = __webpack_require__(66)['default'];
+	
+	var _Promise = __webpack_require__(91)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(2)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _Modal = __webpack_require__(120);
+	
+	var _Modal2 = _interopRequireDefault(_Modal);
+	
+	var _utilSettings = __webpack_require__(117);
+	
+	var _utilSettings2 = _interopRequireDefault(_utilSettings);
+	
+	var _Widget = __webpack_require__(121);
+	
+	var _Widget2 = _interopRequireDefault(_Widget);
+	
+	var ATTR_MAX_WIDTH = 'data-original-width';
+	var ATTR_MAX_HEIGHT = 'data-original-height';
+	var ATTR_SRC = 'data-src';
+	
+	var CLS_HAS_PREV = 'has-prev';
+	var CLS_HAS_NEXT = 'has-next';
+	var CLS_LOADING = 'loading';
+	
+	var ATTR_NO_THUMBNAIL = 'data-no-thumbnail';
+	var ATTR_DATA_HREF = 'data-href';
+	var ATTR_HREF = 'href';
+	
+	var KEY_NEXT = 39;
+	var KEY_PREV = 37;
+	var ATTR_CLOSE = 'data-close-modal';
+	/**
+	 * A Simple LightBox
+	 */
+	
+	var LightBox = (function () {
+	
+	    /**
+	     * Creates a new Lightbox
+	     * @param DelegateContainer
+	     * @param AttributeSelector
+	     * @param ModalAppend
+	     * @param [options]
+	     */
+	
+	    function LightBox(DelegateContainer, AttributeSelector, ModalAppend, options) {
+	        _classCallCheck(this, LightBox);
+	
+	        var thisDelegateContainer = DelegateContainer instanceof HTMLElement ? DelegateContainer : document.getElementById(DelegateContainer);
+	
+	        this._modalAppend = ModalAppend || DelegateContainer;
+	        /**
+	         * @type {Function}
+	         */
+	        this._resizeEvent = null;
+	        /**
+	         * @type {Function}
+	         */
+	        this._keyboardNextEvent = null;
+	        /**
+	         * @type {Promise}
+	         */
+	        this._future = null;
+	        /**
+	         * @type {Promise}
+	         */
+	        this._nextFuture = this._future;
+	        /**
+	         * @type {HTMLElement}
+	         */
+	        this._imageContainer = null;
+	        /**
+	         * @type {HTMLElement}
+	         */
+	        this._modalContainerDiv = null;
+	        /**
+	         * @type {HTMLElement}
+	         */
+	        this._contentContainer = null;
+	        /**
+	         * @type {HTMLElement}
+	         */
+	        this._closerContainerDiv = null;
+	        /**
+	         * @type {HTMLElement}
+	         */
+	        this._delegateContainer = thisDelegateContainer;
+	        /**
+	         * @type {HTMLElement}
+	         */
+	        this._attributeSelector = AttributeSelector;
+	        /**
+	         * @type {Widget}
+	         */
+	        this._widget = null;
+	        /**
+	         * @type {boolean}
+	         */
+	        this._isOpen = false;
+	        /**
+	         * @type {HTMLElement}
+	         */
+	        this.target = null;
+	        /**
+	         * @type {HTMLElement}
+	         */
+	        this.img = null;
+	        /**
+	         * @type {boolean}
+	         */
+	        this._isLoading = false;
+	
+	        /**
+	         * Default options
+	         */
+	        this.options = {
+	            // set if prev and next should be available
+	            registerPrevNextEvents: true,
+	            // set if modal should be closed after last image
+	            closeOnLast: true,
+	            // called when next image is requested (either by keyboard or click), return false to abort
+	            onNext: function onNext() {
+	                return true;
+	            },
+	            onClose: function onClose() {},
+	            getNext: null,
+	            getPrev: null,
+	            // called when underlying target changed
+	            onSwitchImage: function onSwitchImage() {}
+	        };
+	
+	        _Object$assign(this.options, options);
+	    }
+	
+	    /**
+	     * @param {HTMLElement} node
+	     * @returns {HTMLElement|null}
+	     */
+	
+	    _createClass(LightBox, [{
+	        key: 'findImmediateNextTarget',
+	        value: function findImmediateNextTarget(node) {
+	            if (node && node.children[0].hasAttribute(this._attributeSelector)) {
+	                return node.children[0];
+	            }
+	            return null;
+	        }
+	
+	        /**
+	         * Will fetch the next element of a lightBox
+	         * @param {HTMLElement} target
+	         * @returns {null|HTMLElement}
+	         */
+	    }, {
+	        key: 'getNext',
+	        value: function getNext(target) {
+	            if (this.options.getNext) {
+	                return this.options.getNext.apply(this, [target]);
+	            }
+	            return this.findImmediateNextTarget(target.parentNode.nextElementSibling);
+	        }
+	
+	        /**
+	         * Will fetch the previous element of a lightBox
+	         * @param {HTMLElement} target
+	         * @returns {null|HTMLElement}
+	         */
+	    }, {
+	        key: 'getPrev',
+	        value: function getPrev(target) {
+	            if (this.options.getPrev) {
+	                return this.options.getPrev.apply(this, [target]);
+	            }
+	            return this.findImmediateNextTarget(target.parentNode.previousElementSibling);
+	        }
+	
+	        /**
+	         * Registers events for delegate container
+	         */
+	    }, {
+	        key: 'registerEvents',
+	        value: function registerEvents(onOpen) {
+	            var _this = this;
+	
+	            this._delegateContainer.addEventListener(_utilSettings2['default'].getTabEvent(), function (e) {
+	                var target = e.target,
+	                    parent = target.parentNode,
+	                    validTarget = target.hasAttribute(_this._attributeSelector),
+	                    parentIsValid = parent && parent.hasAttribute(_this._attributeSelector);
+	                if (!validTarget && parentIsValid) {
+	                    validTarget = true;
+	                    target = parent;
+	                }
+	                if (validTarget) {
+	                    e.preventDefault();
+	                    _this.open(target).then(function (r) {
+	                        if (onOpen) {
+	                            onOpen.apply(_this, [r, target]);
+	                        }
+	                    });
+	                }
+	            });
+	        }
+	
+	        /**
+	         * @returns {HTMLElement}
+	         */
+	    }, {
+	        key: 'getContentContainer',
+	        value: function getContentContainer() {
+	            return this._contentContainer;
+	        }
+	
+	        /**
+	         * Setup max-width and max-height
+	         * @param {HTMLElement} target
+	         * @param {HTMLElement} img
+	         * @param {HTMLElement} loadedImage
+	         * @private
+	         */
+	    }, {
+	        key: 'switchImageByDirection',
+	
+	        /**
+	         * Switches to the next image
+	         * @param {boolean} direction
+	         */
+	        value: function switchImageByDirection(direction) {
+	            var next = direction ? this.getPrev(this.target) : this.getNext(this.target);
+	            if (this.options.onNext.apply(this, [next])) {
+	                return this.switchImage(next);
+	            }
+	            return new _Promise(function (_, reject) {
+	                return reject(next);
+	            });
+	        }
+	
+	        /**
+	         * Checks if lightbox is currently loading
+	         * @returns {boolean}
+	         */
+	    }, {
+	        key: 'isLoading',
+	        value: function isLoading() {
+	            return this._isLoading;
+	        }
+	
+	        /**
+	         * Checks if modal should be closed
+	         * @private
+	         */
+	    }, {
+	        key: '_runOptionalClose',
+	        value: function _runOptionalClose() {
+	            if (this.options.closeOnLast) {
+	                this.modal.close();
+	            }
+	        }
+	    }, {
+	        key: '_setupPrevNextStates',
+	        value: function _setupPrevNextStates() {
+	            var target = this.target,
+	                hasPrev = this.getPrev(target),
+	                hasNext = this.getNext(target),
+	                hasPrevClass = CLS_HAS_PREV,
+	                hasNextClass = CLS_HAS_NEXT;
+	            // because IE does not support the second toggle parameter, we need to do this manually
+	            if (hasPrev) {
+	                this._imageContainer.classList.add(hasPrevClass);
+	            } else {
+	                this._imageContainer.classList.remove(hasPrevClass);
+	            }
+	            if (hasNext) {
+	                this._imageContainer.classList.add(hasNextClass);
+	            } else {
+	                this._imageContainer.classList.remove(hasNextClass);
+	            }
+	        }
+	
+	        /**
+	         * @param img
+	         * @private
+	         */
+	    }, {
+	        key: '_calculateContainer',
+	        value: function _calculateContainer(img) {
+	            if (_utilSettings2['default'].isIE()) {
+	                setTimeout((function () {
+	                    this._imageContainer.style.height = img.offsetHeight + 'px';
+	                }).bind(this), 0);
+	            }
+	        }
+	
+	        /**
+	         * Switch to a specific image
+	         * @param next
+	         * @returns {*}
+	         */
+	    }, {
+	        key: 'switchImage',
+	        value: function switchImage(next) {
+	            var _this2 = this;
+	
+	            var self = this,
+	                img = this.img;
+	            this._isLoading = true;
+	            self._nextFuture = new _Promise((function (resolve, reject) {
+	                // notify observers about image switching
+	                self.options.onSwitchImage.apply(self, [self._nextFuture]);
+	                if (next) {
+	                    var nextThumb = next.hasAttribute(ATTR_NO_THUMBNAIL) ? next : next.children[0] || next,
+	                        nextHighRes = next.getAttribute(ATTR_DATA_HREF) || next.getAttribute(ATTR_HREF),
+	                        nextSource = nextThumb.getAttribute(ATTR_SRC) || nextThumb.src || nextHighRes,
+	                        nextImgObject = new Image();
+	
+	                    if (!nextSource) {
+	                        reject(next);
+	                        return;
+	                    }
+	                    // set new target to next element
+	                    _this2.target = next;
+	                    nextImgObject.src = nextSource;
+	                    self._imageContainer.classList.add(CLS_LOADING);
+	                    nextImgObject.addEventListener('load', (function () {
+	                        img.src = nextSource;
+	                        self._imageContainer.style.backgroundImage = 'url(' + nextSource + ')';
+	                        LightBox._setupMaxWidthHeight(next, img, nextImgObject);
+	                        self._calculateContainer(img);
+	                        self.highRes(nextThumb, nextHighRes);
+	                        self._setupPrevNextStates();
+	                        self._imageContainer.classList.remove(CLS_LOADING);
+	                        this._isLoading = false;
+	                        resolve(nextSource, this.target);
+	                    }).bind(_this2));
+	                } else {
+	                    reject(_this2);
+	                }
+	            }).bind(this));
+	            return self._nextFuture;
+	        }
+	
+	        /**
+	         * Setup High-Resolution picture
+	         * @param {HTMLElement} thisThumbnail
+	         * @param {String} thisImgHighResolution
+	         */
+	    }, {
+	        key: 'highRes',
+	        value: function highRes(thisThumbnail, thisImgHighResolution) {
+	
+	            if (thisImgHighResolution && thisThumbnail.src !== thisImgHighResolution) {
+	                var highImageObj = new Image();
+	                highImageObj.src = thisImgHighResolution;
+	                highImageObj.addEventListener('load', (function () {
+	                    // if current image is still available
+	                    if (this._getSrc(thisThumbnail) === this.img.src) {
+	                        this.img.src = thisImgHighResolution;
+	                        this._imageContainer.style.backgroundImage = 'url(' + thisImgHighResolution + ')';
+	                    }
+	                }).bind(this));
+	            }
+	        }
+	
+	        /**
+	         * Extracts the source of an image
+	         * @param target
+	         * @returns {String|null}
+	         * @private
+	         */
+	    }, {
+	        key: '_getSrc',
+	        value: function _getSrc(target) {
+	            return target.getAttribute(ATTR_SRC) || target.src;
+	        }
+	
+	        /**
+	         * Will show a lightBox on given target
+	         * @param {HTMLElement} target
+	         * @returns {$.Deferred|*}
+	         */
+	    }, {
+	        key: 'open',
+	        value: function open(target) {
+	            var self = this;
+	
+	            if (!target) {
+	                return false;
+	            }
+	
+	            this.target = target;
+	
+	            // if lightBox is open, we just switch to the new target image
+	            if (this._isOpen && target) {
+	                return this.switchImage(target).then((function () {
+	                    return this;
+	                }).bind(this));
+	            }
+	
+	            this._isOpen = true;
+	
+	            /**
+	             * Setup Widget for modal
+	             * @type {Widget}
+	             */
+	            this._widget = new _Widget2['default']().setAsync((function () {
+	                var _this3 = this;
+	
+	                // thumbnail is either target itself or expected to be first childNode
+	                var thumbnail = target.hasAttribute(ATTR_NO_THUMBNAIL) ? target : target.children[0] || target;
+	
+	                var imgHighResolution = target.getAttribute(ATTR_DATA_HREF) || target.getAttribute(ATTR_HREF),
+	                    imgSrc = this._getSrc(thumbnail) || imgHighResolution;
+	
+	                var imageObj = new Image();
+	                imageObj.src = imgSrc;
+	                this._imageContainer = document.createElement('div');
+	                this._modalContainerDiv = document.createElement('div');
+	                this._closerContainerDiv = document.createElement('i');
+	                this._contentContainer = document.createElement('div');
+	
+	                this._closerContainerDiv.className = 'modal-close modal-close-lightbox icon-cancel-1';
+	                this._closerContainerDiv.setAttribute(ATTR_CLOSE, ATTR_CLOSE);
+	
+	                this._modalContainerDiv.className = 'modal image-modal';
+	                this._modalContainerDiv.appendChild(this._imageContainer);
+	                this._modalContainerDiv.appendChild(this._contentContainer);
+	                this._modalContainerDiv.appendChild(this._closerContainerDiv);
+	                this._contentContainer.className = 'content-container';
+	                this._isLoading = true;
+	                this._future = new _Promise((function (resolve) {
+	                    imageObj.addEventListener('load', (function () {
+	                        this._imageContainer.className = 'image-container';
+	                        var img = document.createElement('img');
+	                        // current image
+	                        this.img = img;
+	
+	                        img.src = imgSrc;
+	                        LightBox._setupMaxWidthHeight(target, img, imageObj);
+	                        this._imageContainer.appendChild(img);
+	                        this._imageContainer.style.backgroundImage = 'url(' + imgSrc + ')';
+	
+	                        resolve(self._modalContainerDiv);
+	                        this._isLoading = false;
+	
+	                        if (_utilSettings2['default'].isIE()) {
+	                            self._resizeEvent = global.addEventListener('resize', function () {
+	                                setTimeout(function () {
+	                                    self._imageContainer.style.height = img.offsetHeight + 'px';
+	                                }, 0);
+	                            });
+	                        }
+	
+	                        if (self.options.registerPrevNextEvents) {
+	                            self._setupPrevNextStates();
+	                            // prev or next on touch/click
+	                            self._imageContainer.addEventListener(_utilSettings2['default'].getTabEvent(), function (e) {
+	                                if (self.isLoading()) {
+	                                    return;
+	                                }
+	                                e.preventDefault();
+	
+	                                var ev = e;
+	                                var pageX = global.TouchEvent && ev instanceof TouchEvent ? ev.changedTouches[0].pageX : ev.pageX;
+	                                var rect = self._imageContainer.getBoundingClientRect(),
+	                                    imgX = rect.left,
+	                                    wrapperWidth = rect.width,
+	                                    posX = pageX - imgX;
+	
+	                                self.switchImageByDirection(wrapperWidth / 2 > posX)['catch'](function () {
+	                                    self._runOptionalClose();
+	                                });
+	                            });
+	
+	                            // register keyboard events
+	                            self._keyboardNextEvent = function (e) {
+	                                if (e.keyCode === KEY_NEXT || e.keyCode === KEY_PREV) {
+	                                    if (self.isLoading()) {
+	                                        return;
+	                                    }
+	                                    self.switchImageByDirection(e.keyCode === KEY_PREV)['catch'](function () {
+	                                        self._runOptionalClose();
+	                                    });
+	                                }
+	                            };
+	                            global.addEventListener('keydown', self._keyboardNextEvent);
+	                        } else {
+	                            self._imageContainer.addEventListener(_utilSettings2['default'].getTabEvent(), function () {
+	                                self._runOptionalClose();
+	                            });
+	                        }
+	
+	                        self.highRes(thumbnail, imgHighResolution);
+	                    }).bind(_this3));
+	                }).bind(this));
+	                this._future.then((function () {
+	                    self._calculateContainer(this.img);
+	                }).bind(this));
+	                self._modalContainerDiv.addEventListener(_Modal.EVENT_MODAL_CLOSED, (function () {
+	                    // cleanup:
+	                    this._modalContainerDiv.parentNode.removeChild(this._modalContainerDiv);
+	                    this.options.onClose.apply(self);
+	                    this._isOpen = false;
+	                    this.modal.destroy();
+	                    // unbind events
+	                    if (this._keyboardNextEvent) {
+	                        global.removeEventListener('keydown', self._keyboardNextEvent);
+	                    }
+	                    if (this._resizeEvent) {
+	                        global.removeEventListener('resize', self._resizeEvent);
+	                    }
+	                }).bind(this));
+	
+	                return this._future;
+	            }).bind(this));
+	
+	            this._nextFuture = this._future;
+	
+	            if (self._widget) {
+	                this.modal = new _Modal2['default'](this._modalAppend);
+	                // make sure we close stack before
+	                return this.modal.close().fromWidget(self._widget).then(function () {
+	                    return self._future.then(function () {
+	                        return self;
+	                    });
+	                });
+	            } else {
+	                return false;
+	            }
+	        }
+	    }], [{
+	        key: '_setupMaxWidthHeight',
+	        value: function _setupMaxWidthHeight(target, img, loadedImage) {
+	            var nextMaxWidth = target.getAttribute(ATTR_MAX_WIDTH),
+	                nextMaxHeight = target.getAttribute(ATTR_MAX_HEIGHT);
+	            if (nextMaxWidth && nextMaxHeight) {
+	                img.style.maxWidth = nextMaxWidth + "px";
+	                img.style.maxHeight = nextMaxHeight + "px";
+	            } else {
+	                img.style.maxWidth = loadedImage.width + "px";
+	                img.style.maxHeight = loadedImage.height + "px";
+	            }
+	        }
+	    }]);
+	
+	    return LightBox;
+	})();
+	
+	exports['default'] = LightBox;
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 126 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	/*
+	 * The MIT License (MIT)
+	 *
+	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 */
+	
+	var _get = __webpack_require__(4)['default'];
+	
+	var _inherits = __webpack_require__(18)['default'];
+	
+	var _createClass = __webpack_require__(29)['default'];
+	
+	var _classCallCheck = __webpack_require__(32)['default'];
+	
+	var _interopRequireDefault = __webpack_require__(2)['default'];
+	
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+	
+	var _DestroyableWidget2 = __webpack_require__(115);
+	
+	var _DestroyableWidget3 = _interopRequireDefault(_DestroyableWidget2);
+	
+	var Showcase = (function (_DestroyableWidget) {
+	    _inherits(Showcase, _DestroyableWidget);
+	
+	    function Showcase(container) {
+	        _classCallCheck(this, Showcase);
+	
+	        _get(Object.getPrototypeOf(Showcase.prototype), 'constructor', this).call(this);
+	
+	        this.container = container;
+	
+	        this.registerEvents();
+	    }
+	
+	    _createClass(Showcase, [{
+	        key: 'registerEvents',
+	        value: function registerEvents() {
+	            var _this = this;
+	
+	            var innerContainer = this.container.children[0],
+	                containerWidth = innerContainer.getBoundingClientRect().width,
+	                parentContainerWidth = this.container.getBoundingClientRect().width;
+	            var diff = containerWidth - parentContainerWidth;
+	
+	            var lastX = 0,
+	                lastMove = undefined;
+	
+	            this.container.addEventListener('mouseenter', function (e) {
+	                var rect = _this.container.getBoundingClientRect();
+	
+	                lastX = e.clientX;
+	            });
+	
+	            this.container.addEventListener('mousemove', function (e) {
+	                var rect = _this.container.getBoundingClientRect();
+	                var nextX = e.clientX;
+	                var normalizedRight = Math.abs(nextX - rect.left) / (rect.width / 2);
+	                requestAnimationFrame(function () {
+	                    var moveX = (1 - normalizedRight) * diff;
+	                    innerContainer.style.webkitTransform = 'translate3d(' + moveX + 'px,0,0)';
+	                    innerContainer.style.transform = 'translate3d(' + moveX + 'px,0,0)';
+	                    lastMove = moveX;
+	                });
+	            });
+	        }
+	    }], [{
+	        key: 'init',
+	        value: function init(selector) {
+	            var elements = document.querySelectorAll(selector);
+	            return Array.prototype.slice.call(elements).map(function (el) {
+	                return new Showcase(el);
+	            });
+	        }
+	    }]);
+	
+	    return Showcase;
+	})(_DestroyableWidget3['default']);
+	
+	exports['default'] = Showcase;
 	module.exports = exports['default'];
 
 /***/ }

@@ -95,7 +95,7 @@ export default class RenderingEvents extends EventEmitter {
 
                 function checkMarklibInstance(e) {
                     const instance = Rendering.getMarklibInstance(e);
-                    // instanceof check will fail if used in test scenario where different DOMS are used
+                    // instanceof check will fail if used in test scenario where different DOMs are used
                     // see also http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
                     return instance && (instance instanceof Rendering || 'wrapperNodes' in instance);
                 }

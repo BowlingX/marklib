@@ -110,6 +110,11 @@ class Rendering extends RenderingEvents {
      */
     setId(id) {
         this.id = id;
+
+        if(this._renderResult) {
+            this.wrapperNodes.forEach((node) => node.setAttribute(ATTR_DATA_ID, this.id));
+        }
+
         return this;
     }
 
@@ -128,9 +133,9 @@ class Rendering extends RenderingEvents {
             // keep track of highlight nodes
             this.wrapperNodes.push(el);
             el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
+            el.setAttribute(ATTR_DATA_ID, this.getId());
         }
         el.setAttribute(DATA_IS_SELECTION, vTrue);
-        el.setAttribute(ATTR_DATA_ID, this.getId());
 
         return el;
     }
@@ -245,9 +250,10 @@ class Rendering extends RenderingEvents {
 
         // Capsule some logic
         const wrap = ((n) => {
+            const instance = Rendering.getMarklibInstance(n.parentNode);
             if (n.parentNode.hasAttribute(ATTR_DATA_START_END) &&
                 n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) &&
-                n.parentNode.getAttribute(ATTR_DATA_ID) === this.getId()) {
+                instance === this) {
                 this._createWrap(n, undefined, undefined, undefined, true);
             } else {
                 this._createWrap(n);
@@ -584,7 +590,7 @@ class Rendering extends RenderingEvents {
     }
 
     /**
-     * Removes bindings to nodes
+     * Removes bindings and classNames to nodes
      */
     destroy() {
         this.wrapperNodes.forEach((node) => {
@@ -609,7 +615,7 @@ class Rendering extends RenderingEvents {
      * @returns {Rendering|null|undefined}
      */
     static getMarklibInstance(el) {
-        return el.marklibInstance;
+        return el? el.marklibInstance : null;
     }
 }
 

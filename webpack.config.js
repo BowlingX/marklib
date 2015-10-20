@@ -36,7 +36,9 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 include: [
-                    path.resolve(__dirname, "src/main")
+                    path.resolve(__dirname, "src/main"),
+                    path.resolve(__dirname, "node_modules/flexcss")
+
                 ],
                 loader: 'babel-loader?optional=runtime'
             },
@@ -67,10 +69,7 @@ module.exports = {
         ]
     },
     resolve: {
-        root: [
-            path.join(__dirname, 'src/main'),
-            path.join(__dirname, 'assets')
-        ]
+        modulesDirectories: ['src/main', 'assets', 'node_modules']
     },
     entry: {
         'site': ['modules/Site'],

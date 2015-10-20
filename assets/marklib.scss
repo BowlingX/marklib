@@ -5,9 +5,11 @@ $buttonAltColor:#9b59b6;
 $buttonWarnColor:#e74c3c;
 $maxWidth:960px;
 $twitterColor:#00aced;
+$includeFontello:false;
 
 @import 'lib/animations';
 @import 'lib/highlighting';
+@import '~flexcss/assets/packages/tooltip';
 
 body {
   font-family: "Roboto", sans-serif;
@@ -114,6 +116,7 @@ p {
 .marking {
   transition:background .5s ease;
   background: $markingColor;
+  cursor:pointer;
 }
 
 .deleted {
@@ -132,7 +135,6 @@ p {
 .marking.marklib--hover .marking,
 .marking.marklib--hover {
   background: lighten($markingColor, 25%) !important;
-  cursor:pointer;
 }
 
 ::selection {
@@ -158,6 +160,10 @@ pre > code {
   margin-bottom:0;
 }
 
+.marking.bubble {
+  animation-name: bubble;
+  animation-duration:.3s;
+}
 
 @media (max-width:480px) {
 

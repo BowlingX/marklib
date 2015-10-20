@@ -7,5 +7,5 @@ import RenderResult from 'RenderResult';
 export default {
     Rendering: Rendering,
     Util: Util,
-    RenderResult
+    RenderResult: RenderResult
 };

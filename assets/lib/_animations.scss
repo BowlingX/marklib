@@ -48,13 +48,37 @@
   }
 }
 
+
+@keyframes bubble {
+
+  0% {
+    transform:translate3d(0, -4px, 0);
+  }
+
+  100% {
+    transform:translate3d(0,0,0);
+  }
+}
+
+
+@-webkit-keyframes bubble {
+
+  0% {
+    -webkit-transform:translate3d(0, -4px, 0);
+  }
+
+  100% {
+    -webkit-transform:translate3d(0,0,0);
+  }
+}
+
+
 .fadeInDown {
   animation-name: fadeInDown;
   animation-duration: .2s;
 }
 
 .fadeInDownSlow {
-
   animation-name: fadeInDownSlow;
   animation-duration: 2s;
 }

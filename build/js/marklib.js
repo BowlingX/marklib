@@ -245,7 +245,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'setId',
 	        value: function setId(id) {
+	            var _this = this;
+	
 	            this.id = id;
+	
+	            if (this._renderResult) {
+	                this.wrapperNodes.forEach(function (node) {
+	                    return node.setAttribute(ATTR_DATA_ID, _this.id);
+	                });
+	            }
+	
 	            return this;
 	        }
 	
@@ -267,9 +276,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // keep track of highlight nodes
 	                this.wrapperNodes.push(el);
 	                el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
+	                el.setAttribute(ATTR_DATA_ID, this.getId());
 	            }
 	            el.setAttribute(_utilUtil.DATA_IS_SELECTION, vTrue);
-	            el.setAttribute(ATTR_DATA_ID, this.getId());
 	
 	            return el;
 	        }
@@ -391,17 +400,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'wrapSiblings',
 	        value: function wrapSiblings(start, endContainer) {
-	            var _this = this;
+	            var _this2 = this;
 	
 	            var next = start,
 	                found = false;
 	
 	            // Capsule some logic
 	            var wrap = (function (n) {
-	                if (n.parentNode.hasAttribute(ATTR_DATA_START_END) && n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) && n.parentNode.getAttribute(ATTR_DATA_ID) === _this.getId()) {
-	                    _this._createWrap(n, undefined, undefined, undefined, true);
+	                var instance = Rendering.getMarklibInstance(n.parentNode);
+	                if (n.parentNode.hasAttribute(ATTR_DATA_START_END) && n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) && instance === _this2) {
+	                    _this2._createWrap(n, undefined, undefined, undefined, true);
 	                } else {
-	                    _this._createWrap(n);
+	                    _this2._createWrap(n);
 	                }
 	            }).bind(this);
 	
@@ -730,7 +740,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        /**
-	         * Removes bindings to nodes
+	         * Removes bindings and classNames to nodes
 	         */
 	    }, {
 	        key: 'destroy',
@@ -766,7 +776,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getMarklibInstance',
 	        value: function getMarklibInstance(el) {
-	            return el.marklibInstance;
+	            return el ? el.marklibInstance : null;
 	        }
 	    }]);
 	
@@ -1957,7 +1967,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                    function checkMarklibInstance(e) {
 	                        var instance = _Rendering2['default'].getMarklibInstance(e);
-	                        // instanceof check will fail if used in test scenario where different DOMS are used
+	                        // instanceof check will fail if used in test scenario where different DOMs are used
 	                        // see also http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
 	                        return instance && (instance instanceof _Rendering2['default'] || 'wrapperNodes' in instance);
 	                    }
