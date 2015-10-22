@@ -428,7 +428,6 @@ class Util {
         });
     }
 
-
     /**
      * @param {Node} container
      * @param {Number} thisIndex

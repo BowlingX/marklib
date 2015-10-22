@@ -53,6 +53,35 @@ export default class RenderingEvents extends EventEmitter {
         this.wrapperNodes = [];
 
         this._registerEvents(document);
+
+        /**
+         * @type {Document}
+         */
+        this.document = document;
+    }
+
+    /**
+     * Constructs a new Range from rendered result
+     * @returns {Range}
+     */
+    get range() {
+        const range = this.document.createRange();
+        const textNodes = [];
+
+        this.wrapperNodes.forEach((wrapper) => {
+            Util.walkTextNodes(wrapper, (node) => {
+                textNodes.push(node);
+            });
+        });
+
+        if(textNodes.length > 0) {
+            const lastTextNode = textNodes[textNodes.length - 1];
+            range.setStart(textNodes[0], 0);
+            range.setEnd(lastTextNode, lastTextNode.length);
+            return range;
+        }
+
+        return null;
     }
 
     /**

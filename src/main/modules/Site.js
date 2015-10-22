@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        tooltip.createTooltip(this.wrapperNodes[0], this.result.text);
+        tooltip.createTooltip(this.wrapperNodes[0], this.result.text, false);
 
         setTimeout(function () {
             if (tooltip.getCurrentTarget()) {

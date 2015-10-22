@@ -61,11 +61,6 @@ class Rendering extends RenderingEvents {
         super(options, document);
 
         /**
-         * @type {Document}
-         */
-        this.document = document;
-
-        /**
          * ID of rendering, will be set on each element that is part of it
          * @type {String}
          */
@@ -524,11 +519,15 @@ class Rendering extends RenderingEvents {
             this._markTextSameNode(startContainer, startOffset, endOffset);
         } else {
             const result = this._markTextDifferentNode(startContainer, endContainer, startOffset, endOffset);
+            const index = this.wrapperNodes.indexOf(result.endT);
+            // remove endContainer, to keep order:
+            this.wrapperNodes.splice(index, 1);
             if (!outer) {
                 this.wrapSiblings(result.startT.nextSibling, endContainer);
             } else {
                 this.walk(result.startT, endContainer, contextContainer);
             }
+            this.wrapperNodes.push(result.endT);
         }
     }
 

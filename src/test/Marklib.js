@@ -42,6 +42,9 @@ describe("Test some wrappings", () => {
             endContainerPath: 'html>body>div>div>p:nth-of-type(4);0'
         };
 
+        expect(marklib.range.startOffset).toEqual(0);
+        expect(marklib.range.endOffset).toEqual(0);
+
         expect(result.serialize()).toEqual(expectedResult);
     });
 
@@ -64,6 +67,8 @@ describe("Test some wrappings", () => {
             startContainerPath: 'html>body>div>div>p:nth-of-type(1);0',
             endContainerPath: 'html>body>div>div>p:nth-of-type(1);0'
         };
+        expect(marklib.range.startOffset).toEqual(0);
+        expect(marklib.range.endOffset).toEqual(0);
 
         expect(result.serialize()).toEqual(rangeResult);
 
