@@ -193,11 +193,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _get(Object.getPrototypeOf(Rendering.prototype), 'constructor', this).call(this, options, document);
 	
 	        /**
-	         * @type {Document}
-	         */
-	        this.document = document;
-	
-	        /**
 	         * ID of rendering, will be set on each element that is part of it
 	         * @type {String}
 	         */
@@ -674,11 +669,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this._markTextSameNode(startContainer, startOffset, endOffset);
 	            } else {
 	                var result = this._markTextDifferentNode(startContainer, endContainer, startOffset, endOffset);
+	                var index = this.wrapperNodes.indexOf(result.endT);
+	                // remove endContainer, to keep order:
+	                this.wrapperNodes.splice(index, 1);
 	                if (!outer) {
 	                    this.wrapSiblings(result.startT.nextSibling, endContainer);
 	                } else {
 	                    this.walk(result.startT, endContainer, contextContainer);
 	                }
+	                this.wrapperNodes.push(result.endT);
 	            }
 	        }
 	
@@ -1830,6 +1829,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/* global Set */
+	
 	'use strict';
 	
 	var _get = __webpack_require__(4)['default'];
@@ -1870,15 +1871,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EVENT_CLICK = 'click';
 	
 	exports.EVENT_CLICK = EVENT_CLICK;
+	/**
+	 * @type {string}
+	 */
 	var EVENT_MOUSEENTER = 'hover-enter';
 	
 	exports.EVENT_MOUSEENTER = EVENT_MOUSEENTER;
+	/**
+	 * @type {string}
+	 */
 	var EVENT_MOUSELEAVE = 'hover-leave';
 	
 	exports.EVENT_MOUSELEAVE = EVENT_MOUSELEAVE;
+	/**
+	 * @type {string}
+	 */
 	var EVENT_PART_TREE_ENTER = 'tree-enter';
 	
 	exports.EVENT_PART_TREE_ENTER = EVENT_PART_TREE_ENTER;
+	/**
+	 * @type {string}
+	 */
 	var EVENT_PART_TREE_LEAVE = 'tree-leave';
 	
 	exports.EVENT_PART_TREE_LEAVE = EVENT_PART_TREE_LEAVE;
@@ -1922,16 +1935,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.wrapperNodes = [];
 	
 	        this._registerEvents(document);
+	
+	        /**
+	         * @type {Document}
+	         */
+	        this.document = document;
 	    }
 	
 	    /**
-	     * Will register events if not already bind.
-	     * @param {Document} document
-	     * @private
+	     * Constructs a new Range from rendered result
+	     * @returns {Range}
 	     */
 	
 	    _createClass(RenderingEvents, [{
 	        key: '_registerEvents',
+	
+	        /**
+	         * Will register events if not already bind.
+	         * @param {Document} document
+	         * @private
+	         */
 	        value: function _registerEvents(document) {
 	            var _this = this;
 	
@@ -2016,10 +2039,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                allInstances.unshift(instance);
 	                                // take the smallest selection
 	                                allInstances = allInstances.sort(function (a, b) {
-	                                    return a.result.text.length > b.result.text.length;
+	                                    return a.result.text.length < b.result.text.length ? -1 : 1;
 	                                });
 	                                instance = allInstances[0];
 	                            }
+	
 	                            return [instance, between];
 	                        }
 	                        return false;
@@ -2056,6 +2080,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }, true);
 	                })();
 	            }
+	        }
+	    }, {
+	        key: 'range',
+	        get: function get() {
+	            var range = this.document.createRange();
+	            var textNodes = [];
+	
+	            this.wrapperNodes.forEach(function (wrapper) {
+	                _utilUtil2['default'].walkTextNodes(wrapper, function (node) {
+	                    textNodes.push(node);
+	                });
+	            });
+	
+	            if (textNodes.length > 0) {
+	                var lastTextNode = textNodes[textNodes.length - 1];
+	                range.setStart(textNodes[0], 0);
+	                range.setEnd(lastTextNode, lastTextNode.length);
+	                return range;
+	            }
+	
+	            return null;
 	        }
 	    }]);
 	
@@ -3508,7 +3553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return;
 	        }
 	
-	        tooltip.createTooltip(this.wrapperNodes[0], this.result.text);
+	        tooltip.createTooltip(this.wrapperNodes[0], this.result.text, false);
 	
 	        setTimeout(function () {
 	            if (tooltip.getCurrentTarget()) {
@@ -5662,11 +5707,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {HTMLElement} target where is this tooltip positioned
 	     * @param {String} text text content in tooltip, will be NOT escaped
 	     * @param {Boolean} [removeTitle] removes title element if given
+	     * @param {Node} [positionRelative]
 	     */
 	
 	    _createClass(Tooltip, [{
 	        key: 'createTooltip',
-	        value: function createTooltip(target, text, removeTitle) {
+	        value: function createTooltip(target, text, removeTitle, positionRelative) {
 	            // abort if text is empty
 	            if (!text || text && text.trim() === '') {
 	                return;
@@ -5689,7 +5735,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                target.removeAttribute('title');
 	            }
 	
-	            _utilUtil2['default'].setupPositionNearby(target, tooltipContainer, this.container, true, true);
+	            _utilUtil2['default'].setupPositionNearby(positionRelative || target, tooltipContainer, this.container, true, true);
 	
 	            tooltipContainer.classList.add(CLASS_NAMES_OPEN);
 	        }
@@ -5786,7 +5832,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/*
+	/* WEBPACK VAR INJECTION */(function(global) {/* global ClientRect */
+	/*
 	 * The MIT License (MIT)
 	 *
 	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
@@ -6070,7 +6117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         *
 	         * You may overwrite preferred positioned with `centerHorizontal` and `positionTop`
 	         *
-	         * @param {HTMLElement} target the target container to align to
+	         * @param {HTMLElement|ClientRect} target the target container to align to
 	         * @param {HTMLElement} elementToPosition the element to position
 	         * @param {HTMLElement} collisionContainer the outer container to prevent collisions
 	         * @param {bool} [centerHorizontal] set true to center element, otherwise it's put on the right border by default
@@ -6100,7 +6147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            });
 	
-	            var targetPosition = target.getBoundingClientRect(),
+	            var targetPosition = target instanceof ClientRect ? target : target.getBoundingClientRect(),
 	                elementRect = elementToPosition.getBoundingClientRect(),
 	                colRect = collisionContainer.getBoundingClientRect(),
 	                targetTop = targetPosition.top - amountTop,

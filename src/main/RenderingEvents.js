@@ -1,3 +1,5 @@
+/* global Set */
+
 'use strict';
 
 import EventEmitter from 'wolfy87-eventemitter';
@@ -9,12 +11,24 @@ import Util from 'util/Util';
  */
 export const EVENT_CLICK = 'click';
 
+/**
+ * @type {string}
+ */
 export const EVENT_MOUSEENTER = 'hover-enter';
 
+/**
+ * @type {string}
+ */
 export const EVENT_MOUSELEAVE = 'hover-leave';
 
+/**
+ * @type {string}
+ */
 export const EVENT_PART_TREE_ENTER = 'tree-enter';
 
+/**
+ * @type {string}
+ */
 export const EVENT_PART_TREE_LEAVE = 'tree-leave';
 
 /**

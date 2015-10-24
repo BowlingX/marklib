@@ -1,6 +1,6 @@
 {
   "name": "marklib",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "main": "build/js/marklib.js",
   "description": "A simple and fast zero-dependencies-library to transform text-selections into serializable markings.",
   "repository": {

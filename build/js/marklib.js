@@ -193,11 +193,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _get(Object.getPrototypeOf(Rendering.prototype), 'constructor', this).call(this, options, document);
 	
 	        /**
-	         * @type {Document}
-	         */
-	        this.document = document;
-	
-	        /**
 	         * ID of rendering, will be set on each element that is part of it
 	         * @type {String}
 	         */
@@ -674,11 +669,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this._markTextSameNode(startContainer, startOffset, endOffset);
 	            } else {
 	                var result = this._markTextDifferentNode(startContainer, endContainer, startOffset, endOffset);
+	                var index = this.wrapperNodes.indexOf(result.endT);
+	                // remove endContainer, to keep order:
+	                this.wrapperNodes.splice(index, 1);
 	                if (!outer) {
 	                    this.wrapSiblings(result.startT.nextSibling, endContainer);
 	                } else {
 	                    this.walk(result.startT, endContainer, contextContainer);
 	                }
+	                this.wrapperNodes.push(result.endT);
 	            }
 	        }
 	
@@ -1830,6 +1829,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/* global Set */
+	
 	'use strict';
 	
 	var _get = __webpack_require__(4)['default'];
@@ -1870,15 +1871,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	var EVENT_CLICK = 'click';
 	
 	exports.EVENT_CLICK = EVENT_CLICK;
+	/**
+	 * @type {string}
+	 */
 	var EVENT_MOUSEENTER = 'hover-enter';
 	
 	exports.EVENT_MOUSEENTER = EVENT_MOUSEENTER;
+	/**
+	 * @type {string}
+	 */
 	var EVENT_MOUSELEAVE = 'hover-leave';
 	
 	exports.EVENT_MOUSELEAVE = EVENT_MOUSELEAVE;
+	/**
+	 * @type {string}
+	 */
 	var EVENT_PART_TREE_ENTER = 'tree-enter';
 	
 	exports.EVENT_PART_TREE_ENTER = EVENT_PART_TREE_ENTER;
+	/**
+	 * @type {string}
+	 */
 	var EVENT_PART_TREE_LEAVE = 'tree-leave';
 	
 	exports.EVENT_PART_TREE_LEAVE = EVENT_PART_TREE_LEAVE;
@@ -1922,16 +1935,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.wrapperNodes = [];
 	
 	        this._registerEvents(document);
+	
+	        /**
+	         * @type {Document}
+	         */
+	        this.document = document;
 	    }
 	
 	    /**
-	     * Will register events if not already bind.
-	     * @param {Document} document
-	     * @private
+	     * Constructs a new Range from rendered result
+	     * @returns {Range}
 	     */
 	
 	    _createClass(RenderingEvents, [{
 	        key: '_registerEvents',
+	
+	        /**
+	         * Will register events if not already bind.
+	         * @param {Document} document
+	         * @private
+	         */
 	        value: function _registerEvents(document) {
 	            var _this = this;
 	
@@ -2016,10 +2039,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                allInstances.unshift(instance);
 	                                // take the smallest selection
 	                                allInstances = allInstances.sort(function (a, b) {
-	                                    return a.result.text.length > b.result.text.length;
+	                                    return a.result.text.length < b.result.text.length ? -1 : 1;
 	                                });
 	                                instance = allInstances[0];
 	                            }
+	
 	                            return [instance, between];
 	                        }
 	                        return false;
@@ -2056,6 +2080,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }, true);
 	                })();
 	            }
+	        }
+	    }, {
+	        key: 'range',
+	        get: function get() {
+	            var range = this.document.createRange();
+	            var textNodes = [];
+	
+	            this.wrapperNodes.forEach(function (wrapper) {
+	                _utilUtil2['default'].walkTextNodes(wrapper, function (node) {
+	                    textNodes.push(node);
+	                });
+	            });
+	
+	            if (textNodes.length > 0) {
+	                var lastTextNode = textNodes[textNodes.length - 1];
+	                range.setStart(textNodes[0], 0);
+	                range.setEnd(lastTextNode, lastTextNode.length);
+	                return range;
+	            }
+	
+	            return null;
 	        }
 	    }]);
 	
