@@ -74,7 +74,7 @@ export default class RenderingEvents extends EventEmitter {
             });
         });
 
-        if(textNodes.length > 0) {
+        if (textNodes.length > 0) {
             const lastTextNode = textNodes[textNodes.length - 1];
             range.setStart(textNodes[0], 0);
             range.setEnd(lastTextNode, lastTextNode.length);
@@ -126,7 +126,7 @@ export default class RenderingEvents extends EventEmitter {
                     const instance = Rendering.getMarklibInstance(e);
                     // instanceof check will fail if used in test scenario where different DOMs are used
                     // see also http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
-                    return instance && (instance instanceof Rendering || 'wrapperNodes' in instance);
+                    return instance && (instance instanceof Rendering || 'wrapperNodes' in instance);
                 }
 
                 function closestInstance(e) {
@@ -173,10 +173,11 @@ export default class RenderingEvents extends EventEmitter {
                             allInstances.unshift(instance);
                             // take the smallest selection
                             allInstances = allInstances.sort(
-                                (a, b) => a.result.text.length > b.result.text.length
+                                (a, b) => a.result.text.length < b.result.text.length ? -1 : 1
                             );
                             instance = allInstances[0];
                         }
+
                         return [instance, between];
                     }
                     return false;
