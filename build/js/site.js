@@ -5832,8 +5832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/* global ClientRect */
-	/*
+	/* WEBPACK VAR INJECTION */(function(global) {/*
 	 * The MIT License (MIT)
 	 *
 	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
@@ -6147,7 +6146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            });
 	
-	            var targetPosition = target instanceof ClientRect ? target : target.getBoundingClientRect(),
+	            var targetPosition = target instanceof HTMLElement ? target.getBoundingClientRect() : target,
 	                elementRect = elementToPosition.getBoundingClientRect(),
 	                colRect = collisionContainer.getBoundingClientRect(),
 	                targetTop = targetPosition.top - amountTop,
