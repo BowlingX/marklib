@@ -40,7 +40,7 @@ module.exports = {
                     path.resolve(__dirname, "node_modules/flexcss")
 
                 ],
-                loader: 'babel-loader?optional=runtime'
+                loader: 'babel-loader'
             },
             {
                 test: /\.scss$/,

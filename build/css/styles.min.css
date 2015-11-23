@@ -205,6 +205,9 @@
 * Mixin to create a button style
 */
 /**
+* Mixin to create a multine ellipsis
+*/
+/**
 * Global Animations
 */
 @-webkit-keyframes progress-bar-stripes {
@@ -266,7 +269,8 @@
 */
 @-webkit-keyframes bounceIn {
   0%, 40%, 100% {
-    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
   }
   0% {
     opacity: 0;
@@ -287,7 +291,8 @@
 
 @keyframes bounceIn {
   0%, 40%, 100% {
-    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    -webkit-animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+            animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
   }
   0% {
     opacity: 0;
@@ -311,7 +316,8 @@
 */
 @-webkit-keyframes fadeIn {
   0%, 100% {
-    transition-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+            animation-timing-function: ease;
   }
   0% {
     opacity: 0;
@@ -323,7 +329,8 @@
 
 @keyframes fadeIn {
   0%, 100% {
-    transition-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+            animation-timing-function: ease;
   }
   0% {
     opacity: 0;
@@ -335,7 +342,8 @@
 
 @-webkit-keyframes darkenerFadeIn {
   0%, 100% {
-    transition-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+            animation-timing-function: ease;
   }
   0% {
     opacity: 0;
@@ -347,7 +355,8 @@
 
 @keyframes darkenerFadeIn {
   0%, 100% {
-    transition-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+            animation-timing-function: ease;
   }
   0% {
     opacity: 0;
@@ -359,7 +368,8 @@
 
 @-webkit-keyframes darkenerFadeOut {
   0%, 100% {
-    transition-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+            animation-timing-function: ease;
   }
   0% {
     opacity: 0.35;
@@ -371,7 +381,8 @@
 
 @keyframes darkenerFadeOut {
   0%, 100% {
-    transition-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+            animation-timing-function: ease;
   }
   0% {
     opacity: 0.35;
@@ -487,8 +498,8 @@
   border-radius: 50%;
   border: 4px solid transparent;
   position: relative;
-  -webkit-animation: spin 1s infinite linear;
-          animation: spin 1s infinite linear;
+  -webkit-animation: spin 1s infinite cubic-bezier(0.37, 0.73, 0.62, 0.28);
+          animation: spin 1s infinite cubic-bezier(0.37, 0.73, 0.62, 0.28);
 }
 
 .loader:before {
@@ -813,7 +824,8 @@ select {
  *    `input` and others.
  */
 button,
-html input[type="button"], input[type="reset"],
+html input[type="button"],
+input[type="reset"],
 input[type="submit"] {
   -webkit-appearance: button;
   /* 2 */
@@ -1204,8 +1216,8 @@ p {
   font-size: 1rem;
   cursor: pointer;
   color: #fff;
-  transition: background 0.5s ease, -webkit-transform 0.5s ease;
-  transition: background 0.5s ease, transform 0.5s ease;
+  transition: background .5s ease, -webkit-transform .5s ease;
+  transition: background .5s ease, transform .5s ease;
   margin: 10px;
   display: inline-block;
   text-decoration: none;
@@ -1246,13 +1258,13 @@ p {
 }
 
 .marking {
-  transition: background 0.5s ease;
+  transition: background .5s ease;
   background: #2ecc71;
   cursor: pointer;
 }
 
 .deleted {
-  transition: background 0.5s ease;
+  transition: background .5s ease;
   background: none !important;
 }
 

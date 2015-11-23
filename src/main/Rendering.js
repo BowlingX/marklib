@@ -457,8 +457,14 @@ class Rendering extends RenderingEvents {
         }
 
         if (endContainer.nodeType !== Node.TEXT_NODE) {
+            let toFindNode = startContainer;
+
+            if(endOffset === 0) {
+                toFindNode = endContainer.previousElementSibling || startContainer;
+            }
+
             // Get the last text node:
-            const endContainerContents = Util.closest(startContainer, ':not([' + DATA_IS_SELECTION + '])').childNodes;
+            const endContainerContents = Util.closest(toFindNode, ':not([' + DATA_IS_SELECTION + '])').childNodes;
             if (endContainerContents.length) {
                 const r = endContainerContents[endContainerContents.length - 1];
                 if (r.nodeType === Node.TEXT_NODE) {
@@ -582,6 +588,7 @@ class Rendering extends RenderingEvents {
      */
     renderWithRange(range) {
         const text = range.toString();
+        console.log(range);
         const result = this._renderWithElements(range.startContainer, range.endContainer,
             range.commonAncestorContainer, range.startOffset, range.endOffset);
         result.text = text;

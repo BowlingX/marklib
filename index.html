@@ -56,6 +56,20 @@ new Marklib.Rendering(document)
             <button class="warn" id="action-clear"><i class="fa fa-trash-o"></i></button>
         </div>
         <p class="text-center subline tight">Marklib depends on zero libraries and is just around 4.5kb compressed</p>
+
+        <h2 id="one-setup-fits-them-all">One setup fits them all</h2>
+
+        <p>Since I started with docker a few month ago, I wondered how to archive the following: </p>
+
+        <p>Having a simple development setup and deploy the same to a <em>staging</em> environment without loosing the ability to
+            have my changes reflected immediately and without rebuilding the container(s) all the time during development.</p>
+
+        <p>A simple but effective way to do this is using <strong><code>ENV</code></strong> in combination with <strong><code>VOLUME</code></strong>.</p>
+
+        <h3 id="dockerize-a-simple-php-application">Dockerize a simple PHP-Application</h3>
+
+        <p>The basic idea is: We use a Volume during development and bundle the source later inside the immutable container
+            for a staging/production deployment.</p>
     </div>
 </div>
 {% highlight bash %}
