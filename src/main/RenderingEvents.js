@@ -3,8 +3,8 @@
 'use strict';
 
 import EventEmitter from 'wolfy87-eventemitter';
-import Rendering from 'Rendering';
-import Util from 'util/Util';
+import Rendering from './Rendering';
+import Util from './util/Util';
 
 /**
  * @type {string}
@@ -41,7 +41,6 @@ export default class RenderingEvents extends EventEmitter {
      * @param {Document} document
      */
     constructor(options, document) {
-
         super();
 
         /**
@@ -104,7 +103,6 @@ export default class RenderingEvents extends EventEmitter {
      * @private
      */
     _registerEvents(document) {
-
         this.on(EVENT_MOUSEENTER, () => {
             this.wrapperNodes.forEach((node) => {
                 node.classList.add(this.options.hoverClass);
@@ -132,9 +130,9 @@ export default class RenderingEvents extends EventEmitter {
 
         if (!document.MARKLIB_EVENTS) {
             document.MARKLIB_EVENTS = true;
-            (function () {
-                const currentHoverInstances = new Set(),
-                    betweenInstances = new Set();
+            (function init() {
+                const currentHoverInstances = new Set();
+                const betweenInstances = new Set();
 
                 function checkMarklibInstance(e) {
                     const instance = Rendering.getMarklibInstance(e);
@@ -146,7 +144,7 @@ export default class RenderingEvents extends EventEmitter {
                 function closestInstance(e) {
                     const closest = Util.closestCallback(
                         e.target,
-                        (e) => checkMarklibInstance(e)
+                        (thisE) => checkMarklibInstance(thisE)
                     );
                     if (typeof closest === 'object') {
                         return Rendering.getMarklibInstance(closest);
@@ -198,14 +196,14 @@ export default class RenderingEvents extends EventEmitter {
                 }
 
                 document.addEventListener('click', (e) => {
-                    let target = findTarget(e);
+                    const target = findTarget(e);
                     if (target) {
                         target[0].emit(EVENT_CLICK, e, target[1]);
                     }
                 }, true);
 
                 document.addEventListener('mouseover', (e) => {
-                    let target = findTarget(e);
+                    const target = findTarget(e);
                     if (target) {
                         const [instance, between] = target;
                         // find instances that lay in between the node
@@ -220,10 +218,7 @@ export default class RenderingEvents extends EventEmitter {
                         mouseOutClear();
                     }
                 }, true);
-
             })();
         }
     }
 }
-
-

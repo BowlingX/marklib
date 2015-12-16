@@ -9,21 +9,17 @@ export const ATTR_DATA_ORIGINAL_INDEX = 'data-original-index';
 /**
  * @type {string}
  */
-export const DATA_PSEUDO = 'data-is-pseudo';
-/**
- * @type {string}
- */
 export const DATA_IS_SELECTION = 'data-is-selection';
 /**
  * @type {string}
  */
 const SERIALIZE_SEPARATOR = ";";
 
-import {ATTR_DATA_ORIGINAL_OFFSET_START} from 'Rendering';
+import { ATTR_DATA_ORIGINAL_OFFSET_START } from 'Rendering';
 
 // polyfill for matchesSelector, IE 10/11 does not support Element.matches
 if (Element && !Element.prototype.matches) {
-    var p = Element.prototype;
+    const p = Element.prototype;
     p.matches = p.matchesSelector ||
         p.mozMatchesSelector || p.msMatchesSelector ||
         p.oMatchesSelector || p.webkitMatchesSelector;
@@ -54,12 +50,11 @@ class Util {
      * @return {String}
      */
     static guid() {
-        function s4() {
+        const s4 = () => {
             return Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
                 .substring(1);
-        }
-
+        };
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
             s4() + '-' + s4() + s4() + s4();
     }
@@ -96,18 +91,21 @@ class Util {
      * @return {HTMLElement}
      */
     static wrap(elms, wrapper) {
-        if (!elms) {
+        let thisElms = elms;
+
+        if (!thisElms) {
             return wrapper;
         }
         // Convert `elms` to an array, if necessary.
-        if (!(elms instanceof NodeList || elms instanceof Array)) {
-            elms = [elms];
+        if (!(thisElms instanceof NodeList || thisElms instanceof Array)) {
+            thisElms = [thisElms];
         }
-        for (var i = elms.length - 1; i >= 0; i--) {
+        for (let i = thisElms.length - 1; i >= 0; i--) {
             const child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
-            const el = elms[i];
+            const el = thisElms[i];
             // Cache the current parent and sibling.
-            const parent = el.parentNode, sibling = el.nextSibling;
+            const parent = el.parentNode;
+            const sibling = el.nextSibling;
 
             child.appendChild(el);
             if (sibling) {
@@ -121,14 +119,15 @@ class Util {
 
     /**
      * Will calculate an index depending on an already modified dom by marklib
-     * @param {HTMLElement} node
+     * @param {HTMLElement|Node} node
      *
      * @returns {int|boolean}
      */
     static calcIndex(node) {
-        let calculatedIndex = 0,
-            foundWrapper = false;
-        const nodes = node.parentNode.childNodes, length = nodes.length;
+        let calculatedIndex = 0;
+        let foundWrapper = false;
+        const nodes = node.parentNode.childNodes;
+        const length = nodes.length;
         for (let thisIndex = 0; thisIndex < length; thisIndex++) {
             const el = nodes[thisIndex];
             if (el === node) {
@@ -138,7 +137,7 @@ class Util {
             const maybeIndexOfOriginal = el.getAttribute ? el.getAttribute(ATTR_DATA_ORIGINAL_INDEX) : null;
 
             if (maybeIndexOfOriginal) {
-                calculatedIndex = parseInt(maybeIndexOfOriginal);
+                calculatedIndex = parseInt(maybeIndexOfOriginal, 10);
                 foundWrapper = true;
             }
             calculatedIndex++;
@@ -156,13 +155,14 @@ class Util {
     static parents(el, optionalSelector) {
         return Util.parentsCallback(el, (element) => {
             if (optionalSelector && ((element === optionalSelector) ||
-                ( (typeof optionalSelector === 'string') && element.matches && element.matches(optionalSelector)))) {
+                ((typeof optionalSelector === 'string') && element.matches &&
+                element.matches(optionalSelector)))) {
                 return true;
             } else if (!optionalSelector) {
                 return true;
             }
             return false;
-        })
+        });
     }
 
     /**
@@ -175,7 +175,7 @@ class Util {
         const foundElements = [];
         while (element.parentNode !== null) {
             element = element.parentNode;
-            if(callback(element)) {
+            if (callback(element)) {
                 foundElements.push(element);
             }
         }
@@ -187,7 +187,7 @@ class Util {
      * @param {Node} el
      * @param {String} selector
      *
-     * @returns {Node|bool}
+     * @returns {Node|boolean}
      */
     static parent(el, selector) {
         let element = el;
@@ -205,7 +205,7 @@ class Util {
      * @param {Node} el
      * @param selector
      *
-     * @returns {Node|bool}
+     * @returns {Node|boolean}
      */
     static closest(el, selector) {
         return Util.closestCallback(el, (element) => element.matches && element.matches(selector));
@@ -215,7 +215,7 @@ class Util {
      * Finds the closest element including itself matching a callback
      * @param {Node} el
      * @param {Function} callback
-     * @returns {Node|bool}
+     * @returns {Node|boolean}
      */
     static closestCallback(el, callback) {
         let element = el;
@@ -232,10 +232,11 @@ class Util {
      * Finds the outermost fitting element that matches callback
      * @param {Node} el
      * @param {Function} callback
-     * @returns {Node|bool}
+     * @returns {Node|boolean}
      */
     static outerMostCallback(el, callback) {
-        let element = el, lastValid = false;
+        let element = el;
+        let lastValid = false;
         while (element !== null) {
             if (callback(element)) {
                 lastValid = element;
@@ -248,7 +249,7 @@ class Util {
     /**
      * @param {HTMLElement} n
      *
-     * @return {bool}
+     * @return {boolean}
      */
     static isMarkNode(n) {
         return n instanceof HTMLElement && n.hasAttribute(DATA_IS_SELECTION);
@@ -262,17 +263,17 @@ class Util {
      * @returns {string}
      */
     static getPath(el, context) {
-        var path = null, node = el;
+        let path = null;
+        let node = el;
 
         const filterSiblings = (thisEl) => {
             return !Util.isMarkNode(thisEl) && thisEl.nodeName === node.nodeName;
         };
 
         while (node) {
-            var name = null;
+            let name = null;
             // If node is a text-node, save index
             if (Node.TEXT_NODE === node.nodeType) {
-
                 /* Because nodes may wrapped inside a highlighting node, we need to find the original index that was
                  * valid before the dom changes. We store the last known index position inside all wrapper elements
                  * We select the outermost
@@ -288,7 +289,7 @@ class Util {
                     calculatedIndex = Util.calcIndex(node);
                 }
                 const index = outerMostElement ? parseInt(
-                    outerMostElement.getAttribute(ATTR_DATA_ORIGINAL_INDEX)) : calculatedIndex;
+                    outerMostElement.getAttribute(ATTR_DATA_ORIGINAL_INDEX), 10) : calculatedIndex;
                 name = SERIALIZE_SEPARATOR + index;
             } else {
                 name = node.nodeName;
@@ -300,10 +301,10 @@ class Util {
 
             name = name.toLowerCase();
 
-            var parent = node.parentNode;
+            const parent = node.parentNode;
 
             if (Util.isMarkNode(node)) {
-                if(parent !== context) {
+                if (parent !== context) {
                     node = parent;
                     continue;
                 } else {
@@ -313,8 +314,8 @@ class Util {
 
             // Select only siblings that are not part of selection and are of the same type
             // (because we use nth-of-type selector later)
-            const siblings = Util.nodeListFilter(parent.children, filterSiblings),
-                nodeIndex = Util.index(node, siblings);
+            const siblings = Util.nodeListFilter(parent.children, filterSiblings);
+            const nodeIndex = Util.index(node, siblings);
 
             if (siblings.length > 1 && nodeIndex >= 0) {
                 name += ':nth-of-type(' + (nodeIndex + 1) + ')';
@@ -344,7 +345,7 @@ class Util {
             return 0;
         }
         const lengthElement = Util.parent(element, '[' + ATTR_DATA_ORIGINAL_OFFSET_START + ']');
-        return lengthElement ? parseInt(lengthElement.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) : 0;
+        return lengthElement ? parseInt(lengthElement.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START), 10) : 0;
     }
 
 
@@ -357,75 +358,79 @@ class Util {
      * @return {Node}
      */
     static deserializePath(path, context) {
-        const pSplit = path.split(';'), p = pSplit[0],
-            objectIndex = parseInt(pSplit[1]),
-            charOffset = parseInt(pSplit[2]),
-            container = !p.trim() ? context : context.querySelector(p);
+        const pSplit = path.split(';');
+        const p = pSplit[0];
+        const objectIndex = parseInt(pSplit[1], 10);
+        const charOffset = parseInt(pSplit[2], 10);
+        const container = !p.trim() ? context : context.querySelector(p);
+
         let maybeFoundNode = null;
-        Util.walkDom(container, function (n) {
-            if (n.nodeType === Node.TEXT_NODE) {
-                let atrOffsetStart = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START);
-                atrOffsetStart = atrOffsetStart === null ? 0 : atrOffsetStart;
-                let atrIndex = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
-                atrIndex = atrIndex === null ? Util.calcIndex(n) : atrIndex;
-                if (parseInt(atrIndex) === objectIndex && charOffset >= atrOffsetStart &&
-                    ((parseInt(atrOffsetStart) + n.length) >= charOffset)) {
-                    const thisOffset = n.parentNode
-                        .hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START) ? charOffset -
-                    parseInt(n.parentNode
-                        .getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) : charOffset;
-                    maybeFoundNode = {node: n, offset: thisOffset};
-                    return false;
-                }
-            } else {
-                return true;
+
+        Util.walkTextNodes(container, (n) => {
+            let atrOffsetStart = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START);
+            atrOffsetStart = atrOffsetStart === null ? 0 : atrOffsetStart;
+            let atrIndex = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
+            atrIndex = atrIndex === null ? Util.calcIndex(n) : atrIndex;
+            if (parseInt(atrIndex, 10) === objectIndex && charOffset >= atrOffsetStart &&
+                ((parseInt(atrOffsetStart, 10) + n.length) >= charOffset)) {
+                const thisOffset = n.parentNode
+                    .hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START) ? charOffset -
+                parseInt(n.parentNode
+                    .getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START), 10) : charOffset;
+
+                maybeFoundNode = {
+                    node: n,
+                    offset: thisOffset
+                };
+
+                return false;
             }
             return true;
-        });
+        }, null);
 
         return maybeFoundNode;
     }
 
 
     /**
-     * Recursively walks the dom tree unless func returns false
-     * This is a lot more efficient then using any jQuery operations
-     *
+     * Walks the dom tree unless func returns false
      * Applies node to function
+     *
      * @param {Node} node
      * @param {Function} func
+     * @param {int} type, see `NodeFilter`
+     * @param {Object} [filter] skips empty text nodes by default
      *
-     * @returns {*}
+     * @returns {boolean} true if function did abort walk
      */
-    static walkDom(node, func) {
+    static walkDom(node, func, type = NodeFilter.SHOW_ALL, filter = null) {
         if (!node) {
             return false;
         }
-        const children = node.childNodes;
-        if (!children) {
-            return false;
+        const args = [node, type];
+        if (filter) {
+            args.push(filter);
         }
-        for (var i = 0; i < children.length; i++) {
-            if (!Util.walkDom(children[i], func)) {
-                return false;
+        const walker = document.createTreeWalker(...args);
+        while (walker.nextNode()) {
+            if (!func(walker.currentNode)) {
+                return true;
             }
         }
-        return func(node);
+        return false;
     }
 
     /**
      * Extracts all TextNodes inside a container
      * @param {Node} el
      * @param {Function} func
-     * @returns {Array.<Text>}
+     * @param {Object} [filter] skips empty text nodes by default
+     * @returns {boolean} true if function did abort walk
      */
-    static walkTextNodes(el, func) {
-        Util.walkDom(el, function (node) {
-            if (Node.TEXT_NODE === node.nodeType && !Util.nodeIsEmpty(node)) {
-                func(node);
-            }
-            return true;
-        });
+    static walkTextNodes(el, func, filter = {
+        acceptNode: (node) => !Util.nodeIsEmpty(node)
+    }) {
+        return Util.walkDom(el, func, NodeFilter.SHOW_TEXT, filter);
     }
 
     /**
@@ -434,8 +439,8 @@ class Util {
      * @returns {int|string} index of parent or original
      */
     static getIndexParentIfHas(container, thisIndex) {
-        var p = container.parentNode;
-        var index = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_INDEX));
+        const p = container.parentNode;
+        const index = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_INDEX), 10);
         return index > thisIndex ? index : thisIndex;
     }
 
@@ -444,8 +449,8 @@ class Util {
      * @returns {int} offset start of parent if has, else 0
      */
     static getOffsetParentIfHas(container) {
-        var p = container.parentNode;
-        var offset = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START));
+        const p = container.parentNode;
+        const offset = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START), 10);
         return offset > 0 ? offset : 0;
     }
 

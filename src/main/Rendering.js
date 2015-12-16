@@ -1,13 +1,11 @@
 /* global Node */
 
-'use strict';
+import Util from './util/Util';
+import RenderResult from './RenderResult';
 
-import Util from 'util/Util';
-import RenderResult from 'RenderResult';
+import RenderingEvents from './RenderingEvents';
 
-import RenderingEvents from 'RenderingEvents';
-
-import {ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION} from 'util/Util';
+import { ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION } from 'util/Util';
 
 /**
  * @type {string}
@@ -57,7 +55,6 @@ class Rendering extends RenderingEvents {
      * @param {Node} context
      */
     constructor(document, options, context) {
-
         super(options, document);
 
         /**
@@ -89,7 +86,6 @@ class Rendering extends RenderingEvents {
          * @private
          */
         this._renderResult = null;
-
     }
 
     /**
@@ -106,7 +102,7 @@ class Rendering extends RenderingEvents {
     setId(id) {
         this.id = id;
 
-        if(this._renderResult) {
+        if (this._renderResult) {
             this.wrapperNodes.forEach((node) => node.setAttribute(ATTR_DATA_ID, this.id));
         }
 
@@ -120,7 +116,9 @@ class Rendering extends RenderingEvents {
      * @private
      */
     _createWrapTemplate(omitHighlight) {
-        const el = this.document.createElement(TAG_NAME), vTrue = "true";
+        const el = this.document.createElement(TAG_NAME);
+        const vTrue = "true";
+
         if (!omitHighlight) {
             el.className = this.options.className.join(' ');
             // save this marker instance to given node
@@ -142,8 +140,8 @@ class Rendering extends RenderingEvents {
      * @private
      */
     _createStartEndWrapTemplate(text) {
-        const el = this._createWrapTemplate(), vTrue = "true";
-        el.setAttribute(ATTR_DATA_START_END, vTrue);
+        const el = this._createWrapTemplate();
+        el.setAttribute(ATTR_DATA_START_END, 'true');
         el.textContent = text;
         return el;
     }
@@ -201,11 +199,11 @@ class Rendering extends RenderingEvents {
      * @param originalElement {Node} original text node element that is created a wrapper for
      * @param index
      * @param offset
-     * @returns {*|jQuery|Node}
+     * @returns {Node}
      */
     _createSplitContainer(originalElement, index, offset) {
-        const wrapper = this.document.createElement(TAG_NAME), vTrue = "true";
-        wrapper.setAttribute(DATA_IS_SELECTION, vTrue);
+        const wrapper = this.document.createElement(TAG_NAME);
+        wrapper.setAttribute(DATA_IS_SELECTION, 'true');
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_INDEX, Util.getIndexParentIfHas(originalElement, index));
         wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
         wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
@@ -240,11 +238,11 @@ class Rendering extends RenderingEvents {
      * @returns {boolean} (true if endContainer was found)
      */
     wrapSiblings(start, endContainer) {
-        let next = start,
-            found = false;
+        let next = start;
+        let found = false;
 
         // Capsule some logic
-        const wrap = ((n) => {
+        const wrap = (n) => {
             const instance = Rendering.getMarklibInstance(n.parentNode);
             if (n.parentNode.hasAttribute(ATTR_DATA_START_END) &&
                 n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) &&
@@ -253,7 +251,7 @@ class Rendering extends RenderingEvents {
             } else {
                 this._createWrap(n);
             }
-        }).bind(this);
+        };
 
         // helper functions
 
@@ -306,14 +304,14 @@ class Rendering extends RenderingEvents {
      * @private
      */
     _markTextSameNode(textNode, startIndex, endIndex) {
-        const initialText = textNode.nodeValue,
-            initialIndex = Util.calcIndex(textNode);
+        const initialText = textNode.nodeValue;
+        const initialIndex = Util.calcIndex(textNode);
 
         if (!initialText) {
             return false;
         }
-        //If there is an unmarked part in the beginning of the text node,
-        //cut off that part and put it into it's own textnode.
+        // If there is an unmarked part in the beginning of the text node,
+        // cut off that part and put it into it's own textnode.
         if (startIndex > 0) {
             const textBefore = initialText.slice(0, startIndex);
             textNode.parentNode.insertBefore(this.document.createTextNode(textBefore), textNode);
@@ -321,8 +319,8 @@ class Rendering extends RenderingEvents {
             Util.wrap(textNode.previousSibling, this._createSplitContainer(textNode,
                 initialIndex, Util.getOffsetParentIfHas(textNode)));
         }
-        //If there is an unmarked part at the end of the text node,
-        //cut off that part and put it into it's own textnode.
+        // If there is an unmarked part at the end of the text node,
+        // cut off that part and put it into it's own textnode.
         if (endIndex < initialText.length) {
             const textAfter = initialText.slice(endIndex, initialText.length);
             textNode.parentNode.insertBefore(this.document.createTextNode(textAfter), textNode.nextSibling);
@@ -330,7 +328,7 @@ class Rendering extends RenderingEvents {
                 initialIndex, Util.getOffsetParentIfHas(textNode) + endIndex));
         }
 
-        //Cutoff the unmarked parts and wrap the textnode into a span.
+        // Cutoff the unmarked parts and wrap the textnode into a span.
         textNode.nodeValue = initialText.slice(startIndex, endIndex);
         this.startContainer = this._createWrap(textNode,
             Util.getOffsetParentIfHas(textNode) + startIndex, initialIndex, true).parentNode;
@@ -401,25 +399,29 @@ class Rendering extends RenderingEvents {
                 offsetParent === endOffset ? offsetParent : offsetParent + endOffset));
         }
 
-        return {startT: startT, endT: endT};
+        return {
+            startT,
+            endT
+        };
     }
 
     /**
      * Renders a selection
-     * @param {Node} startContainer
-     * @param {Node} endContainer
+     * @param {Node} startContainerP
+     * @param {Node} endContainerP
      * @param {Node} commonAncestor
      * @param {int} startOffset
-     * @param {int} endOffset
+     * @param {int} endOffsetP
      * @returns RenderResult
      * @private
      */
-    _renderWithElements(startContainer, endContainer, commonAncestor, startOffset, endOffset) {
-
+    _renderWithElements(startContainerP, endContainerP, commonAncestor, startOffset, endOffsetP) {
         if (this._renderResult) {
             return this._renderResult;
         }
-
+        let startContainer = startContainerP;
+        let endContainer = endContainerP;
+        let endOffset = endOffsetP;
         let outer = Util.parents(startContainer, commonAncestor);
         outer = outer[outer.length - 1];
         const contextContainer = outer ? outer : commonAncestor;
@@ -459,7 +461,7 @@ class Rendering extends RenderingEvents {
         if (endContainer.nodeType !== Node.TEXT_NODE) {
             let toFindNode = startContainer;
 
-            if(endOffset === 0) {
+            if (endOffset === 0) {
                 toFindNode = endContainer.previousElementSibling || startContainer;
             }
 
@@ -478,7 +480,7 @@ class Rendering extends RenderingEvents {
                             endOffset = f.length;
                             if (f.parentNode.hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) {
                                 endOffset = parseInt(f.parentNode
-                                        .getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) + endOffset;
+                                        .getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START), 10) + endOffset;
                             }
                         }
                         f = f.lastChild;
@@ -487,7 +489,7 @@ class Rendering extends RenderingEvents {
             }
             // still no textNode?
             if (endContainer.nodeType !== Node.TEXT_NODE) {
-                throw 'Could not found endContainer, highlighting would be unstable';
+                throw Error('Could not found endContainer, highlighting would be unstable');
             }
         }
 
@@ -560,7 +562,7 @@ class Rendering extends RenderingEvents {
             result.text = text;
             return text;
         }
-        throw 'Could not find start- and/or end-container in document';
+        throw new Error('Could not find start- and/or end-container in document');
     }
 
     /**
@@ -588,7 +590,6 @@ class Rendering extends RenderingEvents {
      */
     renderWithRange(range) {
         const text = range.toString();
-        console.log(range);
         const result = this._renderWithElements(range.startContainer, range.endContainer,
             range.commonAncestorContainer, range.startOffset, range.endOffset);
         result.text = text;
@@ -621,7 +622,7 @@ class Rendering extends RenderingEvents {
      * @returns {Rendering|null|undefined}
      */
     static getMarklibInstance(el) {
-        return el? el.marklibInstance : null;
+        return el ? el.marklibInstance : null;
     }
 }
 

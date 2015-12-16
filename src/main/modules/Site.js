@@ -1,9 +1,7 @@
-'use strict';
-
 /* global localStorage, document */
 
 import Marklib from 'modules/Marklib';
-import {Tooltip} from 'flexcss';
+import { Tooltip } from 'flexcss';
 
 const KEY_ENTER = 13;
 
@@ -11,8 +9,7 @@ const KEY_ENTER = 13;
  * Contains Module for the demonstration
  */
 
-document.addEventListener("DOMContentLoaded", function () {
-
+document.addEventListener("DOMContentLoaded", () => {
     const STORAGE_KEY = 'savedRanges';
     const ANIMATIONEND = 'animationend';
     let allRanges = [];
@@ -22,38 +19,43 @@ document.addEventListener("DOMContentLoaded", function () {
      * Creates an animated rendering
      */
     function presentRendering(selector, classNames, speed) {
-        var text = document.getElementById(selector).childNodes[0];
-        let thisLength = text.length;
+        const text = document.getElementById(selector).childNodes[0];
+        const thisLength = text.length;
 
-        var render = function (autoMarkText, c, length) {
-            var r = new Marklib.Rendering(document, {className: classNames});
-            var range = document.createRange();
+        const render = (autoMarkText, cp, length) => {
+            let c = cp;
+            const r = new Marklib.Rendering(document, {
+                className: classNames
+            });
+            const range = document.createRange();
             range.setStart(autoMarkText, 0);
             range.setEnd(autoMarkText, 1);
             r.renderWithRange(range);
             if (autoMarkText.parentNode.nextSibling) {
-                let nextText = autoMarkText.parentNode.nextSibling.childNodes[0];
-                setTimeout(function () {
+                const nextText = autoMarkText.parentNode.nextSibling.childNodes[0];
+                setTimeout(() => {
                     render(nextText, ++c, length);
                 }, speed);
             }
         };
+
         return render(text, 0, thisLength);
     }
 
     presentRendering('automark', 'fadeInDown', 20);
 
-    var savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [], animated = false;
+    let savedRanges = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    let animated = false;
 
     /**
      * OnClick event for renderings
      */
-    const onClick = function () {
+    function onClick() {
         const self = this;
         this.wrapperNodes.forEach((n) => {
-            n.addEventListener(ANIMATIONEND, function self(e) {
+            n.addEventListener(ANIMATIONEND, function thisFunction(e) {
                 e.target.classList.remove('bubble');
-                e.target.removeEventListener(ANIMATIONEND, self);
+                e.target.removeEventListener(ANIMATIONEND, thisFunction);
             });
             n.classList.add('bubble');
         });
@@ -64,21 +66,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
         tooltip.createTooltip(this.wrapperNodes[0], this.result.text, false);
 
-        setTimeout(function () {
+        setTimeout(() => {
             if (tooltip.getCurrentTarget()) {
-                document.addEventListener('click', function thisFunction(e) {
-                    if(tooltip.getCurrentTarget() && tooltip.getCurrentTarget() === self.wrapperNodes[0]) {
+                document.addEventListener('click', function thisFunction() {
+                    if (tooltip.getCurrentTarget() && tooltip.getCurrentTarget() === self.wrapperNodes[0]) {
                         tooltip.removeTooltip();
                     }
                     document.removeEventListener('click', thisFunction);
                 });
             }
         }, 0);
-    };
+    }
 
 
-    savedRanges.forEach(function (range) {
-        var marker = new Marklib.Rendering(document);
+    savedRanges.forEach((range) => {
+        const marker = new Marklib.Rendering(document);
         try {
             marker.renderWithResult(range);
             allRanges.push(marker);
@@ -88,12 +90,12 @@ document.addEventListener("DOMContentLoaded", function () {
             localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
             console.error('Cleared local storage because of a rendering issue, the page might have been changed ;)');
         }
-
     });
 
-    window.addEventListener('scroll', function () {
-        var el = document.getElementById('secondParagraph'), r = el.getBoundingClientRect(),
-            html = document.documentElement;
+    window.addEventListener('scroll', () => {
+        const el = document.getElementById('secondParagraph');
+        const r = el.getBoundingClientRect();
+        const html = document.documentElement;
         if (r.top <= html.clientHeight && r.bottom >= 0 && !animated) {
             animated = true;
 
@@ -104,10 +106,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    var actionMark = function () {
+    const actionMark = () => {
         try {
-            var selection = document.getSelection(), renderer = new Marklib.Rendering(document),
-                result = renderer.renderWithRange(selection.getRangeAt(0));
+            const selection = document.getSelection();
+            const renderer = new Marklib.Rendering(document);
+            const result = renderer.renderWithRange(selection.getRangeAt(0));
 
             renderer.on('click', onClick);
             allRanges.push(renderer);
@@ -120,13 +123,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    document.addEventListener("keydown", function (e) {
+    document.addEventListener("keydown", (e) => {
         if (e.keyCode === KEY_ENTER) {
             actionMark();
         }
     });
 
-    document.addEventListener("click", function (e) {
+    document.addEventListener("click", (e) => {
         if (e.target.id === 'action-mark') {
             return actionMark();
         } else if (e.target.id === 'action-clear') {

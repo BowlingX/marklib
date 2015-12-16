@@ -40,7 +40,7 @@ export default class RenderResult {
             endOffset: this.endOffset,
             startContainerPath: this.startContainerPath,
             endContainerPath: this.endContainerPath
-        }
+        };
     }
 
     /**

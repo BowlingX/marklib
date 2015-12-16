@@ -86,6 +86,6 @@ module.exports = {
     },
     plugins: [
         new webpack.EnvironmentPlugin(['NODE_ENV']),
-        new ExtractTextPlugin('css/[name].min.css')
+        new ExtractTextPlugin(isProduction ? 'css/[name].min.css' : 'css/[name].css')
     ]
 };

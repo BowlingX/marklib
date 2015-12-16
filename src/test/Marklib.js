@@ -146,10 +146,10 @@ describe("Must fail and fallback", () => {
                 startContainerPath: 'html>body>div>p:nth-child(2);8',
                 endContainerPath: 'html>body>div>p;8'
             });
-        }).toThrow('Could not find start- and/or end-container in document');
+        }).toThrow(Error('Could not find start- and/or end-container in document'));
     });
 
-    it("fallback to last text-node if element (body) is given", () => {
+    it("to last text-node if element (body) is given", () => {
         const renderer = new Rendering(document);
         var range = document.createRange();
         range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
@@ -157,9 +157,9 @@ describe("Must fail and fallback", () => {
         const result = renderer.renderWithRange(range);
         expect(result.serialize()).toEqual({
             startOffset: 0,
-            endOffset: 87,
+            endOffset: 1,
             startContainerPath: 'html>body;0',
-            endContainerPath: 'html>body>div>p;8'
+            endContainerPath: 'html>head;6'
         });
     });
 

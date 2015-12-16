@@ -79,20 +79,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _RenderResult2 = _interopRequireDefault(_RenderResult);
 	
+	var _RenderingEvents = __webpack_require__(5);
+	
+	var _RenderingEvents2 = _interopRequireDefault(_RenderingEvents);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
 	    Rendering: _Rendering2.default,
 	    Util: _Util2.default,
-	    RenderResult: _RenderResult2.default
+	    RenderResult: _RenderResult2.default,
+	    RenderingEvents: _RenderingEvents2.default
 	};
 
 /***/ },
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* global Node */
-	
 	'use strict';
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -114,13 +117,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _RenderingEvents3 = _interopRequireDefault(_RenderingEvents2);
 	
+	var _Util3 = __webpack_require__(3);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* global Node */
 	
 	/**
 	 * @type {string}
@@ -206,7 +211,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @private
 	         */
 	        _this._renderResult = null;
-	
 	        return _this;
 	    }
 	
@@ -251,8 +255,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: '_createWrapTemplate',
 	        value: function _createWrapTemplate(omitHighlight) {
-	            var el = this.document.createElement(TAG_NAME),
-	                vTrue = "true";
+	            var el = this.document.createElement(TAG_NAME);
+	            var vTrue = "true";
+	
 	            if (!omitHighlight) {
 	                el.className = this.options.className.join(' ');
 	                // save this marker instance to given node
@@ -262,7 +267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                el.setAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE, vTrue);
 	                el.setAttribute(ATTR_DATA_ID, this.getId());
 	            }
-	            el.setAttribute(_Util.DATA_IS_SELECTION, vTrue);
+	            el.setAttribute(_Util3.DATA_IS_SELECTION, vTrue);
 	
 	            return el;
 	        }
@@ -277,9 +282,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: '_createStartEndWrapTemplate',
 	        value: function _createStartEndWrapTemplate(text) {
-	            var el = this._createWrapTemplate(),
-	                vTrue = "true";
-	            el.setAttribute(ATTR_DATA_START_END, vTrue);
+	            var el = this._createWrapTemplate();
+	            el.setAttribute(ATTR_DATA_START_END, 'true');
 	            el.textContent = text;
 	            return el;
 	        }
@@ -297,7 +301,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: '_createStartOrEndContainer',
 	        value: function _createStartOrEndContainer(initialNode, text, offset, index) {
 	            var wrapper = this._createStartEndWrapTemplate(text);
-	            wrapper.setAttribute(_Util.ATTR_DATA_ORIGINAL_INDEX, _Util2.default.getIndexParentIfHas(initialNode, index));
+	            wrapper.setAttribute(_Util3.ATTR_DATA_ORIGINAL_INDEX, _Util2.default.getIndexParentIfHas(initialNode, index));
 	            wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
 	            wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
 	
@@ -320,7 +324,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function _createWrap(el, optionalLength, optionalIndex, optionalIsSameNode, omitHighlight) {
 	            var originalIndex = optionalIndex >= 0 ? optionalIndex : _Util2.default.calcIndex(el);
 	            var wrapper = this._createWrapTemplate(omitHighlight);
-	            wrapper.setAttribute(_Util.ATTR_DATA_ORIGINAL_INDEX, _Util2.default.getIndexParentIfHas(el, originalIndex));
+	            wrapper.setAttribute(_Util3.ATTR_DATA_ORIGINAL_INDEX, _Util2.default.getIndexParentIfHas(el, originalIndex));
 	            var offsetLength = optionalLength >= 0 ? optionalLength : _Util2.default.getOffsetParentIfHas(el);
 	            wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offsetLength);
 	
@@ -342,16 +346,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param originalElement {Node} original text node element that is created a wrapper for
 	         * @param index
 	         * @param offset
-	         * @returns {*|jQuery|Node}
+	         * @returns {Node}
 	         */
 	
 	    }, {
 	        key: '_createSplitContainer',
 	        value: function _createSplitContainer(originalElement, index, offset) {
-	            var wrapper = this.document.createElement(TAG_NAME),
-	                vTrue = "true";
-	            wrapper.setAttribute(_Util.DATA_IS_SELECTION, vTrue);
-	            wrapper.setAttribute(_Util.ATTR_DATA_ORIGINAL_INDEX, _Util2.default.getIndexParentIfHas(originalElement, index));
+	            var wrapper = this.document.createElement(TAG_NAME);
+	            wrapper.setAttribute(_Util3.DATA_IS_SELECTION, 'true');
+	            wrapper.setAttribute(_Util3.ATTR_DATA_ORIGINAL_INDEX, _Util2.default.getIndexParentIfHas(originalElement, index));
 	            wrapper.setAttribute(ATTR_DATA_ORIGINAL_OFFSET_START, offset);
 	            wrapper.setAttribute(DATA_ORIGINAL_TEXT_NODE_INDEX, index);
 	            return wrapper;
@@ -392,18 +395,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function wrapSiblings(start, endContainer) {
 	            var _this3 = this;
 	
-	            var next = start,
-	                found = false;
+	            var next = start;
+	            var found = false;
 	
 	            // Capsule some logic
-	            var wrap = (function (n) {
+	            var wrap = function wrap(n) {
 	                var instance = Rendering.getMarklibInstance(n.parentNode);
 	                if (n.parentNode.hasAttribute(ATTR_DATA_START_END) && n.parentNode.hasAttribute(ATTR_DATA_IS_HIGHLIGHT_NODE) && instance === _this3) {
 	                    _this3._createWrap(n, undefined, undefined, undefined, true);
 	                } else {
 	                    _this3._createWrap(n);
 	                }
-	            }).bind(this);
+	            };
 	
 	            // helper functions
 	
@@ -459,29 +462,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: '_markTextSameNode',
 	        value: function _markTextSameNode(textNode, startIndex, endIndex) {
-	            var initialText = textNode.nodeValue,
-	                initialIndex = _Util2.default.calcIndex(textNode);
+	            var initialText = textNode.nodeValue;
+	            var initialIndex = _Util2.default.calcIndex(textNode);
 	
 	            if (!initialText) {
 	                return false;
 	            }
-	            //If there is an unmarked part in the beginning of the text node,
-	            //cut off that part and put it into it's own textnode.
+	            // If there is an unmarked part in the beginning of the text node,
+	            // cut off that part and put it into it's own textnode.
 	            if (startIndex > 0) {
 	                var textBefore = initialText.slice(0, startIndex);
 	                textNode.parentNode.insertBefore(this.document.createTextNode(textBefore), textNode);
 	                // wrap cutted text node:
 	                _Util2.default.wrap(textNode.previousSibling, this._createSplitContainer(textNode, initialIndex, _Util2.default.getOffsetParentIfHas(textNode)));
 	            }
-	            //If there is an unmarked part at the end of the text node,
-	            //cut off that part and put it into it's own textnode.
+	            // If there is an unmarked part at the end of the text node,
+	            // cut off that part and put it into it's own textnode.
 	            if (endIndex < initialText.length) {
 	                var textAfter = initialText.slice(endIndex, initialText.length);
 	                textNode.parentNode.insertBefore(this.document.createTextNode(textAfter), textNode.nextSibling);
 	                _Util2.default.wrap(textNode.nextSibling, this._createSplitContainer(textNode, initialIndex, _Util2.default.getOffsetParentIfHas(textNode) + endIndex));
 	            }
 	
-	            //Cutoff the unmarked parts and wrap the textnode into a span.
+	            // Cutoff the unmarked parts and wrap the textnode into a span.
 	            textNode.nodeValue = initialText.slice(startIndex, endIndex);
 	            this.startContainer = this._createWrap(textNode, _Util2.default.getOffsetParentIfHas(textNode) + startIndex, initialIndex, true).parentNode;
 	            this.endContainer = this.startContainer;
@@ -549,28 +552,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _Util2.default.wrap(endContainer, this._createSplitContainer(endContainer, endContainerIndex, offsetParent === endOffset ? offsetParent : offsetParent + endOffset));
 	            }
 	
-	            return { startT: startT, endT: endT };
+	            return {
+	                startT: startT,
+	                endT: endT
+	            };
 	        }
 	
 	        /**
 	         * Renders a selection
-	         * @param {Node} startContainer
-	         * @param {Node} endContainer
+	         * @param {Node} startContainerP
+	         * @param {Node} endContainerP
 	         * @param {Node} commonAncestor
 	         * @param {int} startOffset
-	         * @param {int} endOffset
+	         * @param {int} endOffsetP
 	         * @returns RenderResult
 	         * @private
 	         */
 	
 	    }, {
 	        key: '_renderWithElements',
-	        value: function _renderWithElements(startContainer, endContainer, commonAncestor, startOffset, endOffset) {
-	
+	        value: function _renderWithElements(startContainerP, endContainerP, commonAncestor, startOffset, endOffsetP) {
 	            if (this._renderResult) {
 	                return this._renderResult;
 	            }
-	
+	            var startContainer = startContainerP;
+	            var endContainer = endContainerP;
+	            var endOffset = endOffsetP;
 	            var outer = _Util2.default.parents(startContainer, commonAncestor);
 	            outer = outer[outer.length - 1];
 	            var contextContainer = outer ? outer : commonAncestor;
@@ -615,7 +622,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	
 	                // Get the last text node:
-	                var endContainerContents = _Util2.default.closest(toFindNode, ':not([' + _Util.DATA_IS_SELECTION + '])').childNodes;
+	                var endContainerContents = _Util2.default.closest(toFindNode, ':not([' + _Util3.DATA_IS_SELECTION + '])').childNodes;
 	                if (endContainerContents.length) {
 	                    var r = endContainerContents[endContainerContents.length - 1];
 	                    if (r.nodeType === Node.TEXT_NODE) {
@@ -628,7 +635,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                endContainer = f;
 	                                endOffset = f.length;
 	                                if (f.parentNode.hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) {
-	                                    endOffset = parseInt(f.parentNode.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) + endOffset;
+	                                    endOffset = parseInt(f.parentNode.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START), 10) + endOffset;
 	                                }
 	                            }
 	                            f = f.lastChild;
@@ -637,7 +644,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	                // still no textNode?
 	                if (endContainer.nodeType !== Node.TEXT_NODE) {
-	                    throw 'Could not found endContainer, highlighting would be unstable';
+	                    throw Error('Could not found endContainer, highlighting would be unstable');
 	                }
 	            }
 	
@@ -712,7 +719,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                result.text = text;
 	                return text;
 	            }
-	            throw 'Could not find start- and/or end-container in document';
+	            throw new Error('Could not find start- and/or end-container in document');
 	        }
 	
 	        /**
@@ -741,7 +748,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'renderWithRange',
 	        value: function renderWithRange(range) {
 	            var text = range.toString();
-	            console.log(range);
 	            var result = this._renderWithElements(range.startContainer, range.endContainer, range.commonAncestorContainer, range.startOffset, range.endOffset);
 	            result.text = text;
 	            return result;
@@ -802,29 +808,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* global Node, NodeList, Element */
 	
-	'use strict'
+	'use strict';
 	
 	/**
 	 * @type {string}
 	 */
-	;
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.DATA_IS_SELECTION = exports.DATA_PSEUDO = exports.ATTR_DATA_ORIGINAL_INDEX = undefined;
+	exports.DATA_IS_SELECTION = exports.ATTR_DATA_ORIGINAL_INDEX = undefined;
 	
 	var _Rendering = __webpack_require__(2);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var ATTR_DATA_ORIGINAL_INDEX = exports.ATTR_DATA_ORIGINAL_INDEX = 'data-original-index';
-	/**
-	 * @type {string}
-	 */
-	var DATA_PSEUDO = exports.DATA_PSEUDO = 'data-is-pseudo';
 	/**
 	 * @type {string}
 	 */
@@ -873,10 +874,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'guid',
 	        value: function guid() {
-	            function s4() {
+	            var s4 = function s4() {
 	                return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-	            }
-	
+	            };
 	            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 	        }
 	
@@ -919,19 +919,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'wrap',
 	        value: function wrap(elms, wrapper) {
-	            if (!elms) {
+	            var thisElms = elms;
+	
+	            if (!thisElms) {
 	                return wrapper;
 	            }
 	            // Convert `elms` to an array, if necessary.
-	            if (!(elms instanceof NodeList || elms instanceof Array)) {
-	                elms = [elms];
+	            if (!(thisElms instanceof NodeList || thisElms instanceof Array)) {
+	                thisElms = [thisElms];
 	            }
-	            for (var i = elms.length - 1; i >= 0; i--) {
+	            for (var i = thisElms.length - 1; i >= 0; i--) {
 	                var child = i > 0 ? wrapper.cloneNode(true) : wrapper;
-	                var el = elms[i];
+	                var el = thisElms[i];
 	                // Cache the current parent and sibling.
-	                var parent = el.parentNode,
-	                    sibling = el.nextSibling;
+	                var parent = el.parentNode;
+	                var sibling = el.nextSibling;
 	
 	                child.appendChild(el);
 	                if (sibling) {
@@ -945,7 +947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        /**
 	         * Will calculate an index depending on an already modified dom by marklib
-	         * @param {HTMLElement} node
+	         * @param {HTMLElement|Node} node
 	         *
 	         * @returns {int|boolean}
 	         */
@@ -953,10 +955,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'calcIndex',
 	        value: function calcIndex(node) {
-	            var calculatedIndex = 0,
-	                foundWrapper = false;
-	            var nodes = node.parentNode.childNodes,
-	                length = nodes.length;
+	            var calculatedIndex = 0;
+	            var foundWrapper = false;
+	            var nodes = node.parentNode.childNodes;
+	            var length = nodes.length;
 	            for (var thisIndex = 0; thisIndex < length; thisIndex++) {
 	                var el = nodes[thisIndex];
 	                if (el === node) {
@@ -966,7 +968,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var maybeIndexOfOriginal = el.getAttribute ? el.getAttribute(ATTR_DATA_ORIGINAL_INDEX) : null;
 	
 	                if (maybeIndexOfOriginal) {
-	                    calculatedIndex = parseInt(maybeIndexOfOriginal);
+	                    calculatedIndex = parseInt(maybeIndexOfOriginal, 10);
 	                    foundWrapper = true;
 	                }
 	                calculatedIndex++;
@@ -1020,7 +1022,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {Node} el
 	         * @param {String} selector
 	         *
-	         * @returns {Node|bool}
+	         * @returns {Node|boolean}
 	         */
 	
 	    }, {
@@ -1041,7 +1043,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * @param {Node} el
 	         * @param selector
 	         *
-	         * @returns {Node|bool}
+	         * @returns {Node|boolean}
 	         */
 	
 	    }, {
@@ -1056,7 +1058,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Finds the closest element including itself matching a callback
 	         * @param {Node} el
 	         * @param {Function} callback
-	         * @returns {Node|bool}
+	         * @returns {Node|boolean}
 	         */
 	
 	    }, {
@@ -1076,14 +1078,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	         * Finds the outermost fitting element that matches callback
 	         * @param {Node} el
 	         * @param {Function} callback
-	         * @returns {Node|bool}
+	         * @returns {Node|boolean}
 	         */
 	
 	    }, {
 	        key: 'outerMostCallback',
 	        value: function outerMostCallback(el, callback) {
-	            var element = el,
-	                lastValid = false;
+	            var element = el;
+	            var lastValid = false;
 	            while (element !== null) {
 	                if (callback(element)) {
 	                    lastValid = element;
@@ -1096,7 +1098,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * @param {HTMLElement} n
 	         *
-	         * @return {bool}
+	         * @return {boolean}
 	         */
 	
 	    }, {
@@ -1116,8 +1118,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'getPath',
 	        value: function getPath(el, context) {
-	            var path = null,
-	                node = el;
+	            var path = null;
+	            var node = el;
 	
 	            var filterSiblings = function filterSiblings(thisEl) {
 	                return !Util.isMarkNode(thisEl) && thisEl.nodeName === node.nodeName;
@@ -1127,7 +1129,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var name = null;
 	                // If node is a text-node, save index
 	                if (Node.TEXT_NODE === node.nodeType) {
-	
 	                    /* Because nodes may wrapped inside a highlighting node, we need to find the original index that was
 	                     * valid before the dom changes. We store the last known index position inside all wrapper elements
 	                     * We select the outermost
@@ -1142,7 +1143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    if (!outerMostElement) {
 	                        calculatedIndex = Util.calcIndex(node);
 	                    }
-	                    var index = outerMostElement ? parseInt(outerMostElement.getAttribute(ATTR_DATA_ORIGINAL_INDEX)) : calculatedIndex;
+	                    var index = outerMostElement ? parseInt(outerMostElement.getAttribute(ATTR_DATA_ORIGINAL_INDEX), 10) : calculatedIndex;
 	                    name = SERIALIZE_SEPARATOR + index;
 	                } else {
 	                    name = node.nodeName;
@@ -1167,8 +1168,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                // Select only siblings that are not part of selection and are of the same type
 	                // (because we use nth-of-type selector later)
-	                var siblings = Util.nodeListFilter(parent.children, filterSiblings),
-	                    nodeIndex = Util.index(node, siblings);
+	                var siblings = Util.nodeListFilter(parent.children, filterSiblings);
+	                var nodeIndex = Util.index(node, siblings);
 	
 	                if (siblings.length > 1 && nodeIndex >= 0) {
 	                    name += ':nth-of-type(' + (nodeIndex + 1) + ')';
@@ -1200,7 +1201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return 0;
 	            }
 	            var lengthElement = Util.parent(element, '[' + _Rendering.ATTR_DATA_ORIGINAL_OFFSET_START + ']');
-	            return lengthElement ? parseInt(lengthElement.getAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START)) : 0;
+	            return lengthElement ? parseInt(lengthElement.getAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START), 10) : 0;
 	        }
 	
 	        /**
@@ -1215,77 +1216,89 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'deserializePath',
 	        value: function deserializePath(path, context) {
-	            var pSplit = path.split(';'),
-	                p = pSplit[0],
-	                objectIndex = parseInt(pSplit[1]),
-	                charOffset = parseInt(pSplit[2]),
-	                container = !p.trim() ? context : context.querySelector(p);
+	            var pSplit = path.split(';');
+	            var p = pSplit[0];
+	            var objectIndex = parseInt(pSplit[1], 10);
+	            var charOffset = parseInt(pSplit[2], 10);
+	            var container = !p.trim() ? context : context.querySelector(p);
+	
 	            var maybeFoundNode = null;
-	            Util.walkDom(container, function (n) {
-	                if (n.nodeType === Node.TEXT_NODE) {
-	                    var atrOffsetStart = n.parentNode.getAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START);
-	                    atrOffsetStart = atrOffsetStart === null ? 0 : atrOffsetStart;
-	                    var atrIndex = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
-	                    atrIndex = atrIndex === null ? Util.calcIndex(n) : atrIndex;
-	                    if (parseInt(atrIndex) === objectIndex && charOffset >= atrOffsetStart && parseInt(atrOffsetStart) + n.length >= charOffset) {
-	                        var thisOffset = n.parentNode.hasAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START) ? charOffset - parseInt(n.parentNode.getAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START)) : charOffset;
-	                        maybeFoundNode = { node: n, offset: thisOffset };
-	                        return false;
-	                    }
-	                } else {
-	                    return true;
+	
+	            Util.walkTextNodes(container, function (n) {
+	                var atrOffsetStart = n.parentNode.getAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START);
+	                atrOffsetStart = atrOffsetStart === null ? 0 : atrOffsetStart;
+	                var atrIndex = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
+	                atrIndex = atrIndex === null ? Util.calcIndex(n) : atrIndex;
+	                if (parseInt(atrIndex, 10) === objectIndex && charOffset >= atrOffsetStart && parseInt(atrOffsetStart, 10) + n.length >= charOffset) {
+	                    var thisOffset = n.parentNode.hasAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START) ? charOffset - parseInt(n.parentNode.getAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START), 10) : charOffset;
+	
+	                    maybeFoundNode = {
+	                        node: n,
+	                        offset: thisOffset
+	                    };
+	
+	                    return false;
 	                }
 	                return true;
-	            });
+	            }, null);
 	
 	            return maybeFoundNode;
 	        }
 	
 	        /**
-	         * Recursively walks the dom tree unless func returns false
-	         * This is a lot more efficient then using any jQuery operations
-	         *
+	         * Walks the dom tree unless func returns false
 	         * Applies node to function
+	         *
 	         * @param {Node} node
 	         * @param {Function} func
+	         * @param {int} type, see `NodeFilter`
+	         * @param {Object} [filter] skips empty text nodes by default
 	         *
-	         * @returns {*}
+	         * @returns {boolean} true if function did abort walk
 	         */
 	
 	    }, {
 	        key: 'walkDom',
 	        value: function walkDom(node, func) {
+	            var _document;
+	
+	            var type = arguments.length <= 2 || arguments[2] === undefined ? NodeFilter.SHOW_ALL : arguments[2];
+	            var filter = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
+	
 	            if (!node) {
 	                return false;
 	            }
-	            var children = node.childNodes;
-	            if (!children) {
-	                return false;
+	            var args = [node, type];
+	            if (filter) {
+	                args.push(filter);
 	            }
-	            for (var i = 0; i < children.length; i++) {
-	                if (!Util.walkDom(children[i], func)) {
-	                    return false;
+	            var walker = (_document = document).createTreeWalker.apply(_document, args);
+	            while (walker.nextNode()) {
+	                if (!func(walker.currentNode)) {
+	                    return true;
 	                }
 	            }
-	            return func(node);
+	            return false;
 	        }
 	
 	        /**
 	         * Extracts all TextNodes inside a container
 	         * @param {Node} el
 	         * @param {Function} func
-	         * @returns {Array.<Text>}
+	         * @param {Object} [filter] skips empty text nodes by default
+	         * @returns {boolean} true if function did abort walk
 	         */
 	
 	    }, {
 	        key: 'walkTextNodes',
 	        value: function walkTextNodes(el, func) {
-	            Util.walkDom(el, function (node) {
-	                if (Node.TEXT_NODE === node.nodeType && !Util.nodeIsEmpty(node)) {
-	                    func(node);
+	            var filter = arguments.length <= 2 || arguments[2] === undefined ? {
+	                acceptNode: function acceptNode(node) {
+	                    return !Util.nodeIsEmpty(node);
 	                }
-	                return true;
-	            });
+	            } : arguments[2];
+	
+	            return Util.walkDom(el, func, NodeFilter.SHOW_TEXT, filter);
 	        }
 	
 	        /**
@@ -1298,7 +1311,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'getIndexParentIfHas',
 	        value: function getIndexParentIfHas(container, thisIndex) {
 	            var p = container.parentNode;
-	            var index = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_INDEX));
+	            var index = parseInt(p.getAttribute(ATTR_DATA_ORIGINAL_INDEX), 10);
 	            return index > thisIndex ? index : thisIndex;
 	        }
 	
@@ -1311,7 +1324,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'getOffsetParentIfHas',
 	        value: function getOffsetParentIfHas(container) {
 	            var p = container.parentNode;
-	            var offset = parseInt(p.getAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START));
+	            var offset = parseInt(p.getAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START), 10);
 	            return offset > 0 ? offset : 0;
 	        }
 	    }]);
@@ -1325,12 +1338,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports) {
 
-	'use strict'
+	'use strict';
 	
 	/**
 	 * A Render Result
 	 */
-	;
 	
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
@@ -1580,9 +1592,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (!document.MARKLIB_EVENTS) {
 	                document.MARKLIB_EVENTS = true;
-	                (function () {
-	                    var currentHoverInstances = new Set(),
-	                        betweenInstances = new Set();
+	                (function init() {
+	                    var currentHoverInstances = new Set();
+	                    var betweenInstances = new Set();
 	
 	                    function checkMarklibInstance(e) {
 	                        var instance = _Rendering2.default.getMarklibInstance(e);
@@ -1592,8 +1604,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	
 	                    function closestInstance(e) {
-	                        var closest = _Util2.default.closestCallback(e.target, function (e) {
-	                            return checkMarklibInstance(e);
+	                        var closest = _Util2.default.closestCallback(e.target, function (thisE) {
+	                            return checkMarklibInstance(thisE);
 	                        });
 	                        if ((typeof closest === 'undefined' ? 'undefined' : _typeof(closest)) === 'object') {
 	                            return _Rendering2.default.getMarklibInstance(closest);

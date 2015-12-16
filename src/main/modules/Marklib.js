@@ -1,11 +1,13 @@
 'use strict';
 
-import Rendering from 'Rendering';
-import Util from 'util/Util';
-import RenderResult from 'RenderResult';
+import Rendering from '../Rendering';
+import Util from '../util/Util';
+import RenderResult from '../RenderResult';
+import RenderingEvents from '../RenderingEvents';
 
 export default {
-    Rendering: Rendering,
-    Util: Util,
-    RenderResult: RenderResult
+    Rendering,
+    Util,
+    RenderResult,
+    RenderingEvents
 };

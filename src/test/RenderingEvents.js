@@ -1,12 +1,10 @@
 /* global loadFixtures */
 
-'use strict';
-
 import setup from 'setup';
 import Rendering from 'Rendering';
 import RenderResult from 'RenderResult';
 import $ from 'jquery';
-import {EVENT_CLICK, EVENT_MOUSEENTER, EVENT_MOUSELEAVE} from 'RenderingEvents';
+import { EVENT_CLICK, EVENT_MOUSEENTER, EVENT_MOUSELEAVE } from 'RenderingEvents';
 setup();
 
 /**
