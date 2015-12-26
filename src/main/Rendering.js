@@ -1,11 +1,8 @@
 /* global Node */
 
-import Util from './util/Util';
 import RenderResult from './RenderResult';
-
 import RenderingEvents from './RenderingEvents';
-
-import { ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION } from 'util/Util';
+import Util, { ATTR_DATA_ORIGINAL_INDEX, DATA_IS_SELECTION } from './util/Util';
 
 /**
  * @type {string}
@@ -449,7 +446,7 @@ class Rendering extends RenderingEvents {
         // We run in some bugs with firefox here that selects no text-nodes sometimes, trying to fix this here
         // Sometimes does not work correctly... (specially when DOM was modified)
         if (startContainer.nodeType !== Node.TEXT_NODE) {
-            Util.walkDom(startContainer, function (el) {
+            Util.walkDom(startContainer, (el) => {
                 if (el.nodeType === Node.TEXT_NODE) {
                     startContainer = el;
                     return false;

@@ -15,7 +15,7 @@ export const DATA_IS_SELECTION = 'data-is-selection';
  */
 const SERIALIZE_SEPARATOR = ";";
 
-import { ATTR_DATA_ORIGINAL_OFFSET_START } from 'Rendering';
+import { ATTR_DATA_ORIGINAL_OFFSET_START } from '../Rendering';
 
 // polyfill for matchesSelector, IE 10/11 does not support Element.matches
 if (Element && !Element.prototype.matches) {
