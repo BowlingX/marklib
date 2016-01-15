@@ -1,11 +1,11 @@
 {
   "name": "marklib",
-  "version": "0.6.1",
+  "version": "0.0.0-semantically-released",
   "main": "build/js/marklib.js",
   "description": "A simple and fast zero-dependencies-library to transform text-selections into serializable markings.",
   "repository": {
     "type": "git",
-    "url": "git@github.com:BowlingX/marklib.git"
+    "url": "https:git@github.com:BowlingX/marklib.git"
   },
   "homepage": "https://bowlingx.com",
   "author": "David Heidrich",
@@ -21,6 +21,7 @@
     "babel-runtime": "^6.3.19",
     "coveralls": "^2.11.6",
     "css-loader": "^0.23.0",
+    "cz-conventional-changelog": "^1.1.5",
     "del": "^2.2.0",
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^2.1.0",
@@ -47,10 +48,10 @@
     "node-libs-browser": "^0.5.3",
     "node-sass": "^3.4.2",
     "sass-loader": "^3.1.2",
+    "semantic-release": "^4.3.5",
     "style-loader": "^0.13.0",
     "url-loader": "^0.5.7",
-    "webpack": "^1.12.9",
-    "publish": "^0.5.0"
+    "webpack": "^1.12.9"
   },
   "engines": {
     "node": ">=0.10.1"
@@ -60,9 +61,14 @@
     "tdd": "karma start --auto-watch",
     "dist": "rm -Rf build && export NODE_ENV=production && webpack --optimize-minimize --optimize-occurence-order && export NODE_ENV=dev && webpack",
     "develop": "webpack --watch",
-    "publish2npm": "publish"
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "dependencies": {
     "wolfy87-eventemitter": "^4.3.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

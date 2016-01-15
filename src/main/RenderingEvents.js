@@ -128,8 +128,8 @@ export default class RenderingEvents extends EventEmitter {
         });
 
 
-        if (!document.MARKLIB_EVENTS) {
-            document.MARKLIB_EVENTS = true;
+        if (!global.__MARKLIB_EVENTS__) {
+            global.__MARKLIB_EVENTS__ = true;
             (function init() {
                 const currentHoverInstances = new Set();
                 const betweenInstances = new Set();

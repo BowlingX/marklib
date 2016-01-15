@@ -1795,7 +1795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* global Set */
+	/* WEBPACK VAR INJECTION */(function(global) {/* global Set */
 	
 	'use strict';
 	
@@ -1968,8 +1968,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                });
 	            });
 	
-	            if (!document.MARKLIB_EVENTS) {
-	                document.MARKLIB_EVENTS = true;
+	            if (!global.__MARKLIB_EVENTS__) {
+	                global.__MARKLIB_EVENTS__ = true;
 	                (function init() {
 	                    var currentHoverInstances = new _set2.default();
 	                    var betweenInstances = new _set2.default();
@@ -2093,6 +2093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})(_wolfy87Eventemitter2.default);
 	
 	exports.default = RenderingEvents;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 54 */

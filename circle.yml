@@ -13,5 +13,5 @@ deployment:
     branch: master
     commands:
       - npm run dist
-      - echo -e "$NPM_USERNAME\n$NPM_PASSWORD\n$NPM_EMAIL" | npm login
-      - npm run publish2npm
+      - npm prune
+      - npm run semantic-release
