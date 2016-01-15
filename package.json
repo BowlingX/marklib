@@ -56,6 +56,12 @@
   "engines": {
     "node": ">=0.10.1"
   },
+  "release": {
+    "debug": false,
+    "verifyConditions": {
+      "path": "./node_modules/semantic-release/dist/lib/plugin-noop.js"
+    }
+  },
   "scripts": {
     "test": "karma start --single-run --ci",
     "tdd": "karma start --auto-watch",
