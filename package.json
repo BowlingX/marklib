@@ -5,7 +5,7 @@
   "description": "A simple and fast zero-dependencies-library to transform text-selections into serializable markings.",
   "repository": {
     "type": "git",
-    "url": "https:git@github.com:BowlingX/marklib.git"
+    "url": "git+https://github.com/BowlingX/marklib.git"
   },
   "homepage": "https://bowlingx.com",
   "author": "David Heidrich",
