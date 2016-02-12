@@ -1,7 +1,5 @@
 /* global Node, NodeList, Element */
 
-'use strict';
-
 /**
  * @type {string}
  */

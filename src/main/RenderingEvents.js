@@ -1,7 +1,5 @@
 /* global Set */
 
-'use strict';
-
 import EventEmitter from 'wolfy87-eventemitter';
 import Rendering from './Rendering';
 import Util from './util/Util';

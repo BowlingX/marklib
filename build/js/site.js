@@ -54,7 +54,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(93);
+	module.exports = __webpack_require__(95);
 
 
 /***/ },
@@ -72,15 +72,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Rendering2 = _interopRequireDefault(_Rendering);
 	
-	var _Util = __webpack_require__(92);
+	var _Util = __webpack_require__(94);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _RenderResult = __webpack_require__(52);
+	var _RenderResult = __webpack_require__(64);
 	
 	var _RenderResult2 = _interopRequireDefault(_RenderResult);
 	
-	var _RenderingEvents = __webpack_require__(53);
+	var _RenderingEvents = __webpack_require__(65);
 	
 	var _RenderingEvents2 = _interopRequireDefault(_RenderingEvents);
 	
@@ -118,19 +118,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
 	
-	var _inherits2 = __webpack_require__(45);
+	var _inherits2 = __webpack_require__(57);
 	
 	var _inherits3 = _interopRequireDefault(_inherits2);
 	
-	var _RenderResult = __webpack_require__(52);
+	var _RenderResult = __webpack_require__(64);
 	
 	var _RenderResult2 = _interopRequireDefault(_RenderResult);
 	
-	var _RenderingEvents2 = __webpack_require__(53);
+	var _RenderingEvents2 = __webpack_require__(65);
 	
 	var _RenderingEvents3 = _interopRequireDefault(_RenderingEvents2);
 	
-	var _Util = __webpack_require__(92);
+	var _Util = __webpack_require__(94);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
@@ -178,8 +178,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Manages a single Render
 	 */
 	
-	var Rendering = (function (_RenderingEvents) {
+	var Rendering = function (_RenderingEvents) {
 	    (0, _inherits3.default)(Rendering, _RenderingEvents);
+	
 	
 	    /**
 	     * @param {Document} document
@@ -189,6 +190,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    function Rendering(document, options, context) {
 	        (0, _classCallCheck3.default)(this, Rendering);
+	
 	
 	        /**
 	         * ID of rendering, will be set on each element that is part of it
@@ -228,6 +230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * @returns {string} id of this rendering
 	     */
+	
 	
 	    (0, _createClass3.default)(Rendering, [{
 	        key: 'getId',
@@ -740,6 +743,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'renderWithResult',
 	
+	
 	        /**
 	         * Renders a result (that returned from `renderWithRange`)
 	         * @param {RenderResult|Object} result
@@ -808,7 +812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }]);
 	    return Rendering;
-	})(_RenderingEvents3.default);
+	}(_RenderingEvents3.default);
 	
 	exports.default = Rendering;
 
@@ -1014,7 +1018,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	exports.default = (function () {
+	exports.default = function () {
 	  function defineProperties(target, props) {
 	    for (var i = 0; i < props.length; i++) {
 	      var descriptor = props[i];
@@ -1030,7 +1034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (staticProps) defineProperties(Constructor, staticProps);
 	    return Constructor;
 	  };
-	})();
+	}();
 
 /***/ },
 /* 17 */
@@ -1093,18 +1097,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	
+	var _typeof = typeof _Symbol === "function" && typeof _Symbol$iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _Symbol === "function" && obj.constructor === _Symbol ? "symbol" : typeof obj; };
+	
 	exports.__esModule = true;
 	
-	var _symbol = __webpack_require__(22);
+	var _iterator = __webpack_require__(22);
+	
+	var _iterator2 = _interopRequireDefault(_iterator);
+	
+	var _symbol = __webpack_require__(47);
 	
 	var _symbol2 = _interopRequireDefault(_symbol);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	function _typeof(obj) { return obj && typeof _Symbol !== "undefined" && obj.constructor === _Symbol ? "symbol" : typeof obj; }
-	
-	exports.default = function (obj) {
-	  return obj && typeof _symbol2.default !== "undefined" && obj.constructor === _symbol2.default ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
+	exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.default) === "symbol" ? function (obj) {
+	  return typeof obj === "undefined" ? "undefined" : _typeof(obj);
+	} : function (obj) {
+	  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
 	};
 
 /***/ },
@@ -1118,33 +1128,390 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(24);
-	__webpack_require__(44);
-	module.exports = __webpack_require__(11).Symbol;
+	__webpack_require__(40);
+	module.exports = __webpack_require__(37)('iterator');
 
 /***/ },
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+	var $at  = __webpack_require__(25)(true);
+	
+	// 21.1.3.27 String.prototype[@@iterator]()
+	__webpack_require__(27)(String, 'String', function(iterated){
+	  this._t = String(iterated); // target
+	  this._i = 0;                // next index
+	// 21.1.5.2.1 %StringIteratorPrototype%.next()
+	}, function(){
+	  var O     = this._t
+	    , index = this._i
+	    , point;
+	  if(index >= O.length)return {value: undefined, done: true};
+	  point = $at(O, index);
+	  this._i += point.length;
+	  return {value: point, done: false};
+	});
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var toInteger = __webpack_require__(26)
+	  , defined   = __webpack_require__(7);
+	// true  -> String#at
+	// false -> String#codePointAt
+	module.exports = function(TO_STRING){
+	  return function(that, pos){
+	    var s = String(defined(that))
+	      , i = toInteger(pos)
+	      , l = s.length
+	      , a, b;
+	    if(i < 0 || i >= l)return TO_STRING ? '' : undefined;
+	    a = s.charCodeAt(i);
+	    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
+	      ? TO_STRING ? s.charAt(i) : a
+	      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+	  };
+	};
+
+/***/ },
+/* 26 */
+/***/ function(module, exports) {
+
+	// 7.1.4 ToInteger
+	var ceil  = Math.ceil
+	  , floor = Math.floor;
+	module.exports = function(it){
+	  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+	};
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var LIBRARY        = __webpack_require__(28)
+	  , $export        = __webpack_require__(9)
+	  , redefine       = __webpack_require__(29)
+	  , hide           = __webpack_require__(30)
+	  , has            = __webpack_require__(33)
+	  , Iterators      = __webpack_require__(34)
+	  , $iterCreate    = __webpack_require__(35)
+	  , setToStringTag = __webpack_require__(36)
+	  , getProto       = __webpack_require__(19).getProto
+	  , ITERATOR       = __webpack_require__(37)('iterator')
+	  , BUGGY          = !([].keys && 'next' in [].keys()) // Safari has buggy iterators w/o `next`
+	  , FF_ITERATOR    = '@@iterator'
+	  , KEYS           = 'keys'
+	  , VALUES         = 'values';
+	
+	var returnThis = function(){ return this; };
+	
+	module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED){
+	  $iterCreate(Constructor, NAME, next);
+	  var getMethod = function(kind){
+	    if(!BUGGY && kind in proto)return proto[kind];
+	    switch(kind){
+	      case KEYS: return function keys(){ return new Constructor(this, kind); };
+	      case VALUES: return function values(){ return new Constructor(this, kind); };
+	    } return function entries(){ return new Constructor(this, kind); };
+	  };
+	  var TAG        = NAME + ' Iterator'
+	    , DEF_VALUES = DEFAULT == VALUES
+	    , VALUES_BUG = false
+	    , proto      = Base.prototype
+	    , $native    = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT]
+	    , $default   = $native || getMethod(DEFAULT)
+	    , methods, key;
+	  // Fix native
+	  if($native){
+	    var IteratorPrototype = getProto($default.call(new Base));
+	    // Set @@toStringTag to native iterators
+	    setToStringTag(IteratorPrototype, TAG, true);
+	    // FF fix
+	    if(!LIBRARY && has(proto, FF_ITERATOR))hide(IteratorPrototype, ITERATOR, returnThis);
+	    // fix Array#{values, @@iterator}.name in V8 / FF
+	    if(DEF_VALUES && $native.name !== VALUES){
+	      VALUES_BUG = true;
+	      $default = function values(){ return $native.call(this); };
+	    }
+	  }
+	  // Define iterator
+	  if((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])){
+	    hide(proto, ITERATOR, $default);
+	  }
+	  // Plug for library
+	  Iterators[NAME] = $default;
+	  Iterators[TAG]  = returnThis;
+	  if(DEFAULT){
+	    methods = {
+	      values:  DEF_VALUES  ? $default : getMethod(VALUES),
+	      keys:    IS_SET      ? $default : getMethod(KEYS),
+	      entries: !DEF_VALUES ? $default : getMethod('entries')
+	    };
+	    if(FORCED)for(key in methods){
+	      if(!(key in proto))redefine(proto, key, methods[key]);
+	    } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
+	  }
+	  return methods;
+	};
+
+/***/ },
+/* 28 */
+/***/ function(module, exports) {
+
+	module.exports = true;
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(30);
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var $          = __webpack_require__(19)
+	  , createDesc = __webpack_require__(31);
+	module.exports = __webpack_require__(32) ? function(object, key, value){
+	  return $.setDesc(object, key, createDesc(1, value));
+	} : function(object, key, value){
+	  object[key] = value;
+	  return object;
+	};
+
+/***/ },
+/* 31 */
+/***/ function(module, exports) {
+
+	module.exports = function(bitmap, value){
+	  return {
+	    enumerable  : !(bitmap & 1),
+	    configurable: !(bitmap & 2),
+	    writable    : !(bitmap & 4),
+	    value       : value
+	  };
+	};
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// Thank's IE8 for his funny defineProperty
+	module.exports = !__webpack_require__(14)(function(){
+	  return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
+	});
+
+/***/ },
+/* 33 */
+/***/ function(module, exports) {
+
+	var hasOwnProperty = {}.hasOwnProperty;
+	module.exports = function(it, key){
+	  return hasOwnProperty.call(it, key);
+	};
+
+/***/ },
+/* 34 */
+/***/ function(module, exports) {
+
+	module.exports = {};
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var $              = __webpack_require__(19)
+	  , descriptor     = __webpack_require__(31)
+	  , setToStringTag = __webpack_require__(36)
+	  , IteratorPrototype = {};
+	
+	// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
+	__webpack_require__(30)(IteratorPrototype, __webpack_require__(37)('iterator'), function(){ return this; });
+	
+	module.exports = function(Constructor, NAME, next){
+	  Constructor.prototype = $.create(IteratorPrototype, {next: descriptor(1, next)});
+	  setToStringTag(Constructor, NAME + ' Iterator');
+	};
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var def = __webpack_require__(19).setDesc
+	  , has = __webpack_require__(33)
+	  , TAG = __webpack_require__(37)('toStringTag');
+	
+	module.exports = function(it, tag, stat){
+	  if(it && !has(it = stat ? it : it.prototype, TAG))def(it, TAG, {configurable: true, value: tag});
+	};
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var store  = __webpack_require__(38)('wks')
+	  , uid    = __webpack_require__(39)
+	  , Symbol = __webpack_require__(10).Symbol;
+	module.exports = function(name){
+	  return store[name] || (store[name] =
+	    Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
+	};
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var global = __webpack_require__(10)
+	  , SHARED = '__core-js_shared__'
+	  , store  = global[SHARED] || (global[SHARED] = {});
+	module.exports = function(key){
+	  return store[key] || (store[key] = {});
+	};
+
+/***/ },
+/* 39 */
+/***/ function(module, exports) {
+
+	var id = 0
+	  , px = Math.random();
+	module.exports = function(key){
+	  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+	};
+
+/***/ },
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(41);
+	var Iterators = __webpack_require__(34);
+	Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	var addToUnscopables = __webpack_require__(42)
+	  , step             = __webpack_require__(43)
+	  , Iterators        = __webpack_require__(34)
+	  , toIObject        = __webpack_require__(44);
+	
+	// 22.1.3.4 Array.prototype.entries()
+	// 22.1.3.13 Array.prototype.keys()
+	// 22.1.3.29 Array.prototype.values()
+	// 22.1.3.30 Array.prototype[@@iterator]()
+	module.exports = __webpack_require__(27)(Array, 'Array', function(iterated, kind){
+	  this._t = toIObject(iterated); // target
+	  this._i = 0;                   // next index
+	  this._k = kind;                // kind
+	// 22.1.5.2.1 %ArrayIteratorPrototype%.next()
+	}, function(){
+	  var O     = this._t
+	    , kind  = this._k
+	    , index = this._i++;
+	  if(!O || index >= O.length){
+	    this._t = undefined;
+	    return step(1);
+	  }
+	  if(kind == 'keys'  )return step(0, index);
+	  if(kind == 'values')return step(0, O[index]);
+	  return step(0, [index, O[index]]);
+	}, 'values');
+	
+	// argumentsList[@@iterator] is %ArrayProto_values% (9.4.4.6, 9.4.4.7)
+	Iterators.Arguments = Iterators.Array;
+	
+	addToUnscopables('keys');
+	addToUnscopables('values');
+	addToUnscopables('entries');
+
+/***/ },
+/* 42 */
+/***/ function(module, exports) {
+
+	module.exports = function(){ /* empty */ };
+
+/***/ },
+/* 43 */
+/***/ function(module, exports) {
+
+	module.exports = function(done, value){
+	  return {value: value, done: !!done};
+	};
+
+/***/ },
+/* 44 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// to indexed object, toObject with fallback for non-array-like ES3 strings
+	var IObject = __webpack_require__(45)
+	  , defined = __webpack_require__(7);
+	module.exports = function(it){
+	  return IObject(defined(it));
+	};
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// fallback for non-array-like ES3 and non-enumerable old V8 strings
+	var cof = __webpack_require__(46);
+	module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
+	  return cof(it) == 'String' ? it.split('') : Object(it);
+	};
+
+/***/ },
+/* 46 */
+/***/ function(module, exports) {
+
+	var toString = {}.toString;
+	
+	module.exports = function(it){
+	  return toString.call(it).slice(8, -1);
+	};
+
+/***/ },
+/* 47 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(48), __esModule: true };
+
+/***/ },
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(49);
+	__webpack_require__(56);
+	module.exports = __webpack_require__(11).Symbol;
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
 	// ECMAScript 6 symbols shim
 	var $              = __webpack_require__(19)
 	  , global         = __webpack_require__(10)
-	  , has            = __webpack_require__(25)
-	  , DESCRIPTORS    = __webpack_require__(26)
+	  , has            = __webpack_require__(33)
+	  , DESCRIPTORS    = __webpack_require__(32)
 	  , $export        = __webpack_require__(9)
-	  , redefine       = __webpack_require__(27)
+	  , redefine       = __webpack_require__(29)
 	  , $fails         = __webpack_require__(14)
-	  , shared         = __webpack_require__(30)
-	  , setToStringTag = __webpack_require__(31)
-	  , uid            = __webpack_require__(33)
-	  , wks            = __webpack_require__(32)
-	  , keyOf          = __webpack_require__(34)
-	  , $names         = __webpack_require__(38)
-	  , enumKeys       = __webpack_require__(39)
-	  , isArray        = __webpack_require__(40)
-	  , anObject       = __webpack_require__(41)
-	  , toIObject      = __webpack_require__(35)
-	  , createDesc     = __webpack_require__(29)
+	  , shared         = __webpack_require__(38)
+	  , setToStringTag = __webpack_require__(36)
+	  , uid            = __webpack_require__(39)
+	  , wks            = __webpack_require__(37)
+	  , keyOf          = __webpack_require__(50)
+	  , $names         = __webpack_require__(51)
+	  , enumKeys       = __webpack_require__(52)
+	  , isArray        = __webpack_require__(53)
+	  , anObject       = __webpack_require__(54)
+	  , toIObject      = __webpack_require__(44)
+	  , createDesc     = __webpack_require__(31)
 	  , getDesc        = $.getDesc
 	  , setDesc        = $.setDesc
 	  , _create        = $.create
@@ -1284,7 +1651,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  $.getNames   = $names.get = $getOwnPropertyNames;
 	  $.getSymbols = $getOwnPropertySymbols;
 	
-	  if(DESCRIPTORS && !__webpack_require__(43)){
+	  if(DESCRIPTORS && !__webpack_require__(28)){
 	    redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
 	  }
 	}
@@ -1354,106 +1721,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	setToStringTag(global.JSON, 'JSON', true);
 
 /***/ },
-/* 25 */
-/***/ function(module, exports) {
-
-	var hasOwnProperty = {}.hasOwnProperty;
-	module.exports = function(it, key){
-	  return hasOwnProperty.call(it, key);
-	};
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// Thank's IE8 for his funny defineProperty
-	module.exports = !__webpack_require__(14)(function(){
-	  return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
-	});
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(28);
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var $          = __webpack_require__(19)
-	  , createDesc = __webpack_require__(29);
-	module.exports = __webpack_require__(26) ? function(object, key, value){
-	  return $.setDesc(object, key, createDesc(1, value));
-	} : function(object, key, value){
-	  object[key] = value;
-	  return object;
-	};
-
-/***/ },
-/* 29 */
-/***/ function(module, exports) {
-
-	module.exports = function(bitmap, value){
-	  return {
-	    enumerable  : !(bitmap & 1),
-	    configurable: !(bitmap & 2),
-	    writable    : !(bitmap & 4),
-	    value       : value
-	  };
-	};
-
-/***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var global = __webpack_require__(10)
-	  , SHARED = '__core-js_shared__'
-	  , store  = global[SHARED] || (global[SHARED] = {});
-	module.exports = function(key){
-	  return store[key] || (store[key] = {});
-	};
-
-/***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var def = __webpack_require__(19).setDesc
-	  , has = __webpack_require__(25)
-	  , TAG = __webpack_require__(32)('toStringTag');
-	
-	module.exports = function(it, tag, stat){
-	  if(it && !has(it = stat ? it : it.prototype, TAG))def(it, TAG, {configurable: true, value: tag});
-	};
-
-/***/ },
-/* 32 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var store  = __webpack_require__(30)('wks')
-	  , uid    = __webpack_require__(33)
-	  , Symbol = __webpack_require__(10).Symbol;
-	module.exports = function(name){
-	  return store[name] || (store[name] =
-	    Symbol && Symbol[name] || (Symbol || uid)('Symbol.' + name));
-	};
-
-/***/ },
-/* 33 */
-/***/ function(module, exports) {
-
-	var id = 0
-	  , px = Math.random();
-	module.exports = function(key){
-	  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-	};
-
-/***/ },
-/* 34 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $         = __webpack_require__(19)
-	  , toIObject = __webpack_require__(35);
+	  , toIObject = __webpack_require__(44);
 	module.exports = function(object, el){
 	  var O      = toIObject(object)
 	    , keys   = $.getKeys(O)
@@ -1464,42 +1736,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// to indexed object, toObject with fallback for non-array-like ES3 strings
-	var IObject = __webpack_require__(36)
-	  , defined = __webpack_require__(7);
-	module.exports = function(it){
-	  return IObject(defined(it));
-	};
-
-/***/ },
-/* 36 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// fallback for non-array-like ES3 and non-enumerable old V8 strings
-	var cof = __webpack_require__(37);
-	module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
-	  return cof(it) == 'String' ? it.split('') : Object(it);
-	};
-
-/***/ },
-/* 37 */
-/***/ function(module, exports) {
-
-	var toString = {}.toString;
-	
-	module.exports = function(it){
-	  return toString.call(it).slice(8, -1);
-	};
-
-/***/ },
-/* 38 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
-	var toIObject = __webpack_require__(35)
+	var toIObject = __webpack_require__(44)
 	  , getNames  = __webpack_require__(19).getNames
 	  , toString  = {}.toString;
 	
@@ -1520,7 +1761,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 39 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// all enumerable object keys, includes symbols
@@ -1539,27 +1780,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 40 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 7.2.2 IsArray(argument)
-	var cof = __webpack_require__(37);
+	var cof = __webpack_require__(46);
 	module.exports = Array.isArray || function(arg){
 	  return cof(arg) == 'Array';
 	};
 
 /***/ },
-/* 41 */
+/* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(42);
+	var isObject = __webpack_require__(55);
 	module.exports = function(it){
 	  if(!isObject(it))throw TypeError(it + ' is not an object!');
 	  return it;
 	};
 
 /***/ },
-/* 42 */
+/* 55 */
 /***/ function(module, exports) {
 
 	module.exports = function(it){
@@ -1567,30 +1808,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 43 */
-/***/ function(module, exports) {
-
-	module.exports = true;
-
-/***/ },
-/* 44 */
+/* 56 */
 /***/ function(module, exports) {
 
 
 
 /***/ },
-/* 45 */
+/* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	exports.__esModule = true;
 	
-	var _setPrototypeOf = __webpack_require__(46);
+	var _setPrototypeOf = __webpack_require__(58);
 	
 	var _setPrototypeOf2 = _interopRequireDefault(_setPrototypeOf);
 	
-	var _create = __webpack_require__(50);
+	var _create = __webpack_require__(62);
 	
 	var _create2 = _interopRequireDefault(_create);
 	
@@ -1617,35 +1852,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 46 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(47), __esModule: true };
+	module.exports = { "default": __webpack_require__(59), __esModule: true };
 
 /***/ },
-/* 47 */
+/* 59 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(48);
+	__webpack_require__(60);
 	module.exports = __webpack_require__(11).Object.setPrototypeOf;
 
 /***/ },
-/* 48 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.3.19 Object.setPrototypeOf(O, proto)
 	var $export = __webpack_require__(9);
-	$export($export.S, 'Object', {setPrototypeOf: __webpack_require__(49).set});
+	$export($export.S, 'Object', {setPrototypeOf: __webpack_require__(61).set});
 
 /***/ },
-/* 49 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Works with __proto__ only. Old v8 can't work with null proto objects.
 	/* eslint-disable no-proto */
 	var getDesc  = __webpack_require__(19).getDesc
-	  , isObject = __webpack_require__(42)
-	  , anObject = __webpack_require__(41);
+	  , isObject = __webpack_require__(55)
+	  , anObject = __webpack_require__(54);
 	var check = function(O, proto){
 	  anObject(O);
 	  if(!isObject(proto) && proto !== null)throw TypeError(proto + ": can't set as prototype!");
@@ -1669,13 +1904,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 50 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(51), __esModule: true };
+	module.exports = { "default": __webpack_require__(63), __esModule: true };
 
 /***/ },
-/* 51 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var $ = __webpack_require__(19);
@@ -1684,14 +1919,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 52 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-	
-	/**
-	 * A Render Result
-	 */
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -1707,7 +1938,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var RenderResult = (function () {
+	/**
+	 * A Render Result
+	 */
+	
+	var RenderResult = function () {
 	    /**
 	     * @param {int} startOffset
 	     * @param {int} endOffset
@@ -1730,8 +1965,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @return RenderResult
 	     */
 	
+	
 	    (0, _createClass3.default)(RenderResult, [{
-	        key: 'serialize',
+	        key: "serialize",
+	
 	
 	        /**
 	         * @returns {Object}
@@ -1750,7 +1987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	
 	    }, {
-	        key: 'text',
+	        key: "text",
 	        set: function set(text) {
 	            this._text = text;
 	        }
@@ -1768,7 +2005,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	
 	    }, {
-	        key: 'instance',
+	        key: "instance",
 	        get: function get() {
 	            return this._renderingInstance;
 	        }
@@ -1781,30 +2018,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._renderingInstance = instance;
 	        }
 	    }], [{
-	        key: 'fromObject',
+	        key: "fromObject",
 	        value: function fromObject(result) {
 	            return new RenderResult(result.startOffset, result.endOffset, result.startContainerPath, result.endContainerPath);
 	        }
 	    }]);
 	    return RenderResult;
-	})();
-	
+	}();
+
 	exports.default = RenderResult;
 
 /***/ },
-/* 53 */
+/* 65 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/* global Set */
-	
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.EVENT_PART_TREE_LEAVE = exports.EVENT_PART_TREE_ENTER = exports.EVENT_MOUSELEAVE = exports.EVENT_MOUSEENTER = exports.EVENT_CLICK = undefined;
 	
-	var _slicedToArray2 = __webpack_require__(54);
+	var _slicedToArray2 = __webpack_require__(66);
 	
 	var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 	
@@ -1812,11 +2047,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _typeof3 = _interopRequireDefault(_typeof2);
 	
-	var _set = __webpack_require__(73);
+	var _set = __webpack_require__(75);
 	
 	var _set2 = _interopRequireDefault(_set);
 	
-	var _assign = __webpack_require__(87);
+	var _assign = __webpack_require__(89);
 	
 	var _assign2 = _interopRequireDefault(_assign);
 	
@@ -1836,11 +2071,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
 	
-	var _inherits2 = __webpack_require__(45);
+	var _inherits2 = __webpack_require__(57);
 	
 	var _inherits3 = _interopRequireDefault(_inherits2);
 	
-	var _wolfy87Eventemitter = __webpack_require__(91);
+	var _wolfy87Eventemitter = __webpack_require__(93);
 	
 	var _wolfy87Eventemitter2 = _interopRequireDefault(_wolfy87Eventemitter);
 	
@@ -1848,7 +2083,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Rendering2 = _interopRequireDefault(_Rendering);
 	
-	var _Util = __webpack_require__(92);
+	var _Util = __webpack_require__(94);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
@@ -1862,6 +2097,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * @type {string}
 	 */
+	/* global Set */
+	
 	var EVENT_MOUSEENTER = exports.EVENT_MOUSEENTER = 'hover-enter';
 	
 	/**
@@ -1883,8 +2120,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Generic Event Handlings for Renderer
 	 */
 	
-	var RenderingEvents = (function (_EventEmitter) {
+	var RenderingEvents = function (_EventEmitter) {
 	    (0, _inherits3.default)(RenderingEvents, _EventEmitter);
+	
 	
 	    /**
 	     * @param {Object} options
@@ -1893,6 +2131,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    function RenderingEvents(options, document) {
 	        (0, _classCallCheck3.default)(this, RenderingEvents);
+	
 	
 	        /**
 	         * Options
@@ -1933,8 +2172,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @returns {Range}
 	     */
 	
+	
 	    (0, _createClass3.default)(RenderingEvents, [{
 	        key: '_registerEvents',
+	
 	
 	        /**
 	         * Will register events if not already bind.
@@ -2090,30 +2331,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }]);
 	    return RenderingEvents;
-	})(_wolfy87Eventemitter2.default);
-	
+	}(_wolfy87Eventemitter2.default);
+
 	exports.default = RenderingEvents;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 54 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	
 	exports.__esModule = true;
 	
-	var _isIterable2 = __webpack_require__(55);
+	var _isIterable2 = __webpack_require__(67);
 	
 	var _isIterable3 = _interopRequireDefault(_isIterable2);
 	
-	var _getIterator2 = __webpack_require__(69);
+	var _getIterator2 = __webpack_require__(71);
 	
 	var _getIterator3 = _interopRequireDefault(_getIterator2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	exports.default = (function () {
+	exports.default = function () {
 	  function sliceIterator(arr, i) {
 	    var _arr = [];
 	    var _n = true;
@@ -2149,240 +2390,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw new TypeError("Invalid attempt to destructure non-iterable instance");
 	    }
 	  };
-	})();
-
-/***/ },
-/* 55 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(56), __esModule: true };
-
-/***/ },
-/* 56 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(57);
-	__webpack_require__(64);
-	module.exports = __webpack_require__(67);
-
-/***/ },
-/* 57 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(58);
-	var Iterators = __webpack_require__(61);
-	Iterators.NodeList = Iterators.HTMLCollection = Iterators.Array;
-
-/***/ },
-/* 58 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var addToUnscopables = __webpack_require__(59)
-	  , step             = __webpack_require__(60)
-	  , Iterators        = __webpack_require__(61)
-	  , toIObject        = __webpack_require__(35);
-	
-	// 22.1.3.4 Array.prototype.entries()
-	// 22.1.3.13 Array.prototype.keys()
-	// 22.1.3.29 Array.prototype.values()
-	// 22.1.3.30 Array.prototype[@@iterator]()
-	module.exports = __webpack_require__(62)(Array, 'Array', function(iterated, kind){
-	  this._t = toIObject(iterated); // target
-	  this._i = 0;                   // next index
-	  this._k = kind;                // kind
-	// 22.1.5.2.1 %ArrayIteratorPrototype%.next()
-	}, function(){
-	  var O     = this._t
-	    , kind  = this._k
-	    , index = this._i++;
-	  if(!O || index >= O.length){
-	    this._t = undefined;
-	    return step(1);
-	  }
-	  if(kind == 'keys'  )return step(0, index);
-	  if(kind == 'values')return step(0, O[index]);
-	  return step(0, [index, O[index]]);
-	}, 'values');
-	
-	// argumentsList[@@iterator] is %ArrayProto_values% (9.4.4.6, 9.4.4.7)
-	Iterators.Arguments = Iterators.Array;
-	
-	addToUnscopables('keys');
-	addToUnscopables('values');
-	addToUnscopables('entries');
-
-/***/ },
-/* 59 */
-/***/ function(module, exports) {
-
-	module.exports = function(){ /* empty */ };
-
-/***/ },
-/* 60 */
-/***/ function(module, exports) {
-
-	module.exports = function(done, value){
-	  return {value: value, done: !!done};
-	};
-
-/***/ },
-/* 61 */
-/***/ function(module, exports) {
-
-	module.exports = {};
-
-/***/ },
-/* 62 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var LIBRARY        = __webpack_require__(43)
-	  , $export        = __webpack_require__(9)
-	  , redefine       = __webpack_require__(27)
-	  , hide           = __webpack_require__(28)
-	  , has            = __webpack_require__(25)
-	  , Iterators      = __webpack_require__(61)
-	  , $iterCreate    = __webpack_require__(63)
-	  , setToStringTag = __webpack_require__(31)
-	  , getProto       = __webpack_require__(19).getProto
-	  , ITERATOR       = __webpack_require__(32)('iterator')
-	  , BUGGY          = !([].keys && 'next' in [].keys()) // Safari has buggy iterators w/o `next`
-	  , FF_ITERATOR    = '@@iterator'
-	  , KEYS           = 'keys'
-	  , VALUES         = 'values';
-	
-	var returnThis = function(){ return this; };
-	
-	module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED){
-	  $iterCreate(Constructor, NAME, next);
-	  var getMethod = function(kind){
-	    if(!BUGGY && kind in proto)return proto[kind];
-	    switch(kind){
-	      case KEYS: return function keys(){ return new Constructor(this, kind); };
-	      case VALUES: return function values(){ return new Constructor(this, kind); };
-	    } return function entries(){ return new Constructor(this, kind); };
-	  };
-	  var TAG        = NAME + ' Iterator'
-	    , DEF_VALUES = DEFAULT == VALUES
-	    , VALUES_BUG = false
-	    , proto      = Base.prototype
-	    , $native    = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT]
-	    , $default   = $native || getMethod(DEFAULT)
-	    , methods, key;
-	  // Fix native
-	  if($native){
-	    var IteratorPrototype = getProto($default.call(new Base));
-	    // Set @@toStringTag to native iterators
-	    setToStringTag(IteratorPrototype, TAG, true);
-	    // FF fix
-	    if(!LIBRARY && has(proto, FF_ITERATOR))hide(IteratorPrototype, ITERATOR, returnThis);
-	    // fix Array#{values, @@iterator}.name in V8 / FF
-	    if(DEF_VALUES && $native.name !== VALUES){
-	      VALUES_BUG = true;
-	      $default = function values(){ return $native.call(this); };
-	    }
-	  }
-	  // Define iterator
-	  if((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])){
-	    hide(proto, ITERATOR, $default);
-	  }
-	  // Plug for library
-	  Iterators[NAME] = $default;
-	  Iterators[TAG]  = returnThis;
-	  if(DEFAULT){
-	    methods = {
-	      values:  DEF_VALUES  ? $default : getMethod(VALUES),
-	      keys:    IS_SET      ? $default : getMethod(KEYS),
-	      entries: !DEF_VALUES ? $default : getMethod('entries')
-	    };
-	    if(FORCED)for(key in methods){
-	      if(!(key in proto))redefine(proto, key, methods[key]);
-	    } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
-	  }
-	  return methods;
-	};
-
-/***/ },
-/* 63 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var $              = __webpack_require__(19)
-	  , descriptor     = __webpack_require__(29)
-	  , setToStringTag = __webpack_require__(31)
-	  , IteratorPrototype = {};
-	
-	// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-	__webpack_require__(28)(IteratorPrototype, __webpack_require__(32)('iterator'), function(){ return this; });
-	
-	module.exports = function(Constructor, NAME, next){
-	  Constructor.prototype = $.create(IteratorPrototype, {next: descriptor(1, next)});
-	  setToStringTag(Constructor, NAME + ' Iterator');
-	};
-
-/***/ },
-/* 64 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var $at  = __webpack_require__(65)(true);
-	
-	// 21.1.3.27 String.prototype[@@iterator]()
-	__webpack_require__(62)(String, 'String', function(iterated){
-	  this._t = String(iterated); // target
-	  this._i = 0;                // next index
-	// 21.1.5.2.1 %StringIteratorPrototype%.next()
-	}, function(){
-	  var O     = this._t
-	    , index = this._i
-	    , point;
-	  if(index >= O.length)return {value: undefined, done: true};
-	  point = $at(O, index);
-	  this._i += point.length;
-	  return {value: point, done: false};
-	});
-
-/***/ },
-/* 65 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var toInteger = __webpack_require__(66)
-	  , defined   = __webpack_require__(7);
-	// true  -> String#at
-	// false -> String#codePointAt
-	module.exports = function(TO_STRING){
-	  return function(that, pos){
-	    var s = String(defined(that))
-	      , i = toInteger(pos)
-	      , l = s.length
-	      , a, b;
-	    if(i < 0 || i >= l)return TO_STRING ? '' : undefined;
-	    a = s.charCodeAt(i);
-	    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
-	      ? TO_STRING ? s.charAt(i) : a
-	      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-	  };
-	};
-
-/***/ },
-/* 66 */
-/***/ function(module, exports) {
-
-	// 7.1.4 ToInteger
-	var ceil  = Math.ceil
-	  , floor = Math.floor;
-	module.exports = function(it){
-	  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-	};
+	}();
 
 /***/ },
 /* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var classof   = __webpack_require__(68)
-	  , ITERATOR  = __webpack_require__(32)('iterator')
-	  , Iterators = __webpack_require__(61);
+	module.exports = { "default": __webpack_require__(68), __esModule: true };
+
+/***/ },
+/* 68 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(40);
+	__webpack_require__(24);
+	module.exports = __webpack_require__(69);
+
+/***/ },
+/* 69 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var classof   = __webpack_require__(70)
+	  , ITERATOR  = __webpack_require__(37)('iterator')
+	  , Iterators = __webpack_require__(34);
 	module.exports = __webpack_require__(11).isIterable = function(it){
 	  var O = Object(it);
 	  return O[ITERATOR] !== undefined
@@ -2391,12 +2421,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 68 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// getting tag from 19.1.3.6 Object.prototype.toString()
-	var cof = __webpack_require__(37)
-	  , TAG = __webpack_require__(32)('toStringTag')
+	var cof = __webpack_require__(46)
+	  , TAG = __webpack_require__(37)('toStringTag')
 	  // ES3 wrong here
 	  , ARG = cof(function(){ return arguments; }()) == 'Arguments';
 	
@@ -2412,25 +2442,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 69 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(70), __esModule: true };
-
-/***/ },
-/* 70 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(57);
-	__webpack_require__(64);
-	module.exports = __webpack_require__(71);
-
-/***/ },
 /* 71 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var anObject = __webpack_require__(41)
-	  , get      = __webpack_require__(72);
+	module.exports = { "default": __webpack_require__(72), __esModule: true };
+
+/***/ },
+/* 72 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(40);
+	__webpack_require__(24);
+	module.exports = __webpack_require__(73);
+
+/***/ },
+/* 73 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var anObject = __webpack_require__(54)
+	  , get      = __webpack_require__(74);
 	module.exports = __webpack_require__(11).getIterator = function(it){
 	  var iterFn = get(it);
 	  if(typeof iterFn != 'function')throw TypeError(it + ' is not iterable!');
@@ -2438,12 +2468,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 72 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var classof   = __webpack_require__(68)
-	  , ITERATOR  = __webpack_require__(32)('iterator')
-	  , Iterators = __webpack_require__(61);
+	var classof   = __webpack_require__(70)
+	  , ITERATOR  = __webpack_require__(37)('iterator')
+	  , Iterators = __webpack_require__(34);
 	module.exports = __webpack_require__(11).getIteratorMethod = function(it){
 	  if(it != undefined)return it[ITERATOR]
 	    || it['@@iterator']
@@ -2451,31 +2481,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 73 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(74), __esModule: true };
-
-/***/ },
-/* 74 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(44);
-	__webpack_require__(64);
-	__webpack_require__(57);
-	__webpack_require__(75);
-	__webpack_require__(85);
-	module.exports = __webpack_require__(11).Set;
-
-/***/ },
 /* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = { "default": __webpack_require__(76), __esModule: true };
+
+/***/ },
+/* 76 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(56);
+	__webpack_require__(24);
+	__webpack_require__(40);
+	__webpack_require__(77);
+	__webpack_require__(87);
+	module.exports = __webpack_require__(11).Set;
+
+/***/ },
+/* 77 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
-	var strong = __webpack_require__(76);
+	var strong = __webpack_require__(78);
 	
 	// 23.2 Set Objects
-	__webpack_require__(84)('Set', function(get){
+	__webpack_require__(86)('Set', function(get){
 	  return function Set(){ return get(this, arguments.length > 0 ? arguments[0] : undefined); };
 	}, {
 	  // 23.2.3.1 Set.prototype.add(value)
@@ -2485,24 +2515,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	}, strong);
 
 /***/ },
-/* 76 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	var $            = __webpack_require__(19)
-	  , hide         = __webpack_require__(28)
-	  , redefineAll  = __webpack_require__(77)
+	  , hide         = __webpack_require__(30)
+	  , redefineAll  = __webpack_require__(79)
 	  , ctx          = __webpack_require__(12)
-	  , strictNew    = __webpack_require__(78)
+	  , strictNew    = __webpack_require__(80)
 	  , defined      = __webpack_require__(7)
-	  , forOf        = __webpack_require__(79)
-	  , $iterDefine  = __webpack_require__(62)
-	  , step         = __webpack_require__(60)
-	  , ID           = __webpack_require__(33)('id')
-	  , $has         = __webpack_require__(25)
-	  , isObject     = __webpack_require__(42)
-	  , setSpecies   = __webpack_require__(83)
-	  , DESCRIPTORS  = __webpack_require__(26)
+	  , forOf        = __webpack_require__(81)
+	  , $iterDefine  = __webpack_require__(27)
+	  , step         = __webpack_require__(43)
+	  , ID           = __webpack_require__(39)('id')
+	  , $has         = __webpack_require__(33)
+	  , isObject     = __webpack_require__(55)
+	  , setSpecies   = __webpack_require__(85)
+	  , DESCRIPTORS  = __webpack_require__(32)
 	  , isExtensible = Object.isExtensible || isObject
 	  , SIZE         = DESCRIPTORS ? '_s' : 'size'
 	  , id           = 0;
@@ -2649,17 +2679,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 77 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var redefine = __webpack_require__(27);
+	var redefine = __webpack_require__(29);
 	module.exports = function(target, src){
 	  for(var key in src)redefine(target, key, src[key]);
 	  return target;
 	};
 
 /***/ },
-/* 78 */
+/* 80 */
 /***/ function(module, exports) {
 
 	module.exports = function(it, Constructor, name){
@@ -2668,15 +2698,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 79 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var ctx         = __webpack_require__(12)
-	  , call        = __webpack_require__(80)
-	  , isArrayIter = __webpack_require__(81)
-	  , anObject    = __webpack_require__(41)
-	  , toLength    = __webpack_require__(82)
-	  , getIterFn   = __webpack_require__(72);
+	  , call        = __webpack_require__(82)
+	  , isArrayIter = __webpack_require__(83)
+	  , anObject    = __webpack_require__(54)
+	  , toLength    = __webpack_require__(84)
+	  , getIterFn   = __webpack_require__(74);
 	module.exports = function(iterable, entries, fn, that){
 	  var iterFn = getIterFn(iterable)
 	    , f      = ctx(fn, that, entries ? 2 : 1)
@@ -2692,11 +2722,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 80 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// call something on iterator step with safe closing on error
-	var anObject = __webpack_require__(41);
+	var anObject = __webpack_require__(54);
 	module.exports = function(iterator, fn, value, entries){
 	  try {
 	    return entries ? fn(anObject(value)[0], value[1]) : fn(value);
@@ -2709,12 +2739,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 81 */
+/* 83 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// check on default Array iterator
-	var Iterators  = __webpack_require__(61)
-	  , ITERATOR   = __webpack_require__(32)('iterator')
+	var Iterators  = __webpack_require__(34)
+	  , ITERATOR   = __webpack_require__(37)('iterator')
 	  , ArrayProto = Array.prototype;
 	
 	module.exports = function(it){
@@ -2722,25 +2752,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 82 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 7.1.15 ToLength
-	var toInteger = __webpack_require__(66)
+	var toInteger = __webpack_require__(26)
 	  , min       = Math.min;
 	module.exports = function(it){
 	  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 	};
 
 /***/ },
-/* 83 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	var core        = __webpack_require__(11)
 	  , $           = __webpack_require__(19)
-	  , DESCRIPTORS = __webpack_require__(26)
-	  , SPECIES     = __webpack_require__(32)('species');
+	  , DESCRIPTORS = __webpack_require__(32)
+	  , SPECIES     = __webpack_require__(37)('species');
 	
 	module.exports = function(KEY){
 	  var C = core[KEY];
@@ -2751,7 +2781,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 84 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2759,13 +2789,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  , global         = __webpack_require__(10)
 	  , $export        = __webpack_require__(9)
 	  , fails          = __webpack_require__(14)
-	  , hide           = __webpack_require__(28)
-	  , redefineAll    = __webpack_require__(77)
-	  , forOf          = __webpack_require__(79)
-	  , strictNew      = __webpack_require__(78)
-	  , isObject       = __webpack_require__(42)
-	  , setToStringTag = __webpack_require__(31)
-	  , DESCRIPTORS    = __webpack_require__(26);
+	  , hide           = __webpack_require__(30)
+	  , redefineAll    = __webpack_require__(79)
+	  , forOf          = __webpack_require__(81)
+	  , strictNew      = __webpack_require__(80)
+	  , isObject       = __webpack_require__(55)
+	  , setToStringTag = __webpack_require__(36)
+	  , DESCRIPTORS    = __webpack_require__(32);
 	
 	module.exports = function(NAME, wrapper, methods, common, IS_MAP, IS_WEAK){
 	  var Base  = global[NAME]
@@ -2811,21 +2841,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 85 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
 	var $export  = __webpack_require__(9);
 	
-	$export($export.P, 'Set', {toJSON: __webpack_require__(86)('Set')});
+	$export($export.P, 'Set', {toJSON: __webpack_require__(88)('Set')});
 
 /***/ },
-/* 86 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://github.com/DavidBruant/Map-Set.prototype.toJSON
-	var forOf   = __webpack_require__(79)
-	  , classof = __webpack_require__(68);
+	var forOf   = __webpack_require__(81)
+	  , classof = __webpack_require__(70);
 	module.exports = function(NAME){
 	  return function toJSON(){
 	    if(classof(this) != NAME)throw TypeError(NAME + "#toJSON isn't generic");
@@ -2836,35 +2866,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 87 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(88), __esModule: true };
-
-/***/ },
-/* 88 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(89);
-	module.exports = __webpack_require__(11).Object.assign;
-
-/***/ },
 /* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// 19.1.3.1 Object.assign(target, source)
-	var $export = __webpack_require__(9);
-	
-	$export($export.S + $export.F, 'Object', {assign: __webpack_require__(90)});
+	module.exports = { "default": __webpack_require__(90), __esModule: true };
 
 /***/ },
 /* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
+	__webpack_require__(91);
+	module.exports = __webpack_require__(11).Object.assign;
+
+/***/ },
+/* 91 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.3.1 Object.assign(target, source)
+	var $export = __webpack_require__(9);
+	
+	$export($export.S + $export.F, 'Object', {assign: __webpack_require__(92)});
+
+/***/ },
+/* 92 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// 19.1.2.1 Object.assign(target, source, ...)
 	var $        = __webpack_require__(19)
 	  , toObject = __webpack_require__(6)
-	  , IObject  = __webpack_require__(36);
+	  , IObject  = __webpack_require__(45);
 	
 	// should work with symbols and should have deterministic property order (V8 bug)
 	module.exports = __webpack_require__(14)(function(){
@@ -2896,7 +2926,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	} : Object.assign;
 
 /***/ },
-/* 91 */
+/* 93 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -3376,16 +3406,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 92 */
+/* 94 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* global Node, NodeList, Element */
-	
 	'use strict';
-	
-	/**
-	 * @type {string}
-	 */
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -3404,6 +3428,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
+	/* global Node, NodeList, Element */
+	
+	/**
+	 * @type {string}
+	 */
 	var ATTR_DATA_ORIGINAL_INDEX = exports.ATTR_DATA_ORIGINAL_INDEX = 'data-original-index';
 	/**
 	 * @type {string}
@@ -3425,13 +3454,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Contains DOM/Node manipulation helpers
 	 */
 	
-	var Util = (function () {
+	var Util = function () {
 	    function Util() {
 	        (0, _classCallCheck3.default)(this, Util);
 	    }
 	
 	    (0, _createClass3.default)(Util, null, [{
 	        key: 'nodeListFilter',
+	
 	
 	        /**
 	         * Filter for a NodeList
@@ -3847,10 +3877,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!node) {
 	                return false;
 	            }
-	            var args = [node, type];
-	            if (filter) {
-	                args.push(filter);
-	            }
+	            var args = [node, type, filter || function () {
+	                return true;
+	            }, false];
+	            args.push(false);
 	            var walker = (_document = document).createTreeWalker.apply(_document, args);
 	            while (walker.nextNode()) {
 	                if (!func(walker.currentNode)) {
@@ -3871,10 +3901,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'walkTextNodes',
 	        value: function walkTextNodes(el, func) {
-	            var filter = arguments.length <= 2 || arguments[2] === undefined ? {
-	                acceptNode: function acceptNode(node) {
-	                    return !Util.nodeIsEmpty(node);
-	                }
+	            var filter = arguments.length <= 2 || arguments[2] === undefined ? function (node) {
+	                return !Util.nodeIsEmpty(node);
 	            } : arguments[2];
 	
 	            return Util.walkDom(el, func, NodeFilter.SHOW_TEXT, filter);
@@ -3908,12 +3936,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }]);
 	    return Util;
-	})();
-	
+	}();
+
 	exports.default = Util;
 
 /***/ },
-/* 93 */
+/* 95 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3922,7 +3950,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 	
-	var _stringify = __webpack_require__(94);
+	var _stringify = __webpack_require__(96);
 	
 	var _stringify2 = _interopRequireDefault(_stringify);
 	
@@ -3930,7 +3958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Marklib2 = _interopRequireDefault(_Marklib);
 	
-	var _flexcss = __webpack_require__(96);
+	var _flexcss = __webpack_require__(98);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -4080,13 +4108,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = _Marklib2.default;
 
 /***/ },
-/* 94 */
+/* 96 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = { "default": __webpack_require__(95), __esModule: true };
+	module.exports = { "default": __webpack_require__(97), __esModule: true };
 
 /***/ },
-/* 95 */
+/* 97 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var core = __webpack_require__(11);
@@ -4095,7 +4123,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 96 */
+/* 98 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4105,43 +4133,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.LightBox = exports.Dropdown = exports.OffCanvas = exports.Toggleable = exports.Util = exports.Settings = exports.Widget = exports.Modal = exports.Tooltip = exports.Form = undefined;
 	
-	var _Form = __webpack_require__(97);
+	var _Form = __webpack_require__(99);
 	
 	var _Form2 = _interopRequireDefault(_Form);
 	
-	var _Tooltip = __webpack_require__(98);
+	var _Tooltip = __webpack_require__(100);
 	
 	var _Tooltip2 = _interopRequireDefault(_Tooltip);
 	
-	var _Modal = __webpack_require__(105);
+	var _Modal = __webpack_require__(107);
 	
 	var _Modal2 = _interopRequireDefault(_Modal);
 	
-	var _Widget = __webpack_require__(106);
+	var _Widget = __webpack_require__(108);
 	
 	var _Widget2 = _interopRequireDefault(_Widget);
 	
-	var _Settings = __webpack_require__(101);
+	var _Settings = __webpack_require__(103);
 	
 	var _Settings2 = _interopRequireDefault(_Settings);
 	
-	var _Toggleable = __webpack_require__(107);
+	var _Toggleable = __webpack_require__(111);
 	
 	var _Toggleable2 = _interopRequireDefault(_Toggleable);
 	
-	var _OffCanvas = __webpack_require__(108);
+	var _OffCanvas = __webpack_require__(112);
 	
 	var _OffCanvas2 = _interopRequireDefault(_OffCanvas);
 	
-	var _Dropdown = __webpack_require__(109);
+	var _Dropdown = __webpack_require__(113);
 	
 	var _Dropdown2 = _interopRequireDefault(_Dropdown);
 	
-	var _LightBox = __webpack_require__(110);
+	var _LightBox = __webpack_require__(114);
 	
 	var _LightBox2 = _interopRequireDefault(_LightBox);
 	
-	var _Util = __webpack_require__(99);
+	var _Util = __webpack_require__(101);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
@@ -4159,7 +4187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.LightBox = _LightBox2.default;
 
 /***/ },
-/* 97 */
+/* 99 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*global HTMLFormElement, fetch, FormData, clearTimeout, NodeList*/
@@ -4196,34 +4224,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	'use strict';
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.EVENT_FORM_AJAX_COMPLETED = exports.EVENT_FORM_AFTER_AJAX_SUBMIT = exports.EVENT_FORM_SUBMIT = exports.EVENT_FORM_READY = undefined;
 	
-	var _Tooltip = __webpack_require__(98);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
+	var _Tooltip = __webpack_require__(100);
 	
 	var _Tooltip2 = _interopRequireDefault(_Tooltip);
 	
-	__webpack_require__(102);
+	__webpack_require__(104);
 	
-	var _Event = __webpack_require__(104);
+	var _Event = __webpack_require__(106);
 	
 	var _Event2 = _interopRequireDefault(_Event);
 	
-	var _Util = __webpack_require__(99);
+	var _Util = __webpack_require__(101);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _Settings = __webpack_require__(101);
+	var _Settings = __webpack_require__(103);
 	
 	var _Settings2 = _interopRequireDefault(_Settings);
 	
-	var _DestroyableWidget2 = __webpack_require__(100);
+	var _DestroyableWidget2 = __webpack_require__(102);
 	
 	var _DestroyableWidget3 = _interopRequireDefault(_DestroyableWidget2);
 	
@@ -4277,7 +4305,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * A HTML5 Form Validation replacement
 	 */
 	
-	var Form = (function (_DestroyableWidget) {
+	var Form = function (_DestroyableWidget) {
 	    _inherits(Form, _DestroyableWidget);
 	
 	    /**
@@ -4493,7 +4521,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var _this2 = this;
 	
 	            var fields = field instanceof Array || field instanceof NodeList ? field : [field];
-	            return this._handleValidation(fields, focus, true).then((function (r) {
+	            return this._handleValidation(fields, focus, true).then(function (r) {
 	                if (!r.foundAnyError) {
 	                    // remove tooltips
 	                    if (_this2.tooltips) {
@@ -4501,7 +4529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	                }
 	                return r;
-	            }).bind(this));
+	            }.bind(this));
 	        }
 	
 	        /**
@@ -4573,7 +4601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: '_handleLabels',
 	        value: function _handleLabels(fields) {
-	            Object.keys(fields).forEach((function (id) {
+	            Object.keys(fields).forEach(function (id) {
 	                var labels = this.getForm().querySelectorAll('[for="' + id + '"]'),
 	                    invalid = fields[id];
 	                if (labels.length) {
@@ -4587,7 +4615,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        }
 	                    }
 	                }
-	            }).bind(this));
+	            }.bind(this));
 	        }
 	
 	        /**
@@ -4825,11 +4853,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var id = field.getAttribute(ATTR_DATA_CUSTOM_LABEL) || field.id;
 	                if (id) {
 	                    var linkedFields = Array.from(this.getForm().querySelectorAll('[' + ATTR_DATA_CUSTOM_LABEL + '="' + id + '"], #' + id));
-	                    linkedFields.forEach((function (thisField) {
+	                    linkedFields.forEach(function (thisField) {
 	                        var validity = thisField.validity,
 	                            isInvalid = validity && !validity.valid && this._isElementInvalidElement(thisField);
 	                        handleAdditionalLabels(isInvalid, labelGroups, thisField);
-	                    }).bind(this));
+	                    }.bind(this));
 	                }
 	            }
 	            this._handleLabels(labelGroups);
@@ -4856,6 +4884,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    }, {
 	        key: 'getForm',
+	
 	
 	        /**
 	         * This form
@@ -4900,6 +4929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    }, {
 	        key: 'showAndOrCreateTooltip',
+	
 	
 	        /**
 	         * Creates a tooltip at given element, will only create a new instance if not created
@@ -5372,12 +5402,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return Form;
-	})(_DestroyableWidget3.default);
+	}(_DestroyableWidget3.default);
 	
 	/**
 	 * Global validators
 	 * @type {Array}
 	 */
+	
 	
 	Form.globalValidators = [];
 	
@@ -5402,28 +5433,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 98 */
+/* 100 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
-	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	
-	var _Util = __webpack_require__(99);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+	
+	var _Util = __webpack_require__(101);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _DestroyableWidget2 = __webpack_require__(100);
+	var _DestroyableWidget2 = __webpack_require__(102);
 	
 	var _DestroyableWidget3 = _interopRequireDefault(_DestroyableWidget2);
 	
-	var _Settings = __webpack_require__(101);
+	var _Settings = __webpack_require__(103);
 	
 	var _Settings2 = _interopRequireDefault(_Settings);
 	
@@ -5491,7 +5522,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Simple Tooltip
 	 */
 	
-	var Tooltip = (function (_DestroyableWidget) {
+	var Tooltip = function (_DestroyableWidget) {
 	    _inherits(Tooltip, _DestroyableWidget);
 	
 	    /**
@@ -5541,6 +5572,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Boolean} [removeTitle] removes title element if given
 	     * @param {Node} [positionRelative]
 	     */
+	
 	
 	    _createClass(Tooltip, [{
 	        key: 'createTooltip',
@@ -5664,22 +5696,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return Tooltip;
-	})(_DestroyableWidget3.default);
+	}(_DestroyableWidget3.default);
 	
 	exports.default = Tooltip;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 99 */
+/* 101 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {"use strict";
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -5719,13 +5751,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Provides shared DOM-Utility functions
 	 */
 	
-	var Util = (function () {
+	var Util = function () {
 	    function Util() {
 	        _classCallCheck(this, Util);
 	    }
 	
 	    _createClass(Util, null, [{
 	        key: "prefixedAnimateEvent",
+	
 	
 	        /**
 	         * Will register the right animation event based on browser
@@ -5761,10 +5794,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var el = document.createElement('fake');
 	
 	            var transitions = {
-	                'transition': 'transitionend',
-	                'OTransition': 'oTransitionEnd',
-	                'MozTransition': 'transitionend',
-	                'WebkitTransition': 'webkitTransitionEnd'
+	                transition: 'transitionend',
+	                OTransition: 'oTransitionEnd',
+	                MozTransition: 'transitionend',
+	                WebkitTransition: 'webkitTransitionEnd'
 	            };
 	
 	            for (t in transitions) {
@@ -5795,6 +5828,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	                now = now.parentNode;
 	            }
 	            return now !== null;
+	        }
+	
+	        /**
+	         * Finds the closest element including itself matching a callback
+	         * @param {Node} el
+	         * @param {Function} callback
+	         * @returns {Node|boolean}
+	         */
+	
+	    }, {
+	        key: "closestCallback",
+	        value: function closestCallback(el, callback) {
+	            var element = el;
+	            while (element !== null) {
+	                if (callback(element)) {
+	                    return element;
+	                }
+	                element = element.parentNode;
+	            }
+	            return false;
 	        }
 	
 	        /**
@@ -5830,7 +5883,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 	            }
 	
-	            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+	            return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + (s4() + s4() + s4());
 	        }
 	
 	        /**
@@ -6020,15 +6073,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var calcLeft = undefined;
 	            if (isCollisionLeft && !isCollisionRight) {
 	                // put element to left if collision with left
-	                calcLeft = targetPosition.left - colRect.left - amountLeft + 'px';
+	                calcLeft = targetPosition.left - colRect.left - amountLeft + "px";
 	                classList.add(COL_LEFT_CLASS);
 	            } else {
 	                // maybe center if no collision with either side
-	                var rightPosition = targetRight - elementRect.width - colRect.left - amountLeft + 'px';
+	                var rightPosition = targetRight - elementRect.width - colRect.left - amountLeft + "px";
 	                var leftCentered = (targetLeft + targetPosition.width / 2 - elementRect.width / 2 || 0) - colRect.left;
 	                var collisionCentered = leftCentered + elementRect.width > colRect.width;
 	                if (centerHorizontal && !collisionCentered) {
-	                    calcLeft = leftCentered + 'px';
+	                    calcLeft = leftCentered + "px";
 	                } else {
 	                    classList.add(COL_RIGHT_CLASS);
 	                    calcLeft = rightPosition;
@@ -6037,10 +6090,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            if (isCollisionBottom || positionTop && !isCollisionTop) {
 	                // Put Element on top if collision
-	                calcTop = targetTop - elementRect.height - colRect.top + 'px';
+	                calcTop = targetTop - elementRect.height - colRect.top + "px";
 	                classList.add(COL_BOTTOM_CLASS);
 	            } else {
-	                calcTop = targetTop + targetPosition.height - colRect.top + 'px';
+	                calcTop = targetTop + targetPosition.height - colRect.top + "px";
 	            }
 	
 	            elementToPosition.style.cssText = "top:" + calcTop + ";left:" + calcLeft + ";";
@@ -6065,7 +6118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    thisOffset = optionalOffset();
 	                }
 	                if (thisOffset > 0) {
-	                    var scrolledY = window.scrollY || window.pageYOffset;
+	                    var scrolledY = window.pageYOffset;
 	                    if (scrolledY) {
 	                        window.scroll(0, scrolledY - thisOffset);
 	                    }
@@ -6075,13 +6128,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return Util;
-	})();
+	}();
 	
 	exports.default = Util;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 100 */
+/* 102 */
 /***/ function(module, exports) {
 
 	/*
@@ -6114,15 +6167,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Provides a Basic Widget
 	 */
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var DestroyableWidget = (function () {
+	var DestroyableWidget = function () {
 	    function DestroyableWidget() {
 	        _classCallCheck(this, DestroyableWidget);
 	
@@ -6132,6 +6185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Destroys a Widget
 	     */
+	
 	
 	    _createClass(DestroyableWidget, [{
 	        key: 'destroy',
@@ -6165,45 +6219,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return DestroyableWidget;
-	})();
+	}();
 	
 	exports.default = DestroyableWidget;
 
 /***/ },
-/* 101 */
+/* 103 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })(); /*
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * The MIT License (MIT)
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Permission is hereby granted, free of charge, to any person obtaining a copy
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * of this software and associated documentation files (the "Software"), to deal
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * in the Software without restriction, including without limitation the rights
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * copies of the Software, and to permit persons to whom the Software is
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * furnished to do so, subject to the following conditions:
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * The above copyright notice and this permission notice shall be included in
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * all copies or substantial portions of the Software.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * THE SOFTWARE.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        */
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	
-	var _Util = __webpack_require__(99);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * The MIT License (MIT)
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Permission is hereby granted, free of charge, to any person obtaining a copy
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * of this software and associated documentation files (the "Software"), to deal
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * in the Software without restriction, including without limitation the rights
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * copies of the Software, and to permit persons to whom the Software is
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * furnished to do so, subject to the following conditions:
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * The above copyright notice and this permission notice shall be included in
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * all copies or substantial portions of the Software.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * THE SOFTWARE.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
+	
+	
+	var _Util = __webpack_require__(101);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
@@ -6234,6 +6289,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        global.FLEXCSS_CONST_TAB_EVENT = 'click';
 	
+	        global.FLEXCSS_IS_SMALL_SCREEN = false;
+	
 	        var init = function init() {
 	            // Measure scrollbar width
 	            global.FLEXCSS_CONST_SCROLLBAR_WIDTH = _Util2.default.getScrollBarWidth();
@@ -6257,13 +6314,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Utility class that setups global settings
 	 */
 	
-	var Settings = (function () {
+	var Settings = function () {
 	    function Settings() {
 	        _classCallCheck(this, Settings);
 	    }
 	
 	    _createClass(Settings, null, [{
 	        key: 'setup',
+	
 	
 	        /**
 	         * Setup global settings, overwrite default values
@@ -6297,6 +6355,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            return global.FLEXCSS_CONST_IS_IOS;
+	        }
+	
+	        /**
+	         * @returns {boolean}
+	         */
+	
+	    }, {
+	        key: 'isSmallScreen',
+	        value: function isSmallScreen() {
+	            return window.innerWidth < Settings.get().smallBreakpoint;
 	        }
 	
 	        /**
@@ -6359,28 +6427,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return Settings;
-	})();
+	}();
 	
 	exports.default = Settings;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 102 */
+/* 104 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// the whatwg-fetch polyfill installs the fetch() function
 	// on the global object (window or self)
 	//
 	// Return that as the export for use in Webpack, Browserify etc.
-	__webpack_require__(103);
+	__webpack_require__(105);
 	module.exports = self.fetch.bind(self);
 
 
 /***/ },
-/* 103 */
+/* 105 */
 /***/ function(module, exports) {
 
-	(function() {
+	(function(self) {
 	  'use strict';
 	
 	  if (self.fetch) {
@@ -6522,6 +6590,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        throw new Error('unsupported BodyInit type')
 	      }
+	
+	      if (!this.headers.get('content-type')) {
+	        if (typeof body === 'string') {
+	          this.headers.set('content-type', 'text/plain;charset=UTF-8')
+	        } else if (this._bodyBlob && this._bodyBlob.type) {
+	          this.headers.set('content-type', this._bodyBlob.type)
+	        }
+	      }
 	    }
 	
 	    if (support.blob) {
@@ -6658,13 +6734,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      options = {}
 	    }
 	
-	    this._initBody(bodyInit)
 	    this.type = 'default'
 	    this.status = options.status
 	    this.ok = this.status >= 200 && this.status < 300
 	    this.statusText = options.statusText
 	    this.headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers)
 	    this.url = options.url || ''
+	    this._initBody(bodyInit)
 	  }
 	
 	  Body.call(Response.prototype)
@@ -6760,20 +6836,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    })
 	  }
 	  self.fetch.polyfill = true
-	})();
+	})(typeof self !== 'undefined' ? self : this);
 
 
 /***/ },
-/* 104 */
+/* 106 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {"use strict";
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -6826,7 +6902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Simpler Event dispatching
 	 */
 	
-	var EventHandler = (function () {
+	var EventHandler = function () {
 	
 	    /**
 	     * @param {HTMLElement} target
@@ -6850,6 +6926,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Object} options
 	     * @returns {EventHandler}
 	     */
+	
 	
 	    _createClass(EventHandler, [{
 	        key: "withOptions",
@@ -6904,9 +6981,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return EventHandler;
-	})();
+	}();
 	
-	var Event = (function () {
+	var Event = function () {
 	    function Event() {
 	        _classCallCheck(this, Event);
 	    }
@@ -6940,13 +7017,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return Event;
-	})();
+	}();
 	
 	exports.default = Event;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 105 */
+/* 107 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*
@@ -6981,32 +7058,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	'use strict';
 	
-	/*global KeyboardEvent*/
-	
-	var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	/* global KeyboardEvent */
 	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.EVENT_MODAL_ASYNC_TARGET_LOADED = exports.EVENT_MODAL_INIT = exports.EVENT_MODAL_OPENED = exports.EVENT_MODAL_BEFORE_CLOSED = exports.EVENT_MODAL_CLOSED = undefined;
 	
-	var _Settings = __webpack_require__(101);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _Settings = __webpack_require__(103);
 	
 	var _Settings2 = _interopRequireDefault(_Settings);
 	
-	var _Event = __webpack_require__(104);
+	var _Event = __webpack_require__(106);
 	
 	var _Event2 = _interopRequireDefault(_Event);
 	
-	var _Util = __webpack_require__(99);
+	var _Util = __webpack_require__(101);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _Widget = __webpack_require__(106);
+	var _Widget = __webpack_require__(108);
 	
 	var _Widget2 = _interopRequireDefault(_Widget);
+	
+	var _FixedWindow = __webpack_require__(109);
+	
+	var _FixedWindow2 = _interopRequireDefault(_FixedWindow);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -7064,12 +7143,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * A Modal Implementation
 	 */
 	
-	var Modal = (function () {
+	var Modal = function () {
 	    function Modal(DelegateContainer, options) {
 	        _classCallCheck(this, Modal);
 	
-	        var doc = global.document,
-	            container = DelegateContainer instanceof HTMLElement ? DelegateContainer : doc.getElementById(DelegateContainer);
+	        var doc = global.document;
+	        var container = DelegateContainer instanceof HTMLElement ? DelegateContainer : doc.getElementById(DelegateContainer);
 	
 	        // Instance vars:
 	        if (!container) {
@@ -7118,40 +7197,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param n
 	     */
 	
+	
 	    _createClass(Modal, [{
 	        key: '_removeModalFromStack',
 	        value: function _removeModalFromStack(n) {
-	            var t = Modal._modalInstances.indexOf(n),
-	                self = this;
+	            var t = Modal._modalInstances.indexOf(n);
 	            if (t > -1) {
 	                Modal._modalInstances.splice(t, 1);
-	                if (Modal._modalInstances.length === 0) {
-	                    // restore scrollPosition:
-	                    if (self.dataMainPageContainer) {
-	                        setTimeout(function () {
-	                            if (self.options.fixedContainer) {
-	                                self.dataMainPageContainer.style.position = "static";
-	                                self.dataMainPageContainer.style.top = "0px";
-	                                // reset scrollTop
-	                                document.documentElement.scrollTop = self.currentScrollTop;
-	                                document.body.scrollTop = self.currentScrollTop;
-	                            }
-	                            _Settings2.default.get().scrollbarUpdateNodes.forEach(function (node) {
-	                                if (node instanceof Array) {
-	                                    var _node = _slicedToArray(node, 2);
-	
-	                                    var whatNode = _node[0];
-	                                    var property = _node[1];
-	
-	                                    whatNode.style[property] = '';
-	                                } else {
-	                                    node.style.paddingRight = '';
-	                                }
-	                            });
-	                            HTML_ELEMENT.classList.remove(CLS_MODAL_OPEN);
-	                        }, 0);
-	                    }
-	                }
+	                _FixedWindow2.default.getInstance().close().then(function () {
+	                    HTML_ELEMENT.classList.remove(CLS_MODAL_OPEN);
+	                });
 	            }
 	        }
 	
@@ -7282,7 +7337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function switchModals(co, last) {
 	            co.prevModal = last;
 	            Modal._modalInstances.push(co);
-	
+	            _FixedWindow2.default.getInstance().open(this);
 	            if (last) {
 	                this._finishState(last);
 	                _Util2.default.prefixedAnimateEvent(last, 'AnimationEnd', this._finishAnim);
@@ -7321,45 +7376,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'handleScrollbar',
 	        value: function handleScrollbar() {
-	            var self = this;
 	            if (Modal._modalInstances.length === 0) {
-	                // save current scrollTop:
-	                var scrollTop = undefined,
-	                    c = undefined;
-	                if (self.options.fixedContainer) {
-	                    scrollTop = global.pageYOffset;
-	                    c = self.dataMainPageContainer;
-	                    self.currentScrollTop = scrollTop;
-	                }
-	                // this causes reflow/paint and should be optimized
-	                // At lest we write in a batch later
-	                _Settings2.default.get().scrollbarUpdateNodes.map(function (n) {
-	                    var foundProperty = 'paddingRight';
-	                    var direction = 1;
-	                    if (n instanceof Array) {
-	                        var _n = n;
-	
-	                        var _n2 = _slicedToArray(_n, 3);
-	
-	                        var whatNode = _n2[0];
-	                        var property = _n2[1];
-	                        var d = _n2[2];
-	
-	                        foundProperty = property;
-	                        n = whatNode;
-	                        direction = d || 1;
-	                    }
-	                    return {
-	                        n: n, property: foundProperty, value: parseInt(global.getComputedStyle(n)[foundProperty]) + _Settings2.default.getScrollbarWidth() * direction + 'px'
-	                    };
-	                }).forEach(function (d) {
-	                    d.n.style[d.property] = d.value;
-	                });
-	                if (self.options.fixedContainer) {
-	                    if (c) {
-	                        c.style.cssText += 'top:' + (scrollTop * -1 + 'px') + ';position:fixed';
-	                    }
-	                }
 	                HTML_ELEMENT.classList.add(CLS_MODAL_OPEN);
 	            }
 	        }
@@ -7544,7 +7561,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function registerEvents(delegate) {
 	            var delegateContainer = delegate || this.container,
 	                self = this;
-	
+	            // Modals should always be fixed
+	            _FixedWindow2.default.getInstance().addScreenConstraint(Modal, function (width) {
+	                return true;
+	            });
 	            // register modal instance so we can detect multiple registrars
 	            delegateContainer.flexModalInstance = self;
 	            self.eventFunction = function () {
@@ -7628,9 +7648,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return Modal;
-	})();
+	}();
 	
 	// Static variable that keeps track of all open modals
+	
 	
 	Modal._modalInstances = [];
 	
@@ -7648,18 +7669,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 106 */
+/* 108 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
-	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 	
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -7697,7 +7718,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * A Widget provides async content on a specific target (e.g. a modal link)
 	 */
 	
-	var Widget = (function () {
+	var Widget = function () {
 	
 	  /**
 	   * Creates a new Widget
@@ -7747,6 +7768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   *
 	   * @returns {Promise}
 	   */
+	
 	
 	  _createClass(Widget, [{
 	    key: 'getAsync',
@@ -7834,40 +7856,326 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }]);
 	
 	  return Widget;
-	})();
+	}();
 	
 	exports.default = Widget;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 107 */
+/* 109 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })(); /*
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * The MIT License (MIT)
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Permission is hereby granted, free of charge, to any person obtaining a copy
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * of this software and associated documentation files (the "Software"), to deal
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * in the Software without restriction, including without limitation the rights
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * copies of the Software, and to permit persons to whom the Software is
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * furnished to do so, subject to the following conditions:
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * The above copyright notice and this permission notice shall be included in
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * all copies or substantial portions of the Software.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * THE SOFTWARE.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        */
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.EVENT_AFTER_FIXED_REMOVE = exports.EVENT_BEFORE_FIXED_ADD = undefined;
+	
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
+	var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _Settings = __webpack_require__(103);
+	
+	var _Settings2 = _interopRequireDefault(_Settings);
+	
+	var _debounce = __webpack_require__(110);
+	
+	var _debounce2 = _interopRequireDefault(_debounce);
+	
+	var _Event = __webpack_require__(106);
+	
+	var _Event2 = _interopRequireDefault(_Event);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var CLS_FIXED_WINDOW = 'fixed-window-open';
+	
+	var EVENT_BEFORE_FIXED_ADD = exports.EVENT_BEFORE_FIXED_ADD = 'flexcss.fixedWindow.beforeAdd';
+	var EVENT_AFTER_FIXED_REMOVE = exports.EVENT_AFTER_FIXED_REMOVE = 'flexcss.fixedWindow.afterRemove';
+	
+	/**
+	 * @type {FixedWindow}
+	 */
+	var fixedWindowInstance = undefined;
+	
+	var FixedWindow = function () {
+	    function FixedWindow() {
+	        _classCallCheck(this, FixedWindow);
+	
+	        this.widgets = [];
+	        this.currentScrollTop = 0;
+	        this.fixedScreenConstraints = [];
+	        this.windowWidth = 0;
+	        this.isFixedWindowActive = false;
+	    }
+	
+	    /**
+	     * Adds a constraint to detect if the window needs to be changed when the screensize changes
+	     *
+	     * @param {Function} widget
+	     * @param {Function} fixedBreakpointFn gets a width argument, return true to open a window
+	     */
+	
+	
+	    _createClass(FixedWindow, [{
+	        key: 'addScreenConstraint',
+	        value: function addScreenConstraint(widget, fixedBreakpointFn) {
+	            this.fixedScreenConstraints[widget] = fixedBreakpointFn;
+	        }
+	
+	        /**
+	         * @returns {null|DestroyableWidget}
+	         */
+	
+	    }, {
+	        key: 'getCurrentWidget',
+	        value: function getCurrentWidget() {
+	            return this.widgets.length > 0 ? this.widgets[this.widgets.length - 1] : null;
+	        }
+	
+	        /**
+	         * @private
+	         */
+	
+	    }, {
+	        key: '_checkFixedNeeded',
+	        value: function _checkFixedNeeded() {
+	            var _this = this;
+	
+	            if (this.widgets.length === 0) {
+	                return;
+	            }
+	            var widgets = new Set(this.widgets);
+	            var widgetsThatRequireFixedWindow = Array.from(widgets).some(function (widget) {
+	                return _this.fixedScreenConstraints[widget] && _this.fixedScreenConstraints[widget](_this.windowWidth);
+	            });
+	            if (!widgetsThatRequireFixedWindow) {
+	                this._removeFixedContainer();
+	            } else {
+	                this._addFixedContainer();
+	            }
+	        }
+	
+	        /**
+	         * @private
+	         */
+	
+	    }, {
+	        key: '_addFixedContainer',
+	        value: function _addFixedContainer() {
+	            if (this.isFixedWindowActive) {
+	                return;
+	            }
+	            _Event2.default.dispatchAndFire(global.document, EVENT_BEFORE_FIXED_ADD, {
+	                detail: this.getCurrentWidget()
+	            });
+	            // this causes layout and should be optimized
+	            // At lest we write in a batch later
+	            this.currentScrollTop = global.pageYOffset;
+	            _Settings2.default.get().scrollbarUpdateNodes.map(function (n) {
+	                var foundProperty = 'paddingRight';
+	                var direction = 1;
+	                var node = n;
+	                if (n instanceof Array) {
+	                    var _n = _slicedToArray(n, 3);
+	
+	                    var whatNode = _n[0];
+	                    var property = _n[1];
+	                    var d = _n[2];
+	
+	                    foundProperty = property;
+	                    node = whatNode;
+	                    direction = d || 1;
+	                }
+	                return {
+	                    node: node,
+	                    property: foundProperty,
+	                    value: parseInt(global.getComputedStyle(node)[foundProperty], 10) + (!node.__fixedWindowMod__ ? _Settings2.default.getScrollbarWidth() * direction : 0) + 'px'
+	                };
+	            }).forEach(function (d) {
+	                d.node.__fixedWindowMod__ = true;
+	                d.node.style[d.property] = d.value;
+	            });
+	
+	            global.document.documentElement.classList.add(CLS_FIXED_WINDOW);
+	            global.document.body.style.cssText += 'top:' + this.currentScrollTop * -1 + 'px;position:fixed';
+	
+	            this.isFixedWindowActive = true;
+	        }
+	
+	        /**
+	         * @private
+	         */
+	
+	    }, {
+	        key: '_removeFixedContainer',
+	        value: function _removeFixedContainer() {
+	            if (this.isFixedWindowActive) {
+	                global.document.body.style.position = "static";
+	                global.document.body.style.top = "0px";
+	                // reset scrollTop
+	                global.document.documentElement.scrollTop = this.currentScrollTop;
+	                global.document.body.scrollTop = this.currentScrollTop;
+	                _Settings2.default.get().scrollbarUpdateNodes.forEach(function (node) {
+	                    if (node instanceof Array) {
+	                        var _node = _slicedToArray(node, 2);
+	
+	                        var whatNode = _node[0];
+	                        var property = _node[1];
+	
+	                        delete whatNode.__fixedWindowMod__;
+	                        whatNode.style[property] = '';
+	                    } else {
+	                        delete node.__fixedWindowMod__;
+	                        node.style.paddingRight = '';
+	                    }
+	                });
+	                global.document.documentElement.classList.remove(CLS_FIXED_WINDOW);
+	                _Event2.default.dispatchAndFire(global.document, EVENT_AFTER_FIXED_REMOVE);
+	                this.isFixedWindowActive = false;
+	            }
+	        }
+	
+	        /**
+	         * Will close a window when no widgets are opened that need one
+	         */
+	
+	    }, {
+	        key: 'resizeListener',
+	        value: function resizeListener() {
+	            this.windowWidth = global.innerWidth;
+	            this._checkFixedNeeded();
+	        }
+	
+	        /**
+	         * @returns {FixedWindow}
+	         */
+	
+	    }, {
+	        key: 'close',
+	
+	
+	        /**
+	         * Request a close of the fixed window
+	         * @returns {Promise}
+	         */
+	        value: function close() {
+	            var _this2 = this;
+	
+	            return new Promise(function (resolve) {
+	                _this2.widgets.pop();
+	                if (_this2.widgets.length === 0) {
+	                    // restore scrollPosition:
+	                    requestAnimationFrame(function () {
+	                        _this2._removeFixedContainer();
+	                        resolve();
+	                    });
+	                }
+	            });
+	        }
+	
+	        /**
+	         * Request to open a fixed windows
+	         * @param {Object|DestroyableWidget} instance
+	         */
+	
+	    }, {
+	        key: 'open',
+	        value: function open(instance) {
+	            var fixed = false;
+	            if ((typeof instance === 'undefined' ? 'undefined' : _typeof(instance)) === 'object') {
+	                var cn = instance.constructor;
+	                var fixedWidget = this.fixedScreenConstraints[instance.constructor];
+	                if (cn && fixedWidget) {
+	                    fixed = fixedWidget(this.windowWidth);
+	                }
+	                var length = this.widgets.length;
+	                this.widgets.push(cn);
+	                // open a new window if there is no window active
+	                if (length === 0) {
+	                    if (fixed) {
+	                        this._addFixedContainer();
+	                    }
+	                }
+	            }
+	        }
+	    }], [{
+	        key: 'getInstance',
+	        value: function getInstance() {
+	            if (!fixedWindowInstance) {
+	                fixedWindowInstance = new FixedWindow();
+	                fixedWindowInstance.windowWidth = global.innerWidth;
+	                var eventHandler = fixedWindowInstance.resizeListener.bind(fixedWindowInstance);
+	                global.addEventListener('resize', (0, _debounce2.default)(eventHandler, 500));
+	                global.addEventListener('orientationchange', eventHandler);
+	            }
+	            return fixedWindowInstance;
+	        }
+	    }]);
+	
+	    return FixedWindow;
+	}();
+
+	exports.default = FixedWindow;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 110 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	exports.default = function (fn, ms) {
+	    return function () {
+	        clearTimeout(fn.timeout);
+	        fn.timeout = setTimeout(fn, ms);
+	    };
+	};
+
+/***/ },
+/* 111 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.EVENT_TAB_OPENED = exports.EVENT_TAB_CLOSED = undefined;
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * The MIT License (MIT)
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Permission is hereby granted, free of charge, to any person obtaining a copy
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * of this software and associated documentation files (the "Software"), to deal
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * in the Software without restriction, including without limitation the rights
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * copies of the Software, and to permit persons to whom the Software is
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * furnished to do so, subject to the following conditions:
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * The above copyright notice and this permission notice shall be included in
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * all copies or substantial portions of the Software.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * THE SOFTWARE.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 	
 	/*!
 	 * FlexCss.Toggleable
@@ -7875,24 +8183,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
 	 */
 	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.EVENT_TAB_OPENED = exports.EVENT_TAB_CLOSED = undefined;
-	
-	var _Settings = __webpack_require__(101);
+	var _Settings = __webpack_require__(103);
 	
 	var _Settings2 = _interopRequireDefault(_Settings);
 	
-	var _Widget = __webpack_require__(106);
+	var _Widget = __webpack_require__(108);
 	
 	var _Widget2 = _interopRequireDefault(_Widget);
 	
-	var _Util = __webpack_require__(99);
+	var _Util = __webpack_require__(101);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _Event = __webpack_require__(104);
+	var _Event = __webpack_require__(106);
 	
 	var _Event2 = _interopRequireDefault(_Event);
 	
@@ -7934,7 +8237,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Creates a toggleable element, either for tabs or a single toggle
 	 */
 	
-	var Toggleable = (function () {
+	var Toggleable = function () {
 	    function Toggleable(ContainerId) {
 	        _classCallCheck(this, Toggleable);
 	
@@ -7945,7 +8248,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.loading = false;
 	
 	        if (!this.container) {
-	            throw 'Toggleable container with id "' + ContainerId + '" not found';
+	            throw new Error('Toggleable container with id ' + ContainerId + ' not found');
 	        }
 	    }
 	
@@ -7955,12 +8258,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @private
 	     */
 	
+	
 	    _createClass(Toggleable, [{
 	        key: '_listener',
 	        value: function _listener(e) {
-	            var target = e.target,
-	                parent = target.parentNode,
-	                doc = global.document;
+	            var target = e.target;
+	            var parent = target.parentNode;
+	            var doc = global.document;
 	
 	            // support target child element to clicked
 	            if (!target.hasAttribute(ATTR_NAME)) {
@@ -7975,8 +8279,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return;
 	            }
 	
-	            var refId = target.getAttribute(ATTR_NAME),
-	                ref = doc.getElementById(refId);
+	            var refId = target.getAttribute(ATTR_NAME);
+	            var ref = doc.getElementById(refId);
 	
 	            e.preventDefault();
 	
@@ -8001,15 +8305,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        /**
 	         * Toggles given `ref`
-	         * @param {HTMLElement} ref
-	         * @param {HTMLElement} [target] optional target node
+	         * @param {HTMLElement|Node} ref
+	         * @param {HTMLElement|Node} [selfTarget] optional target node
 	         */
 	
 	    }, {
 	        key: 'toggleTarget',
-	        value: function toggleTarget(ref, target) {
+	        value: function toggleTarget(ref, selfTarget) {
 	            var _this = this;
 	
+	            var target = selfTarget;
 	            if (!target && !ref) {
 	                return;
 	            }
@@ -8017,19 +8322,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	                target = document.querySelector('[' + ATTR_NAME + '="' + ref.id + '"]');
 	            }
 	
-	            var maybeToggleNode,
-	                future,
-	                elClassList = target.classList,
-	                parentClassList,
-	                parent = target.parentNode,
-	                doc = global.document;
+	            var maybeToggleNode = undefined;
+	            var future = undefined;
+	            var elClassList = target.classList;
+	            var parentClassList = undefined;
+	            var parent = target.parentNode;
+	            var doc = global.document;
 	
 	            future = new Promise(function (resolve, failure) {
 	                if (ref) {
 	                    resolve(ref);
 	                } else {
-	                    var widget = _Widget2.default.findWidget(target),
-	                        async = widget ? widget.getAsync() : null;
+	                    var widget = _Widget2.default.findWidget(target);
+	                    var async = widget ? widget.getAsync() : null;
 	                    if (_Widget2.default.isWidget(widget) && async) {
 	                        future = async.then(function (r) {
 	                            if (r instanceof HTMLElement) {
@@ -8038,7 +8343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                target.setAttribute(ATTR_NAME, id);
 	                                resolve(r);
 	                            } else {
-	                                throw 'Dynamically creating toggle-content is not supported right now. ' + 'Return an HTMLElement instance';
+	                                throw new Error('Dynamically creating toggle-content is not supported right now.\n                            Return an HTMLElement instance');
 	                            }
 	                        });
 	                    } else {
@@ -8065,13 +8370,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	                if (maybeToggleNode) {
 	                    for (var i = 0; i < maybeToggleNode.children.length; i++) {
-	                        var n = maybeToggleNode.children[i],
-	                            targetRef = n.children[0];
+	                        var n = maybeToggleNode.children[i];
+	                        var targetRef = n.children[0];
 	                        if (n !== parent) {
 	                            n.classList.remove(ACTIVE_CLASS);
 	                            if (targetRef) {
-	                                var attr = targetRef.getAttribute(ATTR_NAME),
-	                                    el = attr ? doc.getElementById(attr) : null;
+	                                var attr = targetRef.getAttribute(ATTR_NAME);
+	                                var el = attr ? doc.getElementById(attr) : null;
 	                                if (el) {
 	                                    _Event2.default.dispatchAndFire(el, EVENT_TAB_CLOSED);
 	                                    el.classList.remove(ACTIVE_CLASS);
@@ -8087,15 +8392,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	                elClassList.add(LOADING_CLASS);
 	            }
 	            this.loading = true;
-	            future.then((function (r) {
+	            future.then(function (r) {
 	                _Event2.default.dispatchAndFire(r, EVENT_TAB_OPENED);
 	                Toggleable._handleLoaded(target);
 	                r.classList.toggle(ACTIVE_CLASS);
-	                this.loading = false;
-	            }).bind(this)).catch(function (reason) {
+	                _this.loading = false;
+	            }).catch(function () {
 	                _this.loading = false;
 	                Toggleable._handleLoaded(target);
-	                console.warn(reason);
 	            });
 	        }
 	
@@ -8116,40 +8420,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return Toggleable;
-	})();
+	}();
 	
 	exports.default = Toggleable;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 108 */
+/* 112 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })(); /*
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * The MIT License (MIT)
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * Permission is hereby granted, free of charge, to any person obtaining a copy
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * of this software and associated documentation files (the "Software"), to deal
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * in the Software without restriction, including without limitation the rights
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * copies of the Software, and to permit persons to whom the Software is
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * furnished to do so, subject to the following conditions:
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * The above copyright notice and this permission notice shall be included in
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * all copies or substantial portions of the Software.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        *
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        * THE SOFTWARE.
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        */
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.EVENT_TOGGLE = undefined;
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * The MIT License (MIT)
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * Permission is hereby granted, free of charge, to any person obtaining a copy
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * of this software and associated documentation files (the "Software"), to deal
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * in the Software without restriction, including without limitation the rights
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * copies of the Software, and to permit persons to whom the Software is
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * furnished to do so, subject to the following conditions:
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * The above copyright notice and this permission notice shall be included in
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * all copies or substantial portions of the Software.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      *
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      * THE SOFTWARE.
+	                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 	
 	/*!
 	 * FlexCss.OffCanvas
@@ -8157,17 +8466,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Copyright (c) 2015 David Heidrich, BowlingX <me@bowlingx.com>
 	 */
 	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _Settings = __webpack_require__(101);
+	var _Settings = __webpack_require__(103);
 	
 	var _Settings2 = _interopRequireDefault(_Settings);
 	
-	var _Util = __webpack_require__(99);
+	var _Util = __webpack_require__(101);
 	
 	var _Util2 = _interopRequireDefault(_Util);
+	
+	var _Event = __webpack_require__(106);
+	
+	var _Event2 = _interopRequireDefault(_Event);
+	
+	var _FixedWindow = __webpack_require__(109);
+	
+	var _FixedWindow2 = _interopRequireDefault(_FixedWindow);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -8185,10 +8498,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * @type {string}
 	 */
-	var TOGGLE_CLASS = 'toggled-canvas';
-	/**
-	 * @type {string}
-	 */
 	var INIT_CLASS = 'init';
 	/**
 	 * @type {string}
@@ -8200,10 +8509,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	var HIDE_FACTOR = 3;
 	
 	/**
+	 * @type {string}
+	 */
+	var EVENT_TOGGLE = exports.EVENT_TOGGLE = 'flexcss.offcanvas.toggle';
+	
+	/**
 	 * A OffCanvas Implementation
 	 */
 	
-	var OffCanvas = (function () {
+	var OffCanvas = function () {
 	
 	    /**
 	     * Creates an off-canvas navigation
@@ -8220,17 +8534,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _classCallCheck(this, OffCanvas);
 	
 	        var doc = global.document;
-	        var touched = 0;
+	        var touchedX = 0;
 	        var navigationContainer = NavigationId instanceof HTMLElement ? NavigationId : doc.getElementById(NavigationId);
 	        var darkener = Darkener instanceof HTMLElement ? Darkener : doc.getElementById(Darkener);
 	        var DARKENER_CLASS_TOGGLE = 'toggle-' + darkener.id || 'darkener';
 	        var DARKENER_CLASS_INSTANT_TOGGLE = DARKENER_CLASS_TOGGLE + '-open';
-	        var resetStyles = function resetStyles(s) {
-	            s.transform = '';
-	            s.transition = '';
-	            s.webkitTransform = '';
-	            s.webkitTransition = '';
-	        };
+	
 	        var shouldNotTouch = function shouldNotTouch() {
 	            return window.innerWidth >= _Settings2.default.get().smallBreakpoint;
 	        };
@@ -8242,6 +8551,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.darkener = darkener;
 	        this.darkenerClassToggle = DARKENER_CLASS_TOGGLE;
 	        this.darkenerClassToggleInstant = DARKENER_CLASS_INSTANT_TOGGLE;
+	        this.globalToggleClass = _Settings2.default.get().canvasToggledClass;
 	
 	        this.navigationContainer = navigationContainer;
 	        this.navigationContainerId = navigationContainer.id;
@@ -8254,82 +8564,96 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        if (!disableTouch) {
 	            navigationContainer.addEventListener('touchstart', function (e) {
-	                requestAnimationFrame(function () {
-	                    if (shouldNotTouch()) {
-	                        return;
-	                    }
-	                    touched = e.touches[0].clientX;
-	                    var target = navigationContainer;
-	                    var style = target.style;
-	                    target.mustHide = false;
-	                    style.transition = 'transform 0s ease';
-	                    style.webkitTransition = '-webkit-transform 0s ease';
-	                });
+	                if (shouldNotTouch()) {
+	                    return;
+	                }
+	                touchedX = e.touches[0].clientX;
+	                navigationContainer.mustHide = false;
 	            });
 	            navigationContainer.addEventListener('touchmove', function (e) {
 	                if (shouldNotTouch()) {
 	                    return;
 	                }
-	                var x = e.touches[0].clientX;
+	                var clientX = e.touches[0].clientX;
+	
 	                var target = navigationContainer;
 	                var style = target.style;
-	                var calc = touched - x;
+	                var calcX = touchedX - clientX;
 	                var bounds = target.getBoundingClientRect();
-	                var compare = factor > 0 ? calc <= 0 : calc >= 0;
+	                var compare = factor > 0 ? calcX <= 0 : calcX >= 0;
 	                if (compare) {
-	                    target.mustHide = factor > 0 ? calc * -1 > bounds.width / HIDE_FACTOR : calc > bounds.width / HIDE_FACTOR;
-	                    style.transform = 'translate3d(' + calc * -1 + 'px,0,0)';
-	                    style.webkitTransform = 'translate3d(' + calc * -1 + 'px,0,0)';
+	                    style.transition = 'transform 0s ease';
+	                    style.webkitTransition = '-webkit-transform 0s ease';
+	                    target.mustHide = factor > 0 ? calcX * -1 > bounds.width / HIDE_FACTOR : calcX > bounds.width / HIDE_FACTOR;
+	                    var transform = 'translate3d(' + calcX * -1 + 'px,0,0)';
+	                    style.transform = transform;
+	                    style.webkitTransform = transform;
 	                }
 	            });
 	            navigationContainer.addEventListener('touchend', function () {
-	                requestAnimationFrame(function () {
-	                    if (shouldNotTouch()) {
-	                        return;
-	                    }
-	                    var target = navigationContainer;
-	                    var style = target.style;
-	                    if (target.mustHide) {
-	                        var width = target.getBoundingClientRect().width * factor;
-	                        style.transition = 'transform .2s ease';
-	                        style.webkitTransition = '-webkit-transform .2s ease';
-	
-	                        style.transform = 'translate3d(' + width + 'px,0,0)';
-	                        style.webkitTransform = 'translate3d(' + width + 'px,0,0)';
-	                        _this._remove(function () {
-	                            resetStyles(style);
-	                        });
-	                        _this._removeInstant();
-	                    } else {
-	                        resetStyles(style);
-	                    }
-	                });
+	                if (shouldNotTouch()) {
+	                    return;
+	                }
+	                var target = navigationContainer;
+	                var style = target.style;
+	                if (target.mustHide) {
+	                    var width = target.getBoundingClientRect().width * factor;
+	                    style.transition = 'transform .2s ease';
+	                    style.webkitTransition = '-webkit-transform .2s ease';
+	                    var transform = 'translate3d(' + width + 'px,0,0)';
+	                    style.transform = transform;
+	                    style.webkitTransform = transform;
+	                    _this._remove().then(function () {
+	                        _this.resetTransform(style);
+	                    });
+	                    _this._removeInstant();
+	                } else {
+	                    _this.resetTransform(style);
+	                }
 	            });
 	        }
 	    }
 	
 	    /**
-	     * @private
+	     * @param {Object} s
 	     */
 	
+	
 	    _createClass(OffCanvas, [{
+	        key: 'resetTransform',
+	        value: function resetTransform(s) {
+	            s.transform = '';
+	            s.transition = '';
+	            s.webkitTransform = '';
+	            s.webkitTransition = '';
+	        }
+	
+	        /**
+	         * @param {Object} [event]
+	         * @private
+	         */
+	
+	    }, {
 	        key: '_remove',
-	        value: function _remove(callback) {
+	        value: function _remove(event) {
 	            var _this2 = this;
 	
-	            _Util2.default.addEventOnce(_Settings2.default.getTransitionEvent(), this.navigationContainer, function () {
-	                // add timeout because transition event fires a little to early
-	                setTimeout(function () {
-	                    requestAnimationFrame(function () {
-	                        var body = global.document.body;
-	                        OffCanvas.currentOpen = null;
-	                        body.classList.remove(TOGGLE_CLASS);
-	                        body.classList.remove(_this2.darkenerClassToggle);
-	                        if (callback) {
-	                            callback();
-	                        }
-	                    });
-	                }, _Settings2.default.get().darkenerFadeDelay);
+	            return new Promise(function (resolve) {
+	                _Util2.default.addEventOnce(_Settings2.default.getTransitionEvent(), _this2.navigationContainer, function () {
+	                    // add timeout because transition event fires a little to early
+	                    setTimeout(function () {
+	                        requestAnimationFrame(function () {
+	                            var body = global.document.body;
+	                            OffCanvas.currentOpen = null;
+	                            body.classList.remove(_this2.darkenerClassToggle);
+	                            global.document.documentElement.classList.remove(_this2.globalToggleClass);
+	                            if (!!event) {
+	                                _Event2.default.dispatchAndFire(_this2.navigationContainer, EVENT_TOGGLE);
+	                            }
+	                            resolve();
+	                        });
+	                    }, _Settings2.default.get().darkenerFadeDelay);
+	                });
 	            });
 	        }
 	
@@ -8343,34 +8667,58 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.navigationContainer.classList.remove(OPEN_CLASS);
 	            global.document.body.classList.remove(this.darkenerClassToggleInstant);
 	            this.darkener.classList.remove(INIT_CLASS);
+	            _FixedWindow2.default.getInstance().close();
 	        }
 	
 	        /**
 	         * Toggles a an off-canvas element
-	         * @param e
+	         * @param [e]
 	         * @private
 	         */
 	
 	    }, {
-	        key: '_toggle',
-	        value: function _toggle(e) {
-	            e.preventDefault();
+	        key: 'toggle',
+	        value: function toggle(e) {
+	            var _this3 = this;
+	
+	            if (e) {
+	                e.preventDefault();
+	            }
+	            this.resetTransform(this.navigationContainer.style);
 	            var bodyClass = global.document.body.classList;
 	            var darkenerClass = this.darkener.classList;
 	            var DARKENER_CLASS_TOGGLE = this.darkenerClassToggle;
 	            var DARKENER_CLASS_INSTANT_TOGGLE = this.darkenerClassToggleInstant;
 	            var navigationControllerClassList = this.navigationContainer.classList;
-	            if (this.navigationContainer.classList.contains(OPEN_CLASS)) {
-	                this._remove();
-	                this._removeInstant(navigationControllerClassList);
-	            } else if (!OffCanvas.currentOpen) {
+	            if (!OffCanvas.currentOpen) {
+	                _Util2.default.addEventOnce(_Settings2.default.getTransitionEvent(), this.navigationContainer, function () {
+	                    if (!!e) {
+	                        _Event2.default.dispatchAndFire(_this3.navigationContainer, EVENT_TOGGLE);
+	                    }
+	                });
 	                OffCanvas.currentOpen = this;
+	                _FixedWindow2.default.getInstance().open(this);
+	                global.document.documentElement.classList.add(this.globalToggleClass);
 	                bodyClass.add(DARKENER_CLASS_INSTANT_TOGGLE);
-	                bodyClass.add(TOGGLE_CLASS);
 	                bodyClass.add(DARKENER_CLASS_TOGGLE);
 	                darkenerClass.add(INIT_CLASS);
 	                navigationControllerClassList.add(OPEN_CLASS);
+	            } else {
+	                return this.close(e);
 	            }
+	        }
+	    }, {
+	        key: 'close',
+	        value: function close(event) {
+	            if (this.navigationContainer.classList.contains(OPEN_CLASS)) {
+	                var navigationControllerClassList = this.navigationContainer.classList;
+	                var promise = this._remove(event);
+	                this._removeInstant(navigationControllerClassList);
+	                return promise;
+	            }
+	            return new Promise(function (r) {
+	                return r();
+	            });
 	        }
 	
 	        /**
@@ -8381,22 +8729,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'registerEvents',
 	        value: function registerEvents(delegate) {
-	            var _this3 = this;
+	            var _this4 = this;
 	
 	            var thisDelegate = delegate || global.document;
+	            _FixedWindow2.default.getInstance().addScreenConstraint(OffCanvas, function (width) {
+	                return width < _Settings2.default.get().smallBreakpoint;
+	            });
 	            thisDelegate.addEventListener(_Settings2.default.getTabEvent(), function (e) {
-	                if (OffCanvas.currentOpen && OffCanvas.currentOpen !== _this3) {
+	                if (OffCanvas.currentOpen && OffCanvas.currentOpen !== _this4) {
 	                    return;
 	                }
-	                var id = _this3.navigationContainerId;
+	                var id = _this4.navigationContainerId;
 	                var validTarget = e.target.getAttribute(ATTR_TARGET) === id;
-	                if (!_Util2.default.isPartOfNode(e.target, _this3.navigationContainer)) {
-	                    if (validTarget || OffCanvas.currentOpen === _this3 && e.target === _this3.darkener) {
-	                        _this3._toggle(e);
+	                if (!_Util2.default.isPartOfNode(e.target, _this4.navigationContainer)) {
+	                    if (validTarget || OffCanvas.currentOpen === _this4 && e.target === _this4.darkener) {
+	                        _this4.toggle(e);
 	                    }
 	                } else {
 	                    if (e.target.hasAttribute(ATTR_CLOSE_SIDEBAR)) {
-	                        _this3._toggle(e);
+	                        _this4.toggle(e);
 	                    }
 	                }
 	            });
@@ -8404,7 +8755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return OffCanvas;
-	})();
+	}();
 	
 	OffCanvas.currentOpen = null;
 	
@@ -8412,7 +8763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 109 */
+/* 113 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*
@@ -8447,28 +8798,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	'use strict';
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	exports.EVENT_DROPDOWN_CLOSED = undefined;
 	
-	var _Util = __webpack_require__(99);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _Util = __webpack_require__(101);
 	
 	var _Util2 = _interopRequireDefault(_Util);
 	
-	var _Settings = __webpack_require__(101);
+	var _Settings = __webpack_require__(103);
 	
 	var _Settings2 = _interopRequireDefault(_Settings);
 	
-	var _Event = __webpack_require__(104);
+	var _Event = __webpack_require__(106);
 	
 	var _Event2 = _interopRequireDefault(_Event);
 	
-	var _Widget = __webpack_require__(106);
+	var _Widget = __webpack_require__(108);
 	
 	var _Widget2 = _interopRequireDefault(_Widget);
+	
+	var _FixedWindow = __webpack_require__(109);
+	
+	var _FixedWindow2 = _interopRequireDefault(_FixedWindow);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -8523,7 +8878,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * A Dropdown
 	 */
 	
-	var Dropdown = (function () {
+	var Dropdown = function () {
 	    function Dropdown(DelegateContainer, Darkener) {
 	        _classCallCheck(this, Dropdown);
 	
@@ -8556,13 +8911,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @private
 	     */
 	
+	
 	    _createClass(Dropdown, [{
 	        key: '_delegateFunction',
 	        value: function _delegateFunction(e) {
 	            var currentOpen = this.currentOpen;
-	            var targetHas = e.target.hasAttribute(ATTR_NAME);
-	            var parentHas = e.target.parentNode ? e.target.parentNode.hasAttribute(ATTR_NAME) : false;
-	            var target = targetHas ? e.target : e.target.parentNode;
+	            var target = _Util2.default.closestCallback(e.target, function (n) {
+	                return n instanceof HTMLElement && n.hasAttribute(ATTR_NAME);
+	            });
 	            var targetIsCurrent = target === this.currentTarget;
 	
 	            if (currentOpen && !_Util2.default.isPartOfNode(e.target, currentOpen) || targetIsCurrent) {
@@ -8573,7 +8929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return targetIsCurrent ? false : this._delegateFunction(e);
 	            }
 	
-	            if (targetHas || parentHas && !currentOpen) {
+	            if (target && !currentOpen) {
 	                e.preventDefault();
 	                e.stopImmediatePropagation();
 	
@@ -8602,6 +8958,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: 'registerEvents',
 	        value: function registerEvents() {
+	            _FixedWindow2.default.getInstance().addScreenConstraint(Dropdown, function (width) {
+	                return width < _Settings2.default.get().smallBreakpoint;
+	            });
 	            this.container.addEventListener(_Settings2.default.getTabEvent(), this._delegateFunction.bind(this), true);
 	            return this;
 	        }
@@ -8677,7 +9036,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                                return false;
 	                            }
 	                            _this.toggleDarkenerToggler(darkenerInstance, false);
-	                            _this.container.classList.remove(_Settings2.default.get().canvasToggledClass);
 	                            resolve(true);
 	                        }, _Settings2.default.get().darkenerFadeDelay);
 	                    });
@@ -8687,6 +9045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            });
 	
+	            _FixedWindow2.default.getInstance().close();
 	            currentOpen.classList.remove(CLS_OPEN);
 	
 	            if (currentOpen.flexDarkenerInstance) {
@@ -8787,7 +9146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    selfTarget = selfTarget ? doc.getElementById(selfTarget) : target;
 	                    _Util2.default.setupPositionNearby(selfTarget, dropdownContent, target.flexCollisionContainer);
 	                } else {
-	                    _this2.container.classList.add(_Settings2.default.get().canvasToggledClass);
+	                    _FixedWindow2.default.getInstance().open(_this2);
 	                    // optionally get custom darkener container for target
 	                    var d = target.getAttribute(ATTR_DARKENER);
 	                    if (d) {
@@ -8806,13 +9165,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return Dropdown;
-	})();
+	}();
 	
 	exports.default = Dropdown;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 110 */
+/* 114 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*
@@ -8849,27 +9208,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/* global Image, TouchEvent*/
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-	
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
 	
-	var _Modal = __webpack_require__(105);
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _Modal = __webpack_require__(107);
 	
 	var _Modal2 = _interopRequireDefault(_Modal);
 	
-	var _Settings = __webpack_require__(101);
+	var _Settings = __webpack_require__(103);
 	
 	var _Settings2 = _interopRequireDefault(_Settings);
 	
-	var _Widget = __webpack_require__(106);
+	var _Widget = __webpack_require__(108);
 	
 	var _Widget2 = _interopRequireDefault(_Widget);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -8892,7 +9251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * A Simple LightBox
 	 */
 	
-	var LightBox = (function () {
+	var LightBox = function () {
 	
 	    /**
 	     * Creates a new Lightbox
@@ -8996,6 +9355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @returns {HTMLElement|null}
 	     */
 	
+	
 	    _createClass(LightBox, [{
 	        key: 'findImmediateNextTarget',
 	        value: function findImmediateNextTarget(node) {
@@ -9085,6 +9445,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    }, {
 	        key: 'switchImageByDirection',
+	
 	
 	        /**
 	         * Switches to the next image
@@ -9179,7 +9540,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // notify observers about image switching
 	                self.options.onSwitchImage.apply(self, [self._nextFuture]);
 	                if (next) {
-	                    var _ret = (function () {
+	                    var _ret = function () {
 	                        var nextThumb = next.hasAttribute(ATTR_NO_THUMBNAIL) ? next : next.children[0] || next;
 	                        var nextHighRes = next.getAttribute(ATTR_DATA_HREF) || next.getAttribute(ATTR_HREF);
 	                        var nextSource = nextThumb.getAttribute(ATTR_SRC) || nextThumb.src || nextHighRes;
@@ -9206,7 +9567,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            _this3._isLoading = false;
 	                            resolve(nextSource, _this3.target);
 	                        });
-	                    })();
+	                    }();
 	
 	                    if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
 	                } else {
@@ -9425,7 +9786,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }]);
 	
 	    return LightBox;
-	})();
+	}();
 	
 	exports.default = LightBox;
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
