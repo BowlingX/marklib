@@ -407,10 +407,8 @@ class Util {
         if (!node) {
             return false;
         }
-        const args = [node, type];
-        if (filter) {
-            args.push(filter);
-        }
+        const args = [node, type, filter || (() => true), false];
+        args.push(false);
         const walker = document.createTreeWalker(...args);
         while (walker.nextNode()) {
             if (!func(walker.currentNode)) {
@@ -427,9 +425,7 @@ class Util {
      * @param {Object} [filter] skips empty text nodes by default
      * @returns {boolean} true if function did abort walk
      */
-    static walkTextNodes(el, func, filter = {
-        acceptNode: (node) => !Util.nodeIsEmpty(node)
-    }) {
+    static walkTextNodes(el, func, filter = (node) => !Util.nodeIsEmpty(node)) {
         return Util.walkDom(el, func, NodeFilter.SHOW_TEXT, filter);
     }
 
