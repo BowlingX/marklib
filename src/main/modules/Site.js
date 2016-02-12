@@ -1,6 +1,6 @@
 /* global localStorage, document */
 
-import Marklib from 'modules/Marklib';
+import { Rendering } from 'modules/Marklib';
 import { Tooltip } from 'flexcss';
 
 const KEY_ENTER = 13;
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const render = (autoMarkText, cp, length) => {
             let c = cp;
-            const r = new Marklib.Rendering(document, {
+            const r = new Rendering(document, {
                 className: classNames
             });
             const range = document.createRange();
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     savedRanges.forEach((range) => {
-        const marker = new Marklib.Rendering(document);
+        const marker = new Rendering(document);
         try {
             marker.renderWithResult(range);
             allRanges.push(marker);
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const actionMark = () => {
         try {
             const selection = document.getSelection();
-            const renderer = new Marklib.Rendering(document);
+            const renderer = new Rendering(document);
             const result = renderer.renderWithRange(selection.getRangeAt(0));
 
             renderer.on('click', onClick);
@@ -141,4 +141,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-export default Marklib;
+export default Rendering;

@@ -1275,6 +1275,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.highlight {
+  margin: 0;
+}
+
 .highlight pre {
   max-width: 960px;
   margin: 0 auto;

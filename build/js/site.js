@@ -3956,8 +3956,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _Marklib = __webpack_require__(1);
 	
-	var _Marklib2 = _interopRequireDefault(_Marklib);
-	
 	var _flexcss = __webpack_require__(98);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -3985,7 +3983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        var render = function render(autoMarkText, cp, length) {
 	            var c = cp;
-	            var r = new _Marklib2.default.Rendering(document, {
+	            var r = new _Marklib.Rendering(document, {
 	                className: classNames
 	            });
 	            var range = document.createRange();
@@ -4042,7 +4040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	
 	    savedRanges.forEach(function (range) {
-	        var marker = new _Marklib2.default.Rendering(document);
+	        var marker = new _Marklib.Rendering(document);
 	        try {
 	            marker.renderWithResult(range);
 	            allRanges.push(marker);
@@ -4071,7 +4069,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var actionMark = function actionMark() {
 	        try {
 	            var selection = document.getSelection();
-	            var renderer = new _Marklib2.default.Rendering(document);
+	            var renderer = new _Marklib.Rendering(document);
 	            var result = renderer.renderWithRange(selection.getRangeAt(0));
 	
 	            renderer.on('click', onClick);
@@ -4105,7 +4103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	});
 	
-	exports.default = _Marklib2.default;
+	exports.default = _Marklib.Rendering;
 
 /***/ },
 /* 96 */
