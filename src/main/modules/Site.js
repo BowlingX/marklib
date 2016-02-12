@@ -1,5 +1,6 @@
 /* global localStorage, document */
 
+import 'babel-polyfill';
 import { Rendering } from 'modules/Marklib';
 import { Tooltip } from 'flexcss';
 
