@@ -1,6 +1,7 @@
 /* global localStorage, document */
 
 import 'babel-polyfill';
+import 'ima.js-babel6-polyfill';
 import { Rendering } from 'modules/Marklib';
 import { Tooltip } from 'flexcss';
 

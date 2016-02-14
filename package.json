@@ -71,6 +71,7 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "dependencies": {
+    "ima.js-babel6-polyfill": "^0.1.1",
     "wolfy87-eventemitter": "^4.3.0"
   },
   "config": {
