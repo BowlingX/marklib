@@ -1,7 +1,5 @@
 /* global loadFixtures */
 
-'use strict';
-
 import setup from 'setup';
 import Rendering from 'Rendering';
 
@@ -9,7 +7,7 @@ setup();
 
 describe("Test some Instance stuff", () => {
     it("Create an instance", () => {
-        var marklib = new Rendering(document);
+        const marklib = new Rendering(document);
         expect(marklib instanceof Rendering).toBe(true);
     });
 });
@@ -20,7 +18,7 @@ describe("Test some wrappings", () => {
     });
 
     it("should wrapSiblings", () => {
-        var marklib = new Rendering(document);
+        const marklib = new Rendering(document);
         marklib.wrapSiblings(
             document.getElementById('startContainer'),
             document.getElementById('endContainer')
@@ -28,8 +26,8 @@ describe("Test some wrappings", () => {
     });
 
     it("should render a range in different start/end nodes", () => {
-        var marklib = new Rendering(document);
-        var range = document.createRange();
+        const marklib = new Rendering(document);
+        const range = document.createRange();
         range.setStart(document.getElementById("firstP").childNodes[0], 1);
         range.setEnd(document.getElementById("lastP").childNodes[0], 2);
 
@@ -49,17 +47,17 @@ describe("Test some wrappings", () => {
     });
 
     it("should render a range in the same node", () => {
-        var marklib = new Rendering(document);
-        var range = document.createRange();
+        const marklib = new Rendering(document);
+        const range = document.createRange();
 
         range.setStart(document.getElementById("firstP").childNodes[0], 0);
         range.setEnd(document.getElementById("firstP").childNodes[0], 4);
 
-        var text = range.toString();
+        const text = range.toString();
 
         expect(text).toBe('This');
 
-        var result = marklib.renderWithRange(range);
+        const result = marklib.renderWithRange(range);
 
         const rangeResult = {
             startOffset: 0,
@@ -75,7 +73,6 @@ describe("Test some wrappings", () => {
         // do a second marking over the old one
         const resultedText = new Rendering(document).renderWithResult(rangeResult);
         expect(resultedText).toEqual('This');
-
     });
 });
 
@@ -86,10 +83,9 @@ describe("Bug #4, set the right indices, event if the markup has been modified b
     });
 
     it("indices must be correct in different situations", () => {
-
         // first render something
-        var marklib = new Rendering(document);
-        var range = document.createRange();
+        const marklib = new Rendering(document);
+        const range = document.createRange();
         range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
         range.setEnd(document.getElementById("Paragraph").childNodes[8], 72);
 
@@ -151,7 +147,7 @@ describe("Must fail and fallback", () => {
 
     it("to last text-node if element (body) is given", () => {
         const renderer = new Rendering(document);
-        var range = document.createRange();
+        const range = document.createRange();
         range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
         range.setEnd(document.body, 0);
         const result = renderer.renderWithRange(range);
@@ -164,7 +160,7 @@ describe("Must fail and fallback", () => {
     });
 
     it("Fallback to first text-node if element is given", () => {
-        var range = document.createRange();
+        const range = document.createRange();
         range.setStart(document.getElementById("FirstStrong").childNodes[0], 0);
         range.setEnd(document.getElementById("Paragraph"), 0);
 
@@ -186,7 +182,7 @@ describe("Multiple nodes", () => {
     });
 
     it("must have the right indices later", () => {
-        var range = document.createRange();
+        const range = document.createRange();
         range.setStart(document.getElementsByTagName("h2")[0].childNodes[0], 0);
         range.setEnd(document.getElementById("Paragraph").childNodes[0], 30);
 
@@ -230,19 +226,20 @@ describe("Scoped/Contexted rendering", () => {
 });
 
 describe("iFrame", () => {
-    let frame, frameDocument;
+    let frame;
+    let frameDocument;
     beforeEach((cb) => {
         loadFixtures('iframe.html');
         frame = document.getElementById('iframe');
         frame.onload = () => {
             frameDocument = frame.contentDocument;
             cb();
-        }
+        };
     });
 
     it("must work inside an iframe", () => {
         const renderer = new Rendering(frameDocument);
-        var range = frameDocument.createRange();
+        const range = frameDocument.createRange();
         range.setStart(frameDocument.getElementById("p1").childNodes[0], 0);
         range.setEnd(frameDocument.getElementById("p1").childNodes[0], 7);
         const selection = range.toString();
@@ -265,7 +262,9 @@ describe('Constructor Arguments', () => {
     });
 
     it('Must support arrays as classNames', () => {
-        const renderer = new Rendering(document, {className: ['highlight', 'comment']});
+        const renderer = new Rendering(document, {
+            className: ['highlight', 'comment']
+        });
         const range = document.createRange();
         range.setStart(document.getElementById("p").childNodes[0], 0);
         range.setEnd(document.getElementById("p").childNodes[0], 10);
@@ -276,7 +275,9 @@ describe('Constructor Arguments', () => {
     });
 
     it('Must support strings as classNames', () => {
-        const renderer = new Rendering(document, {className:'highlight comment'});
+        const renderer = new Rendering(document, {
+            className: 'highlight comment'
+        });
         const range = document.createRange();
 
         range.setStart(document.getElementById("p").childNodes[0], 0);
@@ -294,7 +295,9 @@ describe("Cleanup", () => {
     });
 
     it("Must cleanup bindings to nodes after destroying", () => {
-        const renderer = new Rendering(document, {className: 'highlight comment'});
+        const renderer = new Rendering(document, {
+            className: 'highlight comment'
+        });
         const range = document.createRange();
 
         range.setStart(document.getElementById("p").childNodes[0], 0);

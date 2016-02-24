@@ -3,7 +3,6 @@
 import setup from 'setup';
 import Rendering from 'Rendering';
 import RenderResult from 'RenderResult';
-import $ from 'jquery';
 import { EVENT_CLICK, EVENT_MOUSEENTER, EVENT_MOUSELEAVE } from 'RenderingEvents';
 setup();
 
@@ -31,64 +30,60 @@ describe("Test Click Event handling", () => {
 
         const rendering = createRender();
 
-        rendering.on(EVENT_CLICK, function(){
+        rendering.on(EVENT_CLICK, () => {
             hasClick = true;
             result();
         });
 
         // click node directly
         rendering.wrapperNodes[0].dispatchEvent(new MouseEvent('click', {
-            'view': window,
-            'bubbles': true,
-            'cancelable': true
+            view: window,
+            bubbles: true,
+            cancelable: true
         }));
-
     });
 
     it("should execute click event if is clicked", () => {
-
         it('should have a click', () => {
             expect(hasClick).toBe(true);
         });
-
     });
 });
 
 describe("Test Mouseover Event handling", () => {
-    let hasMouseEnter, hasMouseLeave;
+    let hasMouseEnter;
+    let hasMouseLeave;
 
     beforeEach((result) => {
         loadFixtures('simple-text.html');
 
         const rendering = createRender();
 
-        rendering.on(EVENT_MOUSEENTER, function(){
+        rendering.on(EVENT_MOUSEENTER, () => {
             hasMouseEnter = true;
         });
 
-        rendering.on(EVENT_MOUSELEAVE, function(){
+        rendering.on(EVENT_MOUSELEAVE, () => {
             hasMouseLeave = true;
             result();
         });
 
         // hover node directly
         rendering.wrapperNodes[0].dispatchEvent(new MouseEvent('mouseover', {
-            'view': window,
-            'bubbles': true,
-            'cancelable': true
+            view: window,
+            bubbles: true,
+            cancelable: true
         }));
 
         // hover somewhere else in the page
         document.body.dispatchEvent(new MouseEvent('mouseover', {
-            'view': window,
-            'bubbles': true,
-            'cancelable': true
+            view: window,
+            bubbles: true,
+            cancelable: true
         }));
-
     });
 
     it("should execute mouseover handlers", () => {
-
         it('mouse-enter should have called', () => {
             expect(hasMouseEnter).toBe(true);
         });
@@ -96,6 +91,5 @@ describe("Test Mouseover Event handling", () => {
         it('mouse-leave should have called', () => {
             expect(hasMouseLeave).toBe(true);
         });
-
     });
 });

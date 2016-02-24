@@ -52,9 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
     /**
      * OnClick event for renderings
      */
-    function onClick() {
-        const self = this;
-        this.wrapperNodes.forEach((n) => {
+    function onClick(instance) {
+        const self = instance;
+        self.wrapperNodes.forEach((n) => {
             n.addEventListener(ANIMATIONEND, function thisFunction(e) {
                 e.target.classList.remove('bubble');
                 e.target.removeEventListener(ANIMATIONEND, thisFunction);
@@ -62,11 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
             n.classList.add('bubble');
         });
 
-        if (tooltip.getCurrentTarget() === this.wrapperNodes[0]) {
+        if (tooltip.getCurrentTarget() === self.wrapperNodes[0]) {
             return;
         }
 
-        tooltip.createTooltip(this.wrapperNodes[0], this.result.text, false);
+        tooltip.createTooltip(self.wrapperNodes[0], self.result.text, false);
 
         setTimeout(() => {
             if (tooltip.getCurrentTarget()) {
@@ -80,13 +80,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 0);
     }
 
+    Rendering.globalEmitter().on('click', onClick);
+
 
     savedRanges.forEach((range) => {
         const marker = new Rendering(document);
         try {
             marker.renderWithResult(range);
             allRanges.push(marker);
-            marker.on('click', onClick);
         } catch (e) {
             console.warn("Could not render:", range, e);
             localStorage.setItem(STORAGE_KEY, JSON.stringify([]));

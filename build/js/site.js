@@ -2158,8 +2158,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 	        _this.wrapperNodes = [];
 	
-	        _this._registerEvents(document);
-	
 	        /**
 	         * @type {Document}
 	         */
@@ -2174,141 +2172,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	    (0, _createClass3.default)(RenderingEvents, [{
-	        key: '_registerEvents',
-	
-	
-	        /**
-	         * Will register events if not already bind.
-	         * @param {Document} document
-	         * @private
-	         */
-	        value: function _registerEvents(document) {
-	            var _this2 = this;
-	
-	            this.on(EVENT_MOUSEENTER, function () {
-	                _this2.wrapperNodes.forEach(function (node) {
-	                    node.classList.add(_this2.options.hoverClass);
-	                });
-	            });
-	
-	            this.on(EVENT_MOUSELEAVE, function () {
-	                _this2.wrapperNodes.forEach(function (node) {
-	                    node.classList.remove(_this2.options.hoverClass);
-	                });
-	            });
-	
-	            this.on(EVENT_PART_TREE_ENTER, function () {
-	                _this2.wrapperNodes.forEach(function (node) {
-	                    node.classList.add(_this2.options.treeClass);
-	                });
-	            });
-	
-	            this.on(EVENT_PART_TREE_LEAVE, function () {
-	                _this2.wrapperNodes.forEach(function (node) {
-	                    node.classList.remove(_this2.options.treeClass);
-	                });
-	            });
-	
-	            if (!global.__MARKLIB_EVENTS__) {
-	                global.__MARKLIB_EVENTS__ = true;
-	                (function init() {
-	                    var currentHoverInstances = new _set2.default();
-	                    var betweenInstances = new _set2.default();
-	
-	                    function checkMarklibInstance(e) {
-	                        var instance = _Rendering2.default.getMarklibInstance(e);
-	                        // instanceof check will fail if used in test scenario where different DOMs are used
-	                        // see also http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
-	                        return instance && (instance instanceof _Rendering2.default || 'wrapperNodes' in instance);
-	                    }
-	
-	                    function closestInstance(e) {
-	                        var closest = _Util2.default.closestCallback(e.target, function (thisE) {
-	                            return checkMarklibInstance(thisE);
-	                        });
-	                        if ((typeof closest === 'undefined' ? 'undefined' : (0, _typeof3.default)(closest)) === 'object') {
-	                            return _Rendering2.default.getMarklibInstance(closest);
-	                        }
-	                        return false;
-	                    }
-	
-	                    function getInstancesBetween(e, instance) {
-	                        return _Util2.default.parentsCallback(e.target, function (el) {
-	                            return checkMarklibInstance(el) && _Rendering2.default.getMarklibInstance(el) !== instance;
-	                        }).map(function (el) {
-	                            return _Rendering2.default.getMarklibInstance(el);
-	                        });
-	                    }
-	
-	                    function mouseOutClear() {
-	                        currentHoverInstances.forEach(function (thisInstance) {
-	                            thisInstance.emit(EVENT_MOUSELEAVE);
-	                        });
-	                        currentHoverInstances.clear();
-	
-	                        betweenInstances.forEach(function (thisInstance) {
-	                            thisInstance.emit(EVENT_PART_TREE_LEAVE);
-	                        });
-	
-	                        betweenInstances.clear();
-	                    }
-	
-	                    /**
-	                     * @param {Event} e
-	                     * @returns {Array|boolean}
-	                     */
-	                    function findTarget(e) {
-	                        var instance = closestInstance(e);
-	                        if (instance) {
-	                            var between = getInstancesBetween(e, instance);
-	                            if (e.target.textContent !== instance.result.text && between.length > 0) {
-	                                var allInstances = between;
-	                                allInstances.unshift(instance);
-	                                // take the smallest selection
-	                                allInstances = allInstances.sort(function (a, b) {
-	                                    return a.result.text.length < b.result.text.length ? -1 : 1;
-	                                });
-	                                instance = allInstances[0];
-	                            }
-	
-	                            return [instance, between];
-	                        }
-	                        return false;
-	                    }
-	
-	                    document.addEventListener('click', function (e) {
-	                        var target = findTarget(e);
-	                        if (target) {
-	                            target[0].emit(EVENT_CLICK, e, target[1]);
-	                        }
-	                    }, true);
-	
-	                    document.addEventListener('mouseover', function (e) {
-	                        var target = findTarget(e);
-	                        if (target) {
-	                            (function () {
-	                                var _target = (0, _slicedToArray3.default)(target, 2);
-	
-	                                var instance = _target[0];
-	                                var between = _target[1];
-	                                // find instances that lay in between the node
-	
-	                                mouseOutClear();
-	                                between.forEach(function (instanceBetween) {
-	                                    betweenInstances.add(instanceBetween);
-	                                    instanceBetween.emit(EVENT_PART_TREE_ENTER, e, between);
-	                                });
-	                                instance.emit(EVENT_MOUSEENTER, e, between);
-	                                currentHoverInstances.add(instance);
-	                            })();
-	                        } else {
-	                            mouseOutClear();
-	                        }
-	                    }, true);
-	                })();
-	            }
-	        }
-	    }, {
 	        key: 'range',
 	        get: function get() {
 	            var range = this.document.createRange();
@@ -2329,11 +2192,153 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            return null;
 	        }
+	    }], [{
+	        key: 'globalEmitter',
+	        value: function globalEmitter() {
+	            return RenderingEvents.staticEventListener;
+	        }
 	    }]);
 	    return RenderingEvents;
 	}(_wolfy87Eventemitter2.default);
-
+	
 	exports.default = RenderingEvents;
+	
+	
+	RenderingEvents.staticEventListener = new _wolfy87Eventemitter2.default();
+	
+	if (!global.__MARKLIB_EVENTS__) {
+	    global.__MARKLIB_EVENTS__ = true;
+	
+	    RenderingEvents.globalEmitter().on(EVENT_MOUSEENTER, function (instance) {
+	        instance.wrapperNodes.forEach(function (node) {
+	            node.classList.add(instance.options.hoverClass);
+	        });
+	    });
+	
+	    RenderingEvents.globalEmitter().on(EVENT_MOUSELEAVE, function (instance) {
+	        instance.wrapperNodes.forEach(function (node) {
+	            node.classList.remove(instance.options.hoverClass);
+	        });
+	    });
+	
+	    RenderingEvents.globalEmitter().on(EVENT_PART_TREE_ENTER, function (instance) {
+	        instance.wrapperNodes.forEach(function (node) {
+	            node.classList.add(instance.options.treeClass);
+	        });
+	    });
+	
+	    RenderingEvents.globalEmitter().on(EVENT_PART_TREE_LEAVE, function (instance) {
+	        instance.wrapperNodes.forEach(function (node) {
+	            node.classList.remove(instance.options.treeClass);
+	        });
+	    });
+	
+	    (function init() {
+	        var currentHoverInstances = new _set2.default();
+	        var betweenInstances = new _set2.default();
+	
+	        function checkMarklibInstance(e) {
+	            var instance = _Rendering2.default.getMarklibInstance(e);
+	            // instanceof check will fail if used in test scenario where different DOMs are used
+	            // see also http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/
+	            return instance && (instance instanceof _Rendering2.default || 'wrapperNodes' in instance);
+	        }
+	
+	        function closestInstance(e) {
+	            var closest = _Util2.default.closestCallback(e.target, function (thisE) {
+	                return checkMarklibInstance(thisE);
+	            });
+	            if ((typeof closest === 'undefined' ? 'undefined' : (0, _typeof3.default)(closest)) === 'object') {
+	                return _Rendering2.default.getMarklibInstance(closest);
+	            }
+	            return false;
+	        }
+	
+	        function getInstancesBetween(e, instance) {
+	            return _Util2.default.parentsCallback(e.target, function (el) {
+	                return checkMarklibInstance(el) && _Rendering2.default.getMarklibInstance(el) !== instance;
+	            }).map(function (el) {
+	                return _Rendering2.default.getMarklibInstance(el);
+	            });
+	        }
+	
+	        function mouseOutClear() {
+	            currentHoverInstances.forEach(function (thisInstance) {
+	                _Rendering2.default.globalEmitter().emit(EVENT_MOUSELEAVE, thisInstance);
+	                thisInstance.emit(EVENT_MOUSELEAVE);
+	            });
+	            currentHoverInstances.clear();
+	
+	            betweenInstances.forEach(function (thisInstance) {
+	                _Rendering2.default.globalEmitter().emit(EVENT_PART_TREE_LEAVE, thisInstance);
+	                thisInstance.emit(EVENT_PART_TREE_LEAVE);
+	            });
+	
+	            betweenInstances.clear();
+	        }
+	
+	        /**
+	         * @param {Event} e
+	         * @returns {Array|boolean}
+	         */
+	        function findTarget(e) {
+	            var instance = closestInstance(e);
+	            if (instance) {
+	                var between = getInstancesBetween(e, instance);
+	                if (e.target.textContent !== instance.result.text && between.length > 0) {
+	                    var allInstances = between;
+	                    allInstances.unshift(instance);
+	                    // take the smallest selection
+	                    allInstances = allInstances.sort(function (a, b) {
+	                        return a.result.text.length < b.result.text.length ? -1 : 1;
+	                    });
+	                    instance = allInstances[0];
+	                }
+	                return [instance, between];
+	            }
+	            return false;
+	        }
+	
+	        global.addEventListener('click', function (e) {
+	            var target = findTarget(e);
+	            if (target) {
+	                var _target = (0, _slicedToArray3.default)(target, 2);
+	
+	                var instance = _target[0];
+	                var between = _target[1];
+	
+	                _Rendering2.default.globalEmitter().emit(EVENT_CLICK, instance, e, between);
+	                instance.emit(EVENT_CLICK, e, between);
+	            }
+	        }, true);
+	
+	        global.addEventListener('mouseover', function (e) {
+	            var target = findTarget(e);
+	            if (target) {
+	                (function () {
+	                    var _target2 = (0, _slicedToArray3.default)(target, 2);
+	
+	                    var instance = _target2[0];
+	                    var between = _target2[1];
+	
+	                    // find instances that lay in between the node
+	
+	                    mouseOutClear();
+	                    between.forEach(function (instanceBetween) {
+	                        betweenInstances.add(instanceBetween);
+	                        instanceBetween.emit(EVENT_PART_TREE_ENTER, e, between);
+	                        _Rendering2.default.globalEmitter().emit(EVENT_PART_TREE_ENTER, instanceBetween, e, between);
+	                    });
+	                    instance.emit(EVENT_MOUSEENTER, e, between);
+	                    _Rendering2.default.globalEmitter().emit(EVENT_MOUSEENTER, instance, e, between);
+	                    currentHoverInstances.add(instance);
+	                })();
+	            } else {
+	                mouseOutClear();
+	            }
+	        }, true);
+	    })();
+	}
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
@@ -4015,9 +4020,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * OnClick event for renderings
 	     */
-	    function onClick() {
-	        var self = this;
-	        this.wrapperNodes.forEach(function (n) {
+	    function onClick(instance) {
+	        var self = instance;
+	        self.wrapperNodes.forEach(function (n) {
 	            n.addEventListener(ANIMATIONEND, function thisFunction(e) {
 	                e.target.classList.remove('bubble');
 	                e.target.removeEventListener(ANIMATIONEND, thisFunction);
@@ -4025,11 +4030,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            n.classList.add('bubble');
 	        });
 	
-	        if (tooltip.getCurrentTarget() === this.wrapperNodes[0]) {
+	        if (tooltip.getCurrentTarget() === self.wrapperNodes[0]) {
 	            return;
 	        }
 	
-	        tooltip.createTooltip(this.wrapperNodes[0], this.result.text, false);
+	        tooltip.createTooltip(self.wrapperNodes[0], self.result.text, false);
 	
 	        setTimeout(function () {
 	            if (tooltip.getCurrentTarget()) {
@@ -4043,12 +4048,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }, 0);
 	    }
 	
+	    _Marklib.Rendering.globalEmitter().on('click', onClick);
+	
 	    savedRanges.forEach(function (range) {
 	        var marker = new _Marklib.Rendering(document);
 	        try {
 	            marker.renderWithResult(range);
 	            allRanges.push(marker);
-	            marker.on('click', onClick);
 	        } catch (e) {
 	            console.warn("Could not render:", range, e);
 	            localStorage.setItem(STORAGE_KEY, (0, _stringify2.default)([]));
