@@ -364,7 +364,7 @@ class Util {
 
         let maybeFoundNode = null;
 
-        Util.walkTextNodes(container, (n) => {
+        Util.walkDom(container, (n) => {
             let atrOffsetStart = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START);
             atrOffsetStart = atrOffsetStart === null ? 0 : atrOffsetStart;
             let atrIndex = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
@@ -384,47 +384,51 @@ class Util {
                 return false;
             }
             return true;
-        }, null);
+        });
 
         return maybeFoundNode;
     }
 
 
     /**
-     * Walks the dom tree unless func returns false
-     * Applies node to function
+     * Recursively walks the dom tree unless func returns false
+     * This is a lot more efficient then using any jQuery operations
      *
+     * Applies node to function
      * @param {Node} node
      * @param {Function} func
-     * @param {int} type, see `NodeFilter`
-     * @param {Object} [filter] skips empty text nodes by default
      *
-     * @returns {boolean} true if function did abort walk
+     * @returns {*}
      */
-    static walkDom(node, func, type = NodeFilter.SHOW_ALL, filter = null) {
+    static walkDom(node, func) {
         if (!node) {
             return false;
         }
-        const args = [node, type, filter || (() => true), false];
-        args.push(false);
-        const walker = document.createTreeWalker(...args);
-        while (walker.nextNode()) {
-            if (!func(walker.currentNode)) {
-                return true;
+        const children = node.childNodes;
+        if (!children) {
+            return false;
+        }
+        for (let i = 0; i < children.length; i++) {
+            if (!Util.walkDom(children[i], func)) {
+                return false;
             }
         }
-        return false;
+        return func(node);
     }
 
     /**
      * Extracts all TextNodes inside a container
      * @param {Node} el
      * @param {Function} func
-     * @param {Object} [filter] skips empty text nodes by default
-     * @returns {boolean} true if function did abort walk
+     * @returns {Array.<Text>}
      */
-    static walkTextNodes(el, func, filter = (node) => !Util.nodeIsEmpty(node)) {
-        return Util.walkDom(el, func, NodeFilter.SHOW_TEXT, filter);
+    static walkTextNodes(el, func) {
+        Util.walkDom(el, (node) => {
+            if (Node.TEXT_NODE === node.nodeType && !Util.nodeIsEmpty(node)) {
+                func(node);
+            }
+            return true;
+        });
     }
 
     /**

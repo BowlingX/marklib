@@ -3838,7 +3838,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            var maybeFoundNode = null;
 	
-	            Util.walkTextNodes(container, function (n) {
+	            Util.walkDom(container, function (n) {
 	                var atrOffsetStart = n.parentNode.getAttribute(_Rendering.ATTR_DATA_ORIGINAL_OFFSET_START);
 	                atrOffsetStart = atrOffsetStart === null ? 0 : atrOffsetStart;
 	                var atrIndex = n.parentNode.getAttribute(ATTR_DATA_ORIGINAL_INDEX);
@@ -3854,63 +3854,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    return false;
 	                }
 	                return true;
-	            }, null);
+	            });
 	
 	            return maybeFoundNode;
 	        }
 	
 	        /**
-	         * Walks the dom tree unless func returns false
-	         * Applies node to function
+	         * Recursively walks the dom tree unless func returns false
+	         * This is a lot more efficient then using any jQuery operations
 	         *
+	         * Applies node to function
 	         * @param {Node} node
 	         * @param {Function} func
-	         * @param {int} type, see `NodeFilter`
-	         * @param {Object} [filter] skips empty text nodes by default
 	         *
-	         * @returns {boolean} true if function did abort walk
+	         * @returns {*}
 	         */
 	
 	    }, {
 	        key: 'walkDom',
 	        value: function walkDom(node, func) {
-	            var _document;
-	
-	            var type = arguments.length <= 2 || arguments[2] === undefined ? NodeFilter.SHOW_ALL : arguments[2];
-	            var filter = arguments.length <= 3 || arguments[3] === undefined ? null : arguments[3];
-	
 	            if (!node) {
 	                return false;
 	            }
-	            var args = [node, type, filter || function () {
-	                return true;
-	            }, false];
-	            args.push(false);
-	            var walker = (_document = document).createTreeWalker.apply(_document, args);
-	            while (walker.nextNode()) {
-	                if (!func(walker.currentNode)) {
-	                    return true;
+	            var children = node.childNodes;
+	            if (!children) {
+	                return false;
+	            }
+	            for (var i = 0; i < children.length; i++) {
+	                if (!Util.walkDom(children[i], func)) {
+	                    return false;
 	                }
 	            }
-	            return false;
+	            return func(node);
 	        }
 	
 	        /**
 	         * Extracts all TextNodes inside a container
 	         * @param {Node} el
 	         * @param {Function} func
-	         * @param {Object} [filter] skips empty text nodes by default
-	         * @returns {boolean} true if function did abort walk
+	         * @returns {Array.<Text>}
 	         */
 	
 	    }, {
 	        key: 'walkTextNodes',
 	        value: function walkTextNodes(el, func) {
-	            var filter = arguments.length <= 2 || arguments[2] === undefined ? function (node) {
-	                return !Util.nodeIsEmpty(node);
-	            } : arguments[2];
-	
-	            return Util.walkDom(el, func, NodeFilter.SHOW_TEXT, filter);
+	            Util.walkDom(el, function (node) {
+	                if (Node.TEXT_NODE === node.nodeType && !Util.nodeIsEmpty(node)) {
+	                    func(node);
+	                }
+	                return true;
+	            });
 	        }
 	
 	        /**

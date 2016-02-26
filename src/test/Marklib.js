@@ -71,7 +71,8 @@ describe("Test some wrappings", () => {
         expect(result.serialize()).toEqual(rangeResult);
 
         // do a second marking over the old one
-        const resultedText = new Rendering(document).renderWithResult(rangeResult);
+        const newRender = new Rendering(document);
+        const resultedText = newRender.renderWithResult(rangeResult);
         expect(resultedText).toEqual('This');
     });
 });
