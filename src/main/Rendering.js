@@ -423,13 +423,16 @@ class Rendering extends RenderingEvents {
         outer = outer[outer.length - 1];
         const contextContainer = outer ? outer : commonAncestor;
 
-        // Same Element, means the selection is fully contained in a discrete area, start and endpoint have the same parent
+        // Same Element, means the selection is fully contained in a discrete area,
+        // start and endpoint have the same parent
         // but are different nodes:
 
-        // Start and End offset have to be recalculated because dom might be already changed by highlighting in given node
+        // Start and End offset have to be recalculated because dom might be already changed by
+        // highlighting in given node
         // 1: First detect real start offset in startContainer:
 
-        // That works by selecting the highest wrapper and get original-offset-start data element, see "findOriginalOffset"
+        // That works by selecting the highest wrapper and get original-offset-start data element,
+        // see "findOriginalOffset"
         // So first select that container:
         const originalStartOffset = Util.findOriginalOffset(startContainer);
         const originalEndOffset = Util.findOriginalOffset(endContainer);
@@ -463,7 +466,7 @@ class Rendering extends RenderingEvents {
             }
 
             // Get the last text node:
-            const endContainerContents = Util.closest(toFindNode, ':not([' + DATA_IS_SELECTION + '])').childNodes;
+            const endContainerContents = Util.closest(toFindNode, `:not([${DATA_IS_SELECTION}])`).childNodes;
             if (endContainerContents.length) {
                 const r = endContainerContents[endContainerContents.length - 1];
                 if (r.nodeType === Node.TEXT_NODE) {

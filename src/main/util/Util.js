@@ -44,17 +44,16 @@ class Util {
 
     /**
      * Generates a unique id
-     *
      * @return {String}
      */
     static guid() {
-        const s4 = () => {
+        function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
                 .substring(1);
-        };
-        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-            s4() + '-' + s4() + s4() + s4();
+        }
+
+        return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4() + s4() + s4()}`;
     }
 
     /**
@@ -132,7 +131,8 @@ class Util {
                 break;
             }
             // reset index when original index is found
-            const maybeIndexOfOriginal = el.getAttribute ? el.getAttribute(ATTR_DATA_ORIGINAL_INDEX) : null;
+            const maybeIndexOfOriginal = el.getAttribute ?
+                el.getAttribute(ATTR_DATA_ORIGINAL_INDEX) : null;
 
             if (maybeIndexOfOriginal) {
                 calculatedIndex = parseInt(maybeIndexOfOriginal, 10);
@@ -264,9 +264,7 @@ class Util {
         let path = null;
         let node = el;
 
-        const filterSiblings = (thisEl) => {
-            return !Util.isMarkNode(thisEl) && thisEl.nodeName === node.nodeName;
-        };
+        const filterSiblings = (thisEl) => !Util.isMarkNode(thisEl) && thisEl.nodeName === node.nodeName;
 
         while (node) {
             let name = null;
@@ -279,7 +277,7 @@ class Util {
 
                 // Extract original index of this node:
                 // Outer most data-original-index is original index
-                const outerMostElement = Util.parents(node, '[' + ATTR_DATA_ORIGINAL_INDEX + ']').reverse()[0];
+                const outerMostElement = Util.parents(node, `[${ATTR_DATA_ORIGINAL_INDEX}]`).reverse()[0];
                 // if element is not yet wrapped in span, recalculate index based on parent container:
                 // We have to do this because text node indexes != element indexes...
                 let calculatedIndex = 0;
@@ -316,10 +314,10 @@ class Util {
             const nodeIndex = Util.index(node, siblings);
 
             if (siblings.length > 1 && nodeIndex >= 0) {
-                name += ':nth-of-type(' + (nodeIndex + 1) + ')';
+                name += `:nth-of-type(${(nodeIndex + 1)})`;
             }
 
-            path = name + (path ? '>' + path : '');
+            path = name + (path ? `>${path}` : '');
 
 
             if (parent === context) {
@@ -342,7 +340,7 @@ class Util {
         if (!element.parentNode.hasAttribute(ATTR_DATA_ORIGINAL_OFFSET_START)) {
             return 0;
         }
-        const lengthElement = Util.parent(element, '[' + ATTR_DATA_ORIGINAL_OFFSET_START + ']');
+        const lengthElement = Util.parent(element, `[${ATTR_DATA_ORIGINAL_OFFSET_START}]`);
         return lengthElement ? parseInt(lengthElement.getAttribute(ATTR_DATA_ORIGINAL_OFFSET_START), 10) : 0;
     }
 

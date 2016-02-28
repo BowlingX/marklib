@@ -596,13 +596,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            outer = outer[outer.length - 1];
 	            var contextContainer = outer ? outer : commonAncestor;
 	
-	            // Same Element, means the selection is fully contained in a discrete area, start and endpoint have the same parent
+	            // Same Element, means the selection is fully contained in a discrete area,
+	            // start and endpoint have the same parent
 	            // but are different nodes:
 	
-	            // Start and End offset have to be recalculated because dom might be already changed by highlighting in given node
+	            // Start and End offset have to be recalculated because dom might be already changed by
+	            // highlighting in given node
 	            // 1: First detect real start offset in startContainer:
 	
-	            // That works by selecting the highest wrapper and get original-offset-start data element, see "findOriginalOffset"
+	            // That works by selecting the highest wrapper and get original-offset-start data element,
+	            // see "findOriginalOffset"
 	            // So first select that container:
 	            var originalStartOffset = _Util2.default.findOriginalOffset(startContainer);
 	            var originalEndOffset = _Util2.default.findOriginalOffset(endContainer);
@@ -3481,17 +3484,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        /**
 	         * Generates a unique id
-	         *
 	         * @return {String}
 	         */
 	
 	    }, {
 	        key: 'guid',
 	        value: function guid() {
-	            var s4 = function s4() {
+	            function s4() {
 	                return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-	            };
-	            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+	            }
+	
+	            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + (s4() + s4() + s4());
 	        }
 	
 	        /**
