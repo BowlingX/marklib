@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.RenderingEvents = exports.RenderResult = exports.Util = exports.Rendering = undefined;
+	exports.registerEvents = exports.RenderingEvents = exports.RenderResult = exports.Util = exports.Rendering = undefined;
 	
 	var _Rendering = __webpack_require__(2);
 	
@@ -90,6 +90,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Util = _Util2.default;
 	exports.RenderResult = _RenderResult2.default;
 	exports.RenderingEvents = _RenderingEvents2.default;
+	exports.registerEvents = _RenderingEvents.registerEvents;
 
 /***/ },
 /* 2 */
@@ -2398,7 +2399,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.EVENT_PART_TREE_LEAVE = exports.EVENT_PART_TREE_ENTER = exports.EVENT_MOUSELEAVE = exports.EVENT_MOUSEENTER = exports.EVENT_CLICK = undefined;
+	exports.registerEvents = exports.EVENT_PART_TREE_LEAVE = exports.EVENT_PART_TREE_ENTER = exports.EVENT_MOUSELEAVE = exports.EVENT_MOUSEENTER = exports.EVENT_CLICK = undefined;
 	
 	var _slicedToArray2 = __webpack_require__(87);
 	
@@ -2528,10 +2529,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	
 	
-	  RenderingEvents.globalEmitter = function globalEmitter() {
-	    return RenderingEvents.staticEventListener;
-	  };
-	
 	  (0, _createClass3.default)(RenderingEvents, [{
 	    key: 'range',
 	    get: function get() {
@@ -2560,9 +2557,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.default = RenderingEvents;
 	
 	
+	RenderingEvents.globalEmitter = function () {
+	  return RenderingEvents.staticEventListener;
+	};
+	
 	RenderingEvents.staticEventListener = new _wolfy87Eventemitter2.default();
 	
-	var init = function init() {
+	var registerEvents = exports.registerEvents = function registerEvents() {
 	  var currentHoverInstances = new _set2.default();
 	  var betweenInstances = new _set2.default();
 	
@@ -2691,11 +2692,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }, true);
 	};
-	
-	if (!global.__MARKLIB_EVENTS__) {
-	  global.__MARKLIB_EVENTS__ = true;
-	  init();
-	}
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
