@@ -19,7 +19,7 @@
   "rules": {
     "indent": [
       2,
-      4,
+      2,
       {
         "SwitchCase": 1
       }
@@ -32,8 +32,17 @@
     "no-underscore-dangle": 0,
     "no-use-before-define": 0,
     "quotes": 0,
-    "no-param-reassign": [2, {"props": false}],
-    "max-len": [2, 120, 4],
+    "no-param-reassign": [
+      2,
+      {
+        "props": false
+      }
+    ],
+    "max-len": [
+      2,
+      120,
+      4
+    ],
     "strict": [
       2,
       "global"
@@ -45,12 +54,16 @@
     "react/jsx-uses-react": 1,
     "react/jsx-uses-vars": 1,
     "react/no-did-mount-set-state": 1,
-    "react/no-did-update-set-state": [1, "allow-in-func"],
+    "react/no-did-update-set-state": [
+      1,
+      "allow-in-func"
+    ],
     "react/no-multi-comp": 1,
     "react/no-unknown-property": 1,
     "react/prop-types": 1,
     "react/react-in-jsx-scope": 1,
     "react/self-closing-comp": 1,
-    "react/wrap-multilines": 1
+    "react/wrap-multilines": 1,
+    "import/no-unresolved": 0
   }
 }
