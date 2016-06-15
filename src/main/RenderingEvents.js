@@ -92,15 +92,13 @@ export default class RenderingEvents extends EventEmitter {
 
     return null;
   }
-
-  static globalEmitter() {
-    return RenderingEvents.staticEventListener;
-  }
 }
+
+RenderingEvents.globalEmitter = () => RenderingEvents.staticEventListener;
 
 RenderingEvents.staticEventListener = new EventEmitter();
 
-const init = () => {
+export const registerEvents = () => {
   const currentHoverInstances = new Set();
   const betweenInstances = new Set();
 
@@ -219,8 +217,3 @@ const init = () => {
     }
   }, true);
 };
-
-if (!global.__MARKLIB_EVENTS__) {
-  global.__MARKLIB_EVENTS__ = true;
-  init();
-}

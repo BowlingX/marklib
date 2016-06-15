@@ -3,8 +3,9 @@
 import setup from 'setup';
 import Rendering from 'Rendering';
 import RenderResult from 'RenderResult';
-import { EVENT_CLICK, EVENT_MOUSEENTER, EVENT_MOUSELEAVE } from 'RenderingEvents';
+import { EVENT_CLICK, EVENT_MOUSEENTER, EVENT_MOUSELEAVE, registerEvents } from 'RenderingEvents';
 setup();
+registerEvents();
 
 /**
  * @return {Rendering}
