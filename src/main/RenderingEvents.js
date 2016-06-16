@@ -34,6 +34,8 @@ export const EVENT_PART_TREE_LEAVE = 'tree-leave';
  */
 export default class RenderingEvents extends EventEmitter {
 
+  static staticEventListener = new EventEmitter();
+
   /**
    * @param {Object} options
    * @param {Document} document
@@ -92,13 +94,21 @@ export default class RenderingEvents extends EventEmitter {
 
     return null;
   }
+
+  static globalEmitter() {
+    return RenderingEvents.staticEventListener;
+  }
 }
 
-RenderingEvents.globalEmitter = () => RenderingEvents.staticEventListener;
-
-RenderingEvents.staticEventListener = new EventEmitter();
+let HAS_EVENTS = false;
 
 export const registerEvents = () => {
+  if (HAS_EVENTS) {
+    return;
+  }
+
+  HAS_EVENTS = true;
+
   const currentHoverInstances = new Set();
   const betweenInstances = new Set();
 
