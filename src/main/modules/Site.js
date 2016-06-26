@@ -1,7 +1,7 @@
 /* global localStorage, document */
 
 import 'babel-polyfill';
-import { Rendering } from 'modules/Marklib';
+import { Rendering, registerEvents } from 'modules/Marklib';
 import { Tooltip } from 'flexcss';
 
 const KEY_ENTER = 13;
@@ -11,6 +11,7 @@ const KEY_ENTER = 13;
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+  registerEvents();
   const STORAGE_KEY = 'savedRanges';
   const ANIMATIONEND = 'animationend';
   let allRanges = [];

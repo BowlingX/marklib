@@ -4388,6 +4388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* global localStorage, document */
 	
 	document.addEventListener("DOMContentLoaded", function () {
+	  (0, _Marklib.registerEvents)();
 	  var STORAGE_KEY = 'savedRanges';
 	  var ANIMATIONEND = 'animationend';
 	  var allRanges = [];
