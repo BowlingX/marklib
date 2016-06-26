@@ -2529,6 +2529,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	
 	
+	  RenderingEvents.globalEmitter = function globalEmitter() {
+	    return RenderingEvents.staticEventListener;
+	  };
+	
 	  (0, _createClass3.default)(RenderingEvents, [{
 	    key: 'range',
 	    get: function get() {
@@ -2554,16 +2558,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return RenderingEvents;
 	}(_wolfy87Eventemitter2.default);
 	
+	RenderingEvents.staticEventListener = new _wolfy87Eventemitter2.default();
 	exports.default = RenderingEvents;
 	
 	
-	RenderingEvents.globalEmitter = function () {
-	  return RenderingEvents.staticEventListener;
-	};
-	
-	RenderingEvents.staticEventListener = new _wolfy87Eventemitter2.default();
+	var HAS_EVENTS = false;
 	
 	var registerEvents = exports.registerEvents = function registerEvents() {
+	  if (HAS_EVENTS) {
+	    return;
+	  }
+	
+	  HAS_EVENTS = true;
+	
 	  var currentHoverInstances = new _set2.default();
 	  var betweenInstances = new _set2.default();
 	
