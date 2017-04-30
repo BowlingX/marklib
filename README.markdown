@@ -61,7 +61,7 @@ var renderer = new Marklib.Rendering(document, {
 Marklib triggers events that can be listened to with `instance.on('event-name')`. Events are build with 
 `wolfy87-eventemitter` (https://github.com/Olical/EventEmitter). The following Events are available:
 
-Before you can actually receive events, you need to register the event handler with `registerEvents`
+Before you can actually receive events, you need to register the event handler with `registerEvents` (use `import { registerEvents } from 'marklib/src/main/RenderingEvents';` on your application bootstrap code.)
 
 | Event-Name    | Description | Arguments |
 | ------------- |-------------|-------------|
